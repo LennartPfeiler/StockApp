@@ -1,134 +1,220 @@
-﻿body {
+﻿/* Globale Einstellungen */
+body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
+    padding-top: 100px; /* Abstand an die Navbar-Höhe anpassen */
+    background-color: black !important; /* Hintergrund der gesamten Seite auf schwarz setzen */
+    color: #fff; /* Textfarbe auf Weiß setzen, falls benötigt */
 }
 
-header {
-    background-color: #333;
-    color: white;
-    padding: 20px 0;
+/* Navbar-Stile */
+.navbar {
+    background-color: grey !important; /* Hintergrundfarbe der Navbar */
+    height: 80px; /* Höhe der Navbar */
+    margin: 20px; /* Abstand um die Navbar herum */
+    border-radius: 16px; /* Abgerundete Ecken */
+    padding: 0.5rem; /* Innenabstand */
 }
 
-nav ul {
-    list-style-type: none;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin: 0;
-    padding: 0;
+/* Navbar-Brand */
+.navbar-brand {
+    font-weight: 500;
+    color: greenyellow; /* Textfarbe der Navbar-Brand */
+    font-size: 24px; /* Schriftgröße der Navbar-Brand */
+    transition: 0.3s color; /* Farbwechsel-Übergang */
 }
 
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
+/* Login-Button */
+.login-button {
+    background-color: orange; /* Hintergrundfarbe des Login-Buttons */
+    color: white; /* Textfarbe des Login-Buttons */
+    font-size: 14px; /* Schriftgröße */
+    padding: 8px 20px; /* Innenabstand */
+    border-radius: 50px; /* Abgerundete Ecken */
+    text-decoration: none; /* Keine Unterstreichung */
+    transition: 0.3s background-color; /* Hintergrundfarbe-Übergang */
 }
 
-nav ul li a:hover {
-    background-color: #555;
+.login-button:hover {
+    background-color: darkorange; /* Hintergrundfarbe bei Hover */
 }
 
-.profile-icon {
-    width: 35px;
-    height: 35px;
+/* Navbar-Toggler */
+.navbar-toggler {
+    border: none; /* Kein Rand */
+    font-size: 1.25rem; /* Schriftgröße des Toggler-Icons */
 }
 
-.logo-icon {
-    position:absolute;
-    width: 150px; /* Passe die Größe des Logos an */
-    height: auto; /* Automatische Höhe, um das Seitenverhältnis beizubehalten */
+.navbar-toggler:focus, .nav-link:focus {
+    box-shadow: none; /* Kein Schatten bei Fokussierung */
+    outline: none; /* Kein Umriss */
 }
 
+/* Navbar-Link */
+.nav-link {
+    color: grey; /* Textfarbe der Links */
+    font-weight: 500; /* Schriftgewicht */
+    position: relative; /* Für das Pseudo-Element ::before */
+}
+
+.nav-link:hover, .nav-link.active {
+    color: black; /* Textfarbe bei Hover oder aktivem Zustand */
+}
+
+/* Navbar-Link Hover-Effekt */
+@media (min-width: 991px) {
+    .nav-link::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 2px;
+        background-color: black; /* Unterstreichung bei Hover */
+        visibility: hidden; /* Standardmäßig unsichtbar */
+        transition: 0.2s ease-in-out; /* Übergangseffekt */
+    }
+    
+    .nav-link:hover::before, .nav-link.active::before {
+        width: 100%;
+        visibility: visible; /* Sichtbar bei Hover oder aktivem Zustand */
+    }
+}
+
+/* Offcanvas-Menü */
+.offcanvas {
+    background-color: grey !important; /* Hintergrundfarbe des Offcanvas-Menüs */
+    color: #fff; /* Textfarbe im Offcanvas-Menü */
+}
+
+/* Hero-Sektion */
+.hero-section {
+    background-color: black; /* Hintergrundfarbe der Hero-Sektion */
+    background-size: cover; /* Hintergrundbild deckend */
+    width: 100%; /* Breite auf 100% setzen */
+    height: 100vh; /* Höhe auf 100% der Viewport-Höhe setzen */
+}
+
+/* Hauptbereich mit Grid-Layout */
 main {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 20px;
-    padding: 20px;
+    grid-template-columns: 1fr 1fr; /* Zwei Spalten */
+    grid-template-rows: 2fr 1fr; /* Erste Reihe doppelt so hoch wie die zweite Reihe */
+    gap: 20px; /* Abstand zwischen den Grid-Elementen */
+    padding: 20px; /* Innenabstand */
 }
 
+/* Allgemeine Sektion-Stile */
 section {
-    border: 1px solid #ccc;
-    padding: 20px;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc; /* Rand der Sektion */
+    padding: 20px; /* Innenabstand */
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); /* Schatteneffekt */
 }
 
+/* Buy/Sell-Sektion */
 .buy-sell {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
+    grid-column: 1 / 2; /* Erste Spalte */
+    grid-row: 1 / 3; /* Über beide Reihen erstrecken */
+    background-color: #f9f9f9; /* Hintergrundfarbe */
+    border-radius: 8px; /* Abgerundete Ecken */
+    padding: 20px; /* Innenabstand */
 }
 
+/* Portfolio-Sektion */
 .portfolio {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 15px;
+    grid-column: 2 / 3; /* Zweite Spalte */
+    grid-row: 1 / 2; /* Erste Reihe */
+    background-color: #f9f9f9; /* Hintergrundfarbe */
+    border-radius: 8px; /* Abgerundete Ecken */
+    padding: 15px; /* Innenabstand */
 }
 
+/* Transaction History-Sektion */
 .transaction-history {
-    grid-column: 1 / 3;
-    grid-row: 2 / 3;
+    grid-column: 2 / 3; /* Zweite Spalte */
+    grid-row: 2 / 3; /* Zweite Reihe */
+    background-color: #f9f9f9; /* Hintergrundfarbe */
+    border-radius: 8px; /* Abgerundete Ecken */
+    padding: 15px; /* Innenabstand */
 }
 
+/* Styles für Buy/Sell-Formular */
 .buy-sell input,
 .buy-sell button {
     display: block;
-    margin: 10px 0;
-    width: 150px;
-    padding: 8px;
+    margin: 10px 0; /* Abstand oben und unten */
+    width: 150px; /* Breite */
+    padding: 8px; /* Innenabstand */
 }
 
+/* Styles für Preisanzeige */
 #show-price {
-    margin-bottom: 5px;
+    margin-bottom: 5px; /* Abstand unten */
 }
 
 #current-price {
     display: inline-block;
-    margin-left: 10px;
+    margin-left: 10px; /* Abstand links */
 }
 
+/* Styles für Buttons im Buy/Sell-Formular */
 .buy-sell button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    background-color: #4CAF50; /* Hintergrundfarbe */
+    color: white; /* Textfarbe */
+    border: none; /* Kein Rand */
+    cursor: pointer; /* Zeigerzeiger */
+    transition: background-color 0.3s; /* Übergangseffekt */
 }
 
 .buy-sell button#sell-stock {
-    background-color: #f44336;
+    background-color: #f44336; /* Hintergrundfarbe für Verkauf-Button */
 }
 
+/* Hover-Effekte für Buttons */
 .buy-sell button:hover {
-    background-color: #45a049;
+    background-color: #45a049; /* Hintergrundfarbe bei Hover */
 }
 
 .buy-sell button#sell-stock:hover {
-    background-color: #e53935;
+    background-color: #e53935; /* Hintergrundfarbe für Verkauf-Button bei Hover */
 }
 
+/* Styles für Portfolio-Wert */
 .portfolio-value {
-    font-weight: bold;
-    margin-bottom: 10px;
+    font-weight: bold; /* Fettdruck */
+    margin-bottom: 10px; /* Abstand unten */
 }
 
+/* Styles für Prozentsätze */
 .percentage {
-    color: green;
+    color: green; /* Textfarbe für Prozentsätze */
 }
 
+/* Styles für Aktienliste */
 .stock-list div {
-    margin: 5px 0;
-    display: flex;
-    justify-content: space-between;
+    margin: 5px 0; /* Abstand oben und unten */
+    display: flex; /* Flexbox-Layout */
+    justify-content: space-between; /* Abstand zwischen den Elementen */
 }
 
+/* Styles für Veränderungen */
 .change {
-    color: #555;
+    color: #555; /* Textfarbe für Veränderungen */
 }
 
+/* Styles für Transaction History */
 .transaction-history div {
-    margin: 5px 0;
+    margin: 5px 0; /* Abstand oben und unten */
+}
+
+.profile-icon {
+    width: 50px;
+    height: 50px;
+    margin-left: 30px;
+}
+
+.logo-icon {
+    width: 150px;
+    height: 150px;
 }

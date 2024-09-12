@@ -49,3 +49,21 @@ nav ul li a:hover {
     width: 100%;
     height: 80vh;
 }
+
+/* Button Styling */
+.logoff-button {
+    background-color: #f57f00; /* Orange Hintergrundfarbe */
+    color: #fff; /* Textfarbe */
+    border: none; /* Kein Rand */
+    border-radius: 5px; /* Abgerundete Ecken */
+    padding: 10px 20px; /* Innenabstand */
+    cursor: pointer; /* Zeigt an, dass es klickbar ist */
+    font-size: 16px; /* Schriftgröße */
+    transition: background-color 0.3s ease; /* Übergangseffekt bei Farbänderung */
+}
+
+/* Hover-Effekt für den Button */
+.logoff-button:hover {
+    background-color: #e65100; /* Dunkleres Orange beim Hover */
+}
+
