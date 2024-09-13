@@ -114,3 +114,16 @@ section a{
     width: 60% ;
     height: auto;
 }
+
+.login-link{
+    color: #ffffff;
+    text-align: center;
+    font-size: 15px;
+    margin-top: 20px;
+}
+.login-link a{
+    text-align: center;
+    color: #ffffff;
+    font-weight: 600;
+
+}
