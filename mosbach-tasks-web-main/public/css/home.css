@@ -1,48 +1,324 @@
-﻿body {
-    font-family: Arial, sans-serif;
+﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+*{
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
-header {
-    background-color: #333;
-    color: white;
-    padding: 20px 0;
+body {
+    background: #000
 }
 
-nav ul {
-    list-style-type: none;
+.header {
+    position:fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 8%;
+    background: transparent;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    margin: 0;
-    padding: 0;
+    z-index: 100;
 }
 
-nav ul li a {
+.logo img{
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    animation: slideRight 1s ease forwards;
+
+}
+
+.logintxt {
+    
+    font-size: 25px;
+    color: #33e39a;
+    text-decoration: none;
+    font-weight: 600;
+
+}
+
+.Login{
+    display: flex;
+    justify-content: space-between ;
+    width: 180px;
+    height: 60px;
+    transition: transform 0.7s ease;
+    animation: slideSci 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+}
+.Login:hover {
+    transform: scale(1.06);
+    color: #33e39a;
+    }
+
+
+.Login a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 600px;
+    height: 60px;
+    background: transparent;
+    text-decoration: none;
+    text-shadow: 0px 0px 10px grey;
+    
+        
+    font-size: 25px;
     color: white;
     text-decoration: none;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
+    font-weight: 600;
 }
 
-nav ul li a:hover {
-    background-color: #555;
+.Login a:hover{
+    color: #33e39a;
 }
 
-.profile-icon {
-    width: 35px;
-    height: 35px;
+.Login a i{
+font-size: 50px;
+color: rgb(255, 255, 255);
+
+
+
 }
 
-.btn-orange {
-    background-color: orange;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
+.Login a i:hover{
+ color: #33e39a;
 }
 
-.btn-orange:hover {
-    background-color: darkorange;
+.navbar a{
+    display: inline-block;
+    font-size: 18px;
+    color: #eaeaea;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 20px;
+    transition: .5s;
+    text-shadow: 0px 5px 10px grey;
+    animation: slideTop 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+
+}
+
+.navbar a:hover,
+.navbar a.active {
+    color: #33e39a;
+}
+
+.home {
+    color: #eaeaea;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px 8% 0;
+    overflow: hidden;
+
+
+}
+
+.home-content {
+    max-width: 630px;
+
+}
+
+.home-content h1{
+font-size: 50px;
+line-height: 1.2;
+opacity: 0;
+animation: slideBottom 1s ease forwards;
+animation-delay: 1s;
+}
+
+.home-content h3{
+font-size: 40px;
+color: #fbcf04;
+opacity: 0;
+animation: slideRight 1s ease forwards;
+animation-delay: 1.3s;
+
+}
+
+.home-content p {
+
+
+font-size: 16px;
+margin: 15px 0 30px;
+opacity: 0;
+animation: slideLeft 1s ease forwards;
+animation-delay: 1.6s;
+
+
+
+}
+ 
+.btn {
+    display: inline-block;
+    padding: 10px 28px;
+    background: whitesmoke ;
+    border: 2px solid white;
+    border-radius: 6px;
+    box-shadow: 0 0 10px  white;
+    font-size: 16px ;
+    color: #000;
+    letter-spacing: 1px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: .5s;
+    opacity: 0;
+    animation: slideTop 1s ease forwards;
+    animation-delay: 2s;
+}
+.btn:hover {
+    background: #c6a300; /* Beispiel: Ändert den Hintergrund beim Hover */
+    color: white; /* Ändert die Schriftfarbe auf Weiß */
+    box-shadow: 0 0 15px white;
+}
+
+.home-img {
+    position: relative;
+    right: -7%;
+    width: 450px;
+    height: 450px;
+    transform: rotate(45deg);
+
+}
+
+.home-img .rhombus{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: eaeaea;
+    border: 25px solid #c6a300;
+    border-radius: 15px;
+    box-shadow: 0px 0px 5px whitesmoke;
+    opacity: 0;
+    animation: zoomOut 1s ease forwards;
+    animation-delay: 1.6s;
+}
+
+.home-img .rhombus img {
+    position : absolute;
+    max-width: 750px;
+    top: 110px;
+    left: -250px;
+    border: 0px solid #000;
+    border-radius: 15px;
+    transform: rotate(-45deg);
+    box-shadow: 0px 0px 10px whitesmoke;
+    opacity: 0;
+    animation: Bild 1s ease forwards;
+    animation-delay: 2s;
+
+}
+
+.home .rhombus2 {
+    position:absolute;
+    top: -25%;
+    right: -25%;
+    width: 700px;
+    height: 700px;
+    border: 25px solid #c6a300;
+    border-radius: 15px;
+    background-color: #c6a300;
+    transform: rotate(45deg);
+    box-shadow: 0px 0px 10px whitesmoke;
+    opacity: 0;
+    animation: rhombus2 1s ease forwards;
+    
+
+
+}
+
+/*KEYFRAMES ANIMATION by RobiRakete*/
+
+@keyframes slideRight {
+    0%{
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+@keyframes slideLeft {
+    0%{
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateX(0px);
+        opacity: 1;
+    }
+}
+
+@keyframes slideTop {
+    0%{
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+@keyframes slideBottom {
+    0%{
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+@keyframes slideSci {
+    0%{
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    100%{
+        transform: translatex(0) ;
+        opacity: 1;
+    }
+}
+
+@keyframes zoomOut {
+    0%{
+        transform: scale(1.1);
+        opacity: 0;
+    }
+    100%{
+        transform: scale(1) ;
+        opacity: 1;
+    }
+}
+
+@keyframes Bild {
+    0%{
+        transform: translate(300px, -300px) scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+    100%{
+        transform: translate(0, 0) scale(1) rotate(-45deg);
+        opacity: 1;
+    }
+}
+
+@keyframes rhombus2 {
+    0%{
+        right: -40%;
+        opacity: 0;
+    }
+    100%{
+        right: -25%;
+        opacity: 1;
+    }
 }
