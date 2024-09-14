@@ -5,15 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/portfolio.css">
     <title>Aktien Tracker</title>
-    <!-- <link href="../css/bootstrap.min.css"></script> -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">    
+    <style>
+        .price-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-left: 10px;
+            margin-top: 0; /* Um das Label auf die gleiche Höhe wie "Stock name" zu bringen */
+        }
+        .price-display {
+            display: inline-block;
+            width: 100%; /* Übernimmt die Breite des Containers */
+            text-align: right;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #333;
+        }
+        #current-price {
+            display: none;
+        }
+        .form-label {
+            margin-bottom: 0; /* Sicherstellen, dass es keinen zusätzlichen Abstand gibt */
+        }
+        .d-flex-align-items-center {
+            display: flex;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <!--Navbar-->
     <header>
         <nav class="navbar navbar-expand-lg fixed-top">
             <div class="container">
-                <!-- <a class="navbar-brand me-auto" href="../../ressources/Logo.png">logo</a> -->
                 <img src="../../ressources/Logo.png" alt="Logo" class="logo-icon">
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                     <div class="offcanvas-header">
@@ -41,62 +69,43 @@
                 </button>
             </div>
         </nav>
-        
     </header>
     <!--Navbar end -->
-        <main>
-            <section class="buy-sell">
-                <h2>Buy/Sell stocks</h2>
-                <label for="stock-name">Stock name:</label>
-                <input type="text" id="stock-name" value="AAPL">
-                <button id="show-price">Show current price</button>
-                <span id="current-price">220$</span>
-                <label for="quantity">Quantity in $:</label>
-                <input type="number" id="quantity" value="8000">
-                <button id="buy-stock">Buy stock</button>
-                <button id="sell-stock">Sell stock</button>
-            </section>
-            <section class="portfolio">
-                <h2>Portfolio</h2>
-                <div class="portfolio-value">28.450 $ <span class="percentage">+5%</span></div>
-                <div class="stock-list">
-                    <div>AAPL: 13.000$ <span class="change">+2%</span></div>
-                    <div>MSFT: 9.000$ <span class="change">-8%</span></div>
-                    <div>AMZN: 4.200$ <span class="change">+1%</span></div>
-                    <div>TSLA: 1.800$ <span class="change">-12%</span></div>
-                    <div>GOOGL: 550$ <span class="change">+16%</span></div>
-                </div>
-            </section>
-            <section class="transaction-history">
-                <h2>Transaction History</h2>
-                <div>Bought AAPL at price of 220$ for 8000$</div>
-                <div>Bought GOOGL at price of 80$ for 200$</div>
-                <div>Sold GOOGL at price of 100$ for 200$</div>
-                <div>Bought AAPL at price of 220$ for 8000$</div>
-            </section>
-        </main>
 
-     <!--<main>
+    <main>
         <section class="buy-sell">
-            <h2>Buy/Sell stocks</h2>
-            <label for="stock-name">Stock name:</label>
-            <input type="text" id="stock-name" value="AAPL">
-            <button id="show-price">Show current price</button>
+            <h2>Stock Orders</h2>
+            <div class="d-flex align-items-center mb-3">
+                <div class="me-2">
+                    <label for="stock-name" class="form-label">Stock name:</label>
+                    <input type="text" id="stock-name" value="AAPL" class="form-control">
+                </div>
+                <div class="price-container"> <br/>
+                    <div id="price-display" class="price-display">220$</div>
+                </div>
+            </div>
+            <button id="show-price" class="btn btn-primary mt-2">Show current price</button>
             <span id="current-price">220$</span>
-            <label for="quantity">Quantity in $:</label>
-            <input type="number" id="quantity" value="8000">
-            <button id="buy-stock">Buy stock</button>
-            <button id="sell-stock">Sell stock</button>
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity in $:</label>
+                <input type="number" id="quantity" value="8000" class="form-control">
+            </div>
+            <div class="mb-4"></div>
+                <label for="quantity" class="form-label">Quantity in stocks:</label>
+                <input type="number" id="quantity" value="8000" class="form-control">
+            </div>
+            <button id="buy-stock" class="btn btn-success mt-2">Buy stock</button>
+            <button id="sell-stock" class="btn btn-danger mt-2">Sell stock</button>
         </section>
         <section class="portfolio">
             <h2>Portfolio</h2>
-            <div class="portfolio-value">28.450 $ <span class="percentage">+5%</span></div>
+            <div class="portfolio-value">28.450 $ <span class="percentage positive">+5%</span></div>
             <div class="stock-list">
-                <div>AAPL: 13.000$ <span class="change">+2%</span></div>
-                <div>MSFT: 9.000$ <span class="change">-8%</span></div>
-                <div>AMZN: 4.200$ <span class="change">+1%</span></div>
-                <div>TSLA: 1.800$ <span class="change">-12%</span></div>
-                <div>GOOGL: 550$ <span class="change">+16%</span></div>
+                <div>AAPL: 13.000$ <span class="change positive">+2%</span></div>
+                <div>MSFT: 9.000$ <span class="change negative">-8%</span></div>
+                <div>AMZN: 4.200$ <span class="change positive">+1%</span></div>
+                <div>TSLA: 1.800$ <span class="change negative">-12%</span></div>
+                <div>GOOGL: 550$ <span class="change positive">+16%</span></div>
             </div>
         </section>
         <section class="transaction-history">
@@ -106,7 +115,22 @@
             <div>Sold GOOGL at price of 100$ for 200$</div>
             <div>Bought AAPL at price of 220$ for 8000$</div>
         </section>
-    </main> -->
+    </main>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.getElementById('show-price').addEventListener('click', function() {
+            // Der aktuelle Preis, hier hartcodiert für das Beispiel
+            var currentPrice = "220$";
+
+            // Den Preis im Display Only Feld anzeigen
+            var priceDisplay = document.getElementById('price-display');
+            priceDisplay.textContent = currentPrice;
+
+            // Den aktuellen Preis Text ausblenden
+            var currentPriceSpan = document.getElementById('current-price');
+            currentPriceSpan.style.display = 'none';
+        });
+    </script>
 </body>
 </html>

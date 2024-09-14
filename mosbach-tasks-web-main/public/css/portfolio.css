@@ -99,115 +99,169 @@ body {
 /* Hauptbereich mit Grid-Layout */
 main {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Zwei Spalten */
-    grid-template-rows: 2fr 1fr; /* Erste Reihe doppelt so hoch wie die zweite Reihe */
-    gap: 20px; /* Abstand zwischen den Grid-Elementen */
-    padding: 20px; /* Innenabstand */
+    grid-template-columns: 1fr 1fr; /* Zwei gleich breite Spalten */
+    grid-template-rows: auto auto; /* Automatische Höhen für beide Zeilen */
+    gap: 40px; /* Mehr Abstand zwischen den Elementen */
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto; /* Zentriert auf dem Bildschirm */
 }
 
 /* Allgemeine Sektion-Stile */
 section {
-    border: 1px solid #ccc; /* Rand der Sektion */
-    padding: 20px; /* Innenabstand */
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); /* Schatteneffekt */
+    background-color: #2a2a2a; /* Sanfter dunkler Hintergrund */
+    border-radius: 12px; /* Leicht abgerundete Ecken */
+    padding: 30px; /* Mehr Innenabstand */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtiler Schatten */
+    transition: background-color 0.3s ease-in-out;
 }
 
 /* Buy/Sell-Sektion */
 .buy-sell {
     grid-column: 1 / 2; /* Erste Spalte */
-    grid-row: 1 / 3; /* Über beide Reihen erstrecken */
-    background-color: #f9f9f9; /* Hintergrundfarbe */
-    border-radius: 8px; /* Abgerundete Ecken */
-    padding: 20px; /* Innenabstand */
+    grid-row: 1 / 2; /* Erste Zeile */
+    background-color: #303030;
+    color: #e0e0e0;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Portfolio-Sektion */
 .portfolio {
     grid-column: 2 / 3; /* Zweite Spalte */
-    grid-row: 1 / 2; /* Erste Reihe */
-    background-color: #f9f9f9; /* Hintergrundfarbe */
-    border-radius: 8px; /* Abgerundete Ecken */
-    padding: 15px; /* Innenabstand */
+    grid-row: 1 / 2; /* Erste Zeile */
+    background-color: #303030;
+    color: #e0e0e0;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: none; /* Portfolio kann sich nach Bedarf vergrößern */
 }
 
 /* Transaction History-Sektion */
 .transaction-history {
-    grid-column: 2 / 3; /* Zweite Spalte */
-    grid-row: 2 / 3; /* Zweite Reihe */
-    background-color: #f9f9f9; /* Hintergrundfarbe */
-    border-radius: 8px; /* Abgerundete Ecken */
-    padding: 15px; /* Innenabstand */
+    grid-column: 1 / 3; /* Beide Spalten einnehmen */
+    grid-row: 2 / 3; /* Zweite Zeile */
+    background-color: #303030;
+    color: #e0e0e0;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 300px; /* Feste Höhe für Transaction History */
+    overflow-y: auto; /* Scrollbar, wenn der Inhalt überläuft */
+}
+
+/* Scrollbar-Styling */
+.transaction-history::-webkit-scrollbar {
+    width: 10px; /* Breite der Scrollbar */
+}
+
+.transaction-history::-webkit-scrollbar-track {
+    background: #2a2a2a; /* Hintergrund der Scroll-Leiste */
+}
+
+.transaction-history::-webkit-scrollbar-thumb {
+    background-color: #555; /* Dunklerer Scrollbar-Farbton */
+    border-radius: 6px; /* Runde Ecken */
+    border: 2px solid #2a2a2a; /* Rand für ein besseres Scrollbar-Design */
+}
+
+.transaction-history::-webkit-scrollbar-thumb:hover {
+    background-color: #444; /* Hellere Farbe beim Hover */
 }
 
 /* Styles für Buy/Sell-Formular */
 .buy-sell input,
 .buy-sell button {
+    background-color: #444; /* Dunkler Hintergrund für Inputs und Buttons */
+    color: #fff; /* Helle Textfarbe */
+    border: none;
     display: block;
-    margin: 10px 0; /* Abstand oben und unten */
-    width: 150px; /* Breite */
-    padding: 8px; /* Innenabstand */
+    margin: 15px 0;
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    border-radius: 8px; /* Runde Ecken für Inputs und Buttons */
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
-/* Styles für Preisanzeige */
-#show-price {
-    margin-bottom: 5px; /* Abstand unten */
-}
-
-#current-price {
-    display: inline-block;
-    margin-left: 10px; /* Abstand links */
+.buy-sell input:focus, .buy-sell button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 133, 237, 0.5); /* Fokus-Ring */
 }
 
 /* Styles für Buttons im Buy/Sell-Formular */
 .buy-sell button {
-    background-color: #4CAF50; /* Hintergrundfarbe */
-    color: white; /* Textfarbe */
-    border: none; /* Kein Rand */
-    cursor: pointer; /* Zeigerzeiger */
-    transition: background-color 0.3s; /* Übergangseffekt */
+    background-color: #4CAF50;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
 }
 
 .buy-sell button#sell-stock {
-    background-color: #f44336; /* Hintergrundfarbe für Verkauf-Button */
+    background-color: #f44336;
 }
 
 /* Hover-Effekte für Buttons */
 .buy-sell button:hover {
-    background-color: #45a049; /* Hintergrundfarbe bei Hover */
+    background-color: #45a049;
 }
 
 .buy-sell button#sell-stock:hover {
-    background-color: #e53935; /* Hintergrundfarbe für Verkauf-Button bei Hover */
+    background-color: #e53935;
 }
 
 /* Styles für Portfolio-Wert */
 .portfolio-value {
-    font-weight: bold; /* Fettdruck */
-    margin-bottom: 10px; /* Abstand unten */
+    font-weight: bold;
+    font-size: 20px; /* Größere Schrift für den Portfolio-Wert */
+    margin-bottom: 20px;
+    color: #fff;
 }
 
 /* Styles für Prozentsätze */
 .percentage {
-    color: green; /* Textfarbe für Prozentsätze */
+    font-weight: bold;
+}
+
+/* Positive Prozentsätze */
+.percentage.positive {
+    color: #4CAF50; /* Grün für positive Prozentsätze */
+}
+
+/* Negative Prozentsätze */
+.percentage.negative {
+    color: #f44336; /* Rot für negative Prozentsätze */
 }
 
 /* Styles für Aktienliste */
 .stock-list div {
-    margin: 5px 0; /* Abstand oben und unten */
-    display: flex; /* Flexbox-Layout */
-    justify-content: space-between; /* Abstand zwischen den Elementen */
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Leichte Trennlinie */
 }
 
 /* Styles für Veränderungen */
 .change {
-    color: #555; /* Textfarbe für Veränderungen */
+    color: #aaa;
+    font-size: 14px;
 }
 
 /* Styles für Transaction History */
 .transaction-history div {
-    margin: 5px 0; /* Abstand oben und unten */
+    margin: 10px 0;
+    padding: 8px 0;
+    color: #fff;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Profil- und Logo-Icons */
 .profile-icon {
     width: 50px;
     height: 50px;
@@ -217,4 +271,37 @@ section {
 .logo-icon {
     width: 150px;
     height: 150px;
+}
+
+/* Styles für Prozentsätze */
+.percentage.positive {
+    color: #4CAF50; /* Grün für positive Prozentsätze */
+}
+
+.percentage.negative {
+    color: #f44336; /* Rot für negative Prozentsätze */
+}
+
+/* Styles für Veränderungen */
+.change.positive {
+    color: #4CAF50; /* Grün für positive Veränderungen */
+}
+
+.change.negative {
+    color: #f44336; /* Rot für negative Veränderungen */
+}
+
+/* Styles für das Preis-Display-Feld */
+#price-display {
+    background-color: #444; /* Dunkler Hintergrund für Feld */
+    color: #fff; /* Helle Textfarbe */
+    border: none;
+    display: block;
+    margin: 15px 0;
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    border-radius: 8px; /* Runde Ecken für Feld */
+    font-size: 16px;
+    box-sizing: border-box; /* Box-Sizing für Padding und Border */
 }
