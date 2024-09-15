@@ -12,6 +12,8 @@ body{
     align-items: center;
     min-height: 100vh;
     background: #000000;
+    opacity: 0;
+    animation: slideRight 1s ease forwards;
 }
 .login-box{
     display: flex;
@@ -20,6 +22,9 @@ body{
     width: 440px;
     height: 480px;
     padding: 30px;
+    opacity: 0;
+    animation: slideBottom 1s ease forwards;
+    animation-delay: 0.5s;
 }
 .login-header{
     text-align: center;
@@ -41,6 +46,9 @@ body{
     box-shadow: 0px 5px 10px 1px rgba(0,0,0, 0.05);
     outline: none;
     transition: .3s;
+    opacity: 0;
+    animation: slideBottom 1s ease forwards;
+    animation-delay: 0.5s;
 }
 ::placeholder{
     font-weight: 500;
@@ -113,4 +121,26 @@ section a{
 .Logo-Bild{
     width: 60% ;
     height: 60%;
+}
+
+@keyframes slideRight {
+    0%{
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideBottom {
+    0%{
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    100%{
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
