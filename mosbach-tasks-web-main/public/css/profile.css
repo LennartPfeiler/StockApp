@@ -2,32 +2,104 @@
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    background-color: #0000;
 }
 
-header {
-    background-color: #333;
-    color: white;
-    padding: 20px 0;
-}
-
-nav ul {
-    list-style-type: none;
+.header {
+    position:absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 8%;
+    background: transparent;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    margin: 0;
-    padding: 0;
+    z-index: 100;
 }
 
-nav ul li a {
+.logo img{
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    animation: slideRight 1s ease forwards;
+
+}
+
+.logintxt {
+    
+    font-size: 25px;
+    color: #900808;
+    text-decoration: none;
+    font-weight: 600;
+
+}
+
+.Login{
+    display: flex;
+    justify-content: space-between ;
+    width: 180px;
+    height: 60px;
+    transition: transform 0.7s ease;
+    animation: slideSci 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+}
+.Login:hover {
+    transform: scale(1.06);
+    color: #900808;
+    }
+
+
+.Login a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 600px;
+    height: 60px;
+    background: transparent;
+    text-decoration: none;
+    text-shadow: 0px 0px 10px grey;
+    
+        
+    font-size: 25px;
     color: white;
     text-decoration: none;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
+    font-weight: 600;
 }
 
-nav ul li a:hover {
-    background-color: #555;
+.Login a:hover{
+    color: #900808;
+}
+
+.Login a i{
+font-size: 50px;
+color: rgb(255, 255, 255);
+
+
+
+}
+
+.Login a i:hover{
+ color:#900808;
+}
+
+.navbar a{
+    display: inline-block;
+    font-size: 18px;
+    color: #eaeaea;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 20px;
+    transition: .5s;
+    text-shadow: 0px 5px 10px grey;
+    animation: slideTop 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+
+}
+
+.navbar a:hover,
+.navbar a.active {
+    color: #33e39a;
 }
 
 main {

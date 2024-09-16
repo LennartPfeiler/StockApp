@@ -7,6 +7,133 @@
     font-family: 'Poppins', sans-serif;
 }
 
+.header {
+    position:absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 8%;
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
+
+.logo img{
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    animation: slideRight 1s ease forwards;
+
+}
+
+.logintxt {
+    
+    font-size: 25px;
+    color: #900808;
+    text-decoration: none;
+    font-weight: 600;
+
+}
+
+.Login{
+    display: flex;
+    justify-content: space-between ;
+    width: 180px;
+    height: 60px;
+    transition: transform 0.7s ease;
+    animation: slideSci 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+}
+.Login:hover {
+    transform: scale(1.06);
+    color: #900808;
+    }
+
+
+.Login a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 600px;
+    height: 60px;
+    background: transparent;
+    text-decoration: none;
+    text-shadow: 0px 0px 10px grey;
+    
+        
+    font-size: 25px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.Login a:hover{
+    color: #900808;
+}
+
+.Login a i{
+font-size: 50px;
+color: rgb(255, 255, 255);
+
+
+
+}
+
+.Login a i:hover{
+ color:#900808;
+}
+
+.navbar a{
+    display: inline-block;
+    font-size: 18px;
+    color: #eaeaea;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 20px;
+    transition: .5s;
+    text-shadow: 0px 5px 10px grey;
+    animation: slideTop 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+
+}
+
+.navbar a:hover,
+.navbar a.active {
+    color: #33e39a;
+}
+
+
+.price-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 10px;
+    margin-top: 0; /* Um das Label auf die gleiche Höhe wie "Stock name" zu bringen */
+}
+.price-display {
+    display: inline-block;
+    width: 100%; /* Übernimmt die Breite des Containers */
+    text-align: right;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #333;
+}
+#current-price {
+    display: none;
+}
+.form-label {
+    margin-bottom: 0; /* Sicherstellen, dass es keinen zusätzlichen Abstand gibt */
+}
+.d-flex-align-items-center {
+    display: flex;
+    align-items: center;
+}
+
 /* Globale Einstellungen */
 body {
     font-family: Arial, sans-serif;
@@ -16,22 +143,6 @@ body {
     color: #eaeaea; /* Textfarbe auf Weiß setzen, falls benötigt */
 }
 
-/* Navbar-Stile */
-.navbar {
-    background-color: grey !important; /* Hintergrundfarbe der Navbar */
-    height: 80px; /* Höhe der Navbar */
-    margin: 20px; /* Abstand um die Navbar herum */
-    border-radius: 16px; /* Abgerundete Ecken */
-    padding: 0.5rem; /* Innenabstand */
-}
-
-/* Navbar-Brand */
-.navbar-brand {
-    font-weight: 500;
-    color: greenyellow; /* Textfarbe der Navbar-Brand */
-    font-size: 24px; /* Schriftgröße der Navbar-Brand */
-    transition: 0.3s color; /* Farbwechsel-Übergang */
-}
 
 /* Login-Button */
 .login-button {
