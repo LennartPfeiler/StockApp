@@ -9,7 +9,7 @@
 
 /* Body Background */
 body {
-    background-color: #121212; /* Dark background for entire page */
+    background-color: black; /* Dark background for entire page */
     color: #eaeaea; /* Light text color for contrast */
 }
 
@@ -20,7 +20,7 @@ body {
     left: 0;
     width: 100%;
     padding: 20px 8%;
-    background-color: #121212; /* Dark background for dark mode */
+    background-color: black; /* Dark background for dark mode */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -110,7 +110,7 @@ body {
     margin: 0 auto;
     padding: 20px;
     padding-top: 200px; /* Increased padding to move the widget further down */
-    background-color: #121212; /* Dark background for dark mode */
+    background-color: black; /* Dark background for dark mode */
 }
 
 #tradingview_1dcca {
