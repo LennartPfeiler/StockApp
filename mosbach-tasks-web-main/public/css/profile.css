@@ -1,37 +1,135 @@
-﻿body {
-    font-family: Arial, sans-serif;
+﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
-header {
-    background-color: #333;
-    color: white;
-    padding: 20px 0;
+/* Body Background */
+body {
+    background-color: black; /* Dark background for entire page */
+    color: #eaeaea; /* Light text color for contrast */
 }
 
-nav ul {
-    list-style-type: none;
+/* Header Styling */
+.header {
+    position: absolute; /* absolute position to keep the navbar at the top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 8%;
+    background-color: black; /* Dark background for dark mode */
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    margin: 0;
-    padding: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow for better separation */
 }
 
-nav ul li a {
-    color: white;
+.logo img {
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    animation: slideRight 1s ease forwards;
+}
+
+/* Logo Animation */
+@keyframes slideRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Login Styling */
+.logintxt {
+    font-size: 25px;
+    color: #900808;
     text-decoration: none;
-    padding: 10px 20px;
-    transition: background-color 0.3s;
+    font-weight: 600;
 }
 
-nav ul li a:hover {
-    background-color: #555;
+.Login {
+    display: flex;
+    justify-content: space-between;
+    width: 180px;
+    height: 60px;
+    transition: transform 0.7s ease;
+    animation: slideSci 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+}
+
+.Login:hover {
+    transform: scale(1.06);
+    color: #900808;
+}
+
+.Login a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    background: transparent;
+    text-decoration: none;
+    text-shadow: 0px 0px 10px grey;
+    font-size: 25px;
+    color: white;
+    font-weight: 600;
+}
+
+.Login a:hover {
+    color: #900808;
+}
+
+.Login a i {
+    font-size: 50px;
+    color: white;
+}
+
+.Login a i:hover {
+    color: #900808;
+}
+
+/* Navbar Styling */
+.navbar a {
+    display: inline-block;
+    font-size: 18px;
+    color: #eaeaea; /* Light text color for contrast */
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 20px;
+    transition: .5s;
+    text-shadow: 0px 5px 10px grey;
+    animation: slideTop 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+}
+
+/* Navbar Animation */
+@keyframes slideTop {
+    0% {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar a:hover,
+.navbar a.active {
+    color: #33e39a; /* Highlight active or hovered links */
 }
 
 main {
-    padding: 20px;
+    padding: 150px 20px 20px 20px;
     display: flex;
     justify-content: center;
 }

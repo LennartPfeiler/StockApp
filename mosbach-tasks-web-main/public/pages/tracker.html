@@ -5,20 +5,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRADING live</title>
+    <link rel="icon" type="image/x-icon" sizes="32x32" href="../../ressources/candles-regular-24.ico">
     <link rel="stylesheet" href="../css/tracker.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="Home.html">Home</a></li>
-                <li><a href="Tracker.html">Aktien-Tracker</a></li>
-                <li><a href="Portfolio.html">Portfolio</a></li>
-                <li><button class="logoff-button">Logoff</button></li>
-                <li><a href="Profile.html"><img src="../../ressources/profile.png" alt="Profil" class="profile-icon"></a></li>
-            </ul>
+    <header class="header">
+        
+
+        <!--Navbar-->
+    
+        <a href="#" class="logo">
+            <img src="../../ressources/Logo.png">
+        </a>
+
+
+        <nav class="navbar">
+            <a href="home.html" style="--i:1;">Home </a>
+            <a href="tracker.html" style="--i:2;"class="active">Aktien-Tracker</a>
+            <a href="portfolio.html"  style="--i:3;">Portfolio</a>
+              <a href="profile.html" style="--i:4;">Profile</a>
         </nav>
+
+    <div class="Login">
+        <a href="home.html" style="--i:1;" class="logintxt">Logout</a>
+        <a href="home.html" style="--i:2;"><i class='bx bx-log-out-circle'></i></a>
+
+    </div>
+
+    
+
     </header>
+    <!--Navbar end -->
+    
+    
     <main>
         <div class="tradingview-widget-container">
             <div id="tradingview_1dcca"></div>
@@ -29,6 +49,7 @@
             </div>
         </div>
     </main>
+    
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
         new TradingView.widget({
