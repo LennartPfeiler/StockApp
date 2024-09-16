@@ -5,91 +5,51 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
+   
 }
 
 body {
-    background: #000
+    overflow:hidden;
+    background: #000;
+    padding-top: 100px;
 }
 
 .header {
-    position:fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 30px 8%;
+    overflow: visible;
+    position: absolute;
     background: transparent;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     z-index: 100;
+    padding-top: 100px;
 }
-
-.logo img{
-    width: 150px;
-    height: 150px;
-    opacity: 0;
-    animation: slideRight 1s ease forwards;
-
+.header .logo img {
+    max-width: 150px;
+    height: auto;
 }
-
-.logintxt {
-    
-    font-size: 25px;
-    color: #33e39a;
+.navbar a {
+    overflow: visible;
+    color: #eaeaea;
+    font-size: 18px;
     text-decoration: none;
-    font-weight: 600;
-
+    margin: 0 15px;
 }
-
-.Login{
-    display: flex;
-    justify-content: space-between ;
-    width: 180px;
-    height: 60px;
-    transition: transform 0.7s ease;
-    animation: slideSci 1s ease forwards;
-    animation-delay: calc(.2s * var(--i));
-}
-.Login:hover {
-    transform: scale(1.06);
+.navbar a:hover,
+.navbar a.active {
     color: #33e39a;
-    }
-
-
+}
 .Login a {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    width: 600px;
-    height: 60px;
-    background: transparent;
-    text-decoration: none;
-    text-shadow: 0px 0px 10px grey;
-    
-        
     font-size: 25px;
     color: white;
     text-decoration: none;
-    font-weight: 600;
 }
-
-.Login a:hover{
+.Login a:hover {
     color: #33e39a;
 }
-
-.Login a i{
-font-size: 50px;
-color: rgb(255, 255, 255);
-
-
-
-}
-
-.Login a i:hover{
- color: #33e39a;
+.Login a i {
+    font-size: 50px;
 }
 
 .navbar a{
+    overflow: visible;
     display: inline-block;
     font-size: 18px;
     color: #eaeaea;
@@ -109,6 +69,7 @@ color: rgb(255, 255, 255);
 }
 
 .home {
+
     color: #eaeaea;
     width: 100%;
     height: 100vh;
@@ -122,11 +83,13 @@ color: rgb(255, 255, 255);
 }
 
 .home-content {
+    
     max-width: 630px;
 
 }
 
 .home-content h1{
+
 font-size: 50px;
 line-height: 1.2;
 opacity: 0;
@@ -135,6 +98,7 @@ animation-delay: 1s;
 }
 
 .home-content h3{
+
 font-size: 40px;
 color: #fbcf04;
 opacity: 0;
@@ -157,6 +121,7 @@ animation-delay: 1.6s;
 }
  
 .btn {
+    
     display: inline-block;
     padding: 10px 28px;
     background: whitesmoke ;
@@ -180,6 +145,7 @@ animation-delay: 1.6s;
 }
 
 .home-img {
+
     position: relative;
     right: -7%;
     width: 450px;
@@ -189,6 +155,8 @@ animation-delay: 1.6s;
 }
 
 .home-img .rhombus{
+
+ 
     position: absolute;
     width: 100%;
     height: 100%;
@@ -202,8 +170,9 @@ animation-delay: 1.6s;
 }
 
 .home-img .rhombus img {
+
     position : absolute;
-    max-width: 750px;
+    max-width: 600px;
     top: 110px;
     left: -250px;
     border: 0px solid #000;
@@ -217,6 +186,7 @@ animation-delay: 1.6s;
 }
 
 .home .rhombus2 {
+
     position:absolute;
     top: -25%;
     right: -25%;
@@ -320,5 +290,24 @@ animation-delay: 1.6s;
     100%{
         right: -25%;
         opacity: 1;
+    }
+}
+
+@media (max-width: 1420px) {
+    .rhombus2 {
+        display: none;
+        overflow: hidden;
+    }
+}
+@media (max-width: 1420px) {
+    .rhombus {
+        display: none;
+        overflow: hidden;
+    }
+}
+@media (max-width: 1420px){
+
+    body{
+        overflow: scroll;
     }
 }
