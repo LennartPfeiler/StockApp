@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.cftestbackend.controller;
+package mosbach.dhbw.de.controller;
 
 import org.springframework.web.bind.annotation.*;
 
