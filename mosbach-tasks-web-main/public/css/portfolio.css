@@ -293,6 +293,23 @@ section {
     animation-delay: 1.3s;
 }
 
+.buy-sell input:focus {
+    background-color: #555; /* Bleibt Grau beim Fokus */
+    color: #fff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 133, 237, 0.5); /* Optional: Schatteneffekt */
+}
+
+.buy-sell input:not(:placeholder-shown) {
+    background-color: #555; /* Bleibt Grau, wenn Text vorhanden ist */
+    color: #fff;
+}
+
+.buy-sell input:valid {
+    background-color: #555; /* Gültige Eingaben bleiben grau */
+    color: #fff;
+}
+
 /* Portfolio-Sektion */
 .portfolio {
     grid-column: 2 / 3;
