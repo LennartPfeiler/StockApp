@@ -128,42 +128,73 @@ body {
     color: #33e39a; /* Highlight active or hovered links */
 }
 
-main {
-    padding: 150px 20px 20px 20px;
-    display: flex;
-    justify-content: center;
-}
-
+/* Profile Section Styling */
 .profile {
-    border: 1px solid #ccc;
+    background-color: #2c2c2c; /* Grauer Hintergrund für das Profilfenster */
+    color: #eaeaea; /* Helle Schriftfarbe */
     padding: 20px;
-    width: 300px;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
     border-radius: 8px;
+    width: 350px;
+    margin: 50px auto; /* Zentriert die Section */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Leichter Schatten für Tiefe */
 }
 
-.profile input,
-.profile button {
-    display: block;
-    margin: 10px 0;
+/* Input Felder Styling */
+.profile input {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #424242; /* Dunkleres Grau für Input-Felder */
+    border: 1px solid #555; /* Leichter Rand */
+    border-radius: 4px;
+    color: #eaeaea;
 }
 
+.profile input::placeholder {
+    color: #b0b0b0; /* Platzhalterfarbe etwas heller */
+}
+
+/* Button Styling */
 .profile button {
-    background-color: #4CAF50;
-    color: white;
+    width: 48%; /* Beide Buttons nehmen jeweils 48% des verfügbaren Platzes ein */
+    padding: 10px;
+    background-color: #33e39a; /* Grüne Farbe für den Apply-Button */
     border: none;
+    border-radius: 4px;
+    color: #121212;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
 }
 
 .profile button:hover {
-    background-color: #45a049;
+    background-color: #28c883; /* Dunklere Farbe beim Hover */
+}
+
+/* Spezifisch für den "Delete Profile"-Button */
+.profile .delete-btn {
+    background-color: #d9534f; /* Rote Farbe für Löschen */
+}
+
+.profile .delete-btn:hover {
+    background-color: #c9302c; /* Dunkleres Rot beim Hover */
+}
+
+/* Section Title Styling */
+.profile h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #eaeaea;
 }
 
 .profile-icon {
     width: 35px;
     height: 35px;
+}
+
+main {
+    padding-top: 200px; /* Abstand nach oben, damit das Editorfeld unterhalb der Navbar beginnt */
+    display: flex;
+    justify-content: center;
 }

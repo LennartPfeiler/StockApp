@@ -31,18 +31,34 @@
     </header>
     <main>
         <section class="profile">
-            <br></br>
-            <br></br>
-            <h2>Profile</h2>
+            <h2>Edit Profile</h2>
+            
             <label for="first-name">First name:</label>
-            <input type="text" id="first-name">
+            <input type="text" id="first-name" name="first-name" placeholder="Enter your first name">
+    
             <label for="last-name">Last name:</label>
-            <input type="text" id="last-name">
+            <input type="text" id="last-name" name="last-name" placeholder="Enter your last name">
+    
             <label for="email">Email:</label>
-            <input type="email" id="email">
-            <button>Edit profile</button>
-            <button>Delete profile</button>
+            <input type="email" id="email" name="email" placeholder="Enter your email">
+    
+            <button type="button" onclick="applyChanges()">Apply</button>
+            <button type="button" class="delete-btn" onclick="deleteProfile()">Delete Profile</button>
         </section>
     </main>
+    
+    <script>
+        function applyChanges() {
+            alert("Changes applied!");
+        }
+    
+        function deleteProfile() {
+            const confirmation = confirm("Are you sure you want to delete your profile?");
+            if (confirmation) {
+                alert("Profile deleted!");
+            }
+        }
+    </script>
+    
 </body>
 </html>
