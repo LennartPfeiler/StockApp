@@ -37,7 +37,6 @@
     <!--Navbar end -->
     <br></br>
     <main>
-        
         <section class="buy-sell">
             <h2>Stock Orders</h2>
             <div class="d-flex align-items-center mb-3">
@@ -49,15 +48,14 @@
                     <div id="price-display" class="price-display">220$</div>
                 </div>
             </div>
-            <button id="show-price" class="btn btn-primary mt-2">Show current price</button>
+            <button id="show-price" class="btn btn-primary mt-2" onclick="showPrice()">Show current price</button>
             <span id="current-price">220$</span>
             <div class="mb-3">
-                <label for="quantity" class="form-label">Quantity in $:</label>
+                <label for="quantity" id="quantity-label" class="form-label">Quantity in $:</label>
                 <input type="number" id="quantity" value="8000" class="form-control">
             </div>
-            <div class="mb-4"></div>
-                <label for="quantity" class="form-label">Quantity in stocks:</label>
-                <input type="number" id="quantity" value="8000" class="form-control">
+            <div class="mb-4">
+                <button id="toggle-label" class="btn btn-secondary mt-2" onclick="toggleLabel()">Switch to Stocks</button>
             </div>
             <button id="buy-stock" class="btn btn-success mt-2">Buy stock</button>
             <button id="sell-stock" class="btn btn-danger mt-2">Sell stock</button>
@@ -83,19 +81,6 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script>
-        document.getElementById('show-price').addEventListener('click', function() {
-            // Der aktuelle Preis, hier hartcodiert für das Beispiel
-            var currentPrice = "220$";
-
-            // Den Preis im Display Only Feld anzeigen
-            var priceDisplay = document.getElementById('price-display');
-            priceDisplay.textContent = currentPrice;
-
-            // Den aktuellen Preis Text ausblenden
-            var currentPriceSpan = document.getElementById('current-price');
-            currentPriceSpan.style.display = 'none';
-        });
-    </script>
+    <script src="../js/StockApp.js"></script>
 </body>
 </html>

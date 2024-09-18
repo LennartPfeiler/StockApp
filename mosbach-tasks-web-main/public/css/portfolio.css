@@ -535,3 +535,36 @@ section {
         opacity: 1;
     }
 }
+
+#toggle-label {
+    background-color: #c6a300; /* Gleiche Hintergrundfarbe wie Buy Stock */
+    color: white; /* Weißer Text */
+    border: none;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px; /* Gleiche abgerundete Ecken */
+    transition: background-color 0.3s ease-in-out; /* Weicher Übergang */
+}
+
+#show-price {
+    background-color: #c6a300; /* Gleiche Hintergrundfarbe wie Buy Stock */
+    color: white; /* Weißer Text */
+    border: none;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px; /* Gleiche abgerundete Ecken */
+    transition: background-color 0.3s ease-in-out; /* Weicher Übergang */
+}
+
+
+
+
+

@@ -71,3 +71,26 @@ function getProfile(){
         setCookie("password", user.password);
     });
 }
+
+// Funktion, um den aktuellen Preis anzuzeigen (Portfolio-Seite)
+function showPrice() {
+    var currentPrice = "220$";
+    var priceDisplay = document.getElementById('price-display');
+    priceDisplay.textContent = currentPrice;
+    var currentPriceSpan = document.getElementById('current-price');
+    currentPriceSpan.style.display = 'none';
+}
+
+// Funktion, um das Label und den Button zu toggeln (Portfolio-Seite)
+function toggleLabel() {
+    var label = document.getElementById('quantity-label');
+    var button = document.getElementById('toggle-label');
+
+    if (label.textContent === 'Quantity in $:') {
+        label.textContent = 'Quantity in Stocks:';
+        button.textContent = 'Switch to $';
+    } else {
+        label.textContent = 'Quantity in $:';
+        button.textContent = 'Switch to Stocks';
+    }
+}
