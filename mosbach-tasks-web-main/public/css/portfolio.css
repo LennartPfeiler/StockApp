@@ -29,29 +29,27 @@
 }
 
 .logintxt {
-    
     font-size: 25px;
     color: #900808;
     text-decoration: none;
     font-weight: 600;
-
 }
 
-.Login{
+.Login {
     display: flex;
-    justify-content: space-between ;
+    justify-content: space-between;
     width: 180px;
     height: 60px;
     transition: transform 0.7s ease;
     animation: slideSci 1s ease forwards;
     animation-delay: calc(.2s * var(--i));
 }
+
 .Login:hover {
-    transform: scale(1.06);
-    color: #900808;
-    }
+    transform: scale(1.10);
+}
 
-
+/* Stil für das <a>-Element */
 .Login a {
     display: inline-flex;
     justify-content: center;
@@ -61,28 +59,23 @@
     background: transparent;
     text-decoration: none;
     text-shadow: 0px 0px 10px grey;
-    
-        
     font-size: 25px;
     color: white;
-    text-decoration: none;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.Login a:hover{
+/* Stil für das <i>-Element */
+.Login a i {
+    font-size: 50px;
+    color: rgb(255, 255, 255);
+    transition: color 0.3s ease;
+}
+
+/* Wenn über das <a> oder <i> gehovert wird, färbe sowohl <a> als auch <i> */
+.Login:hover a, .Login:hover a i {
     color: #900808;
-}
-
-.Login a i{
-font-size: 50px;
-color: rgb(255, 255, 255);
-
-
-
-}
-
-.Login a i:hover{
- color:#900808;
+    text-shadow: none;
 }
 
 .navbar a{
