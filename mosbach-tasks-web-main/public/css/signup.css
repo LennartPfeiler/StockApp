@@ -55,7 +55,7 @@ body{
 
 ::placeholder{
     font-weight: 500;
-    color: #222;
+    color: black;
 }
 .input-field:focus{
     width: 105%;
@@ -146,7 +146,7 @@ section a{
     height: 60px;
     font-size: 17px;
     font-family: 'Poppins', sans-serif; /* Schriftart wie bei den anderen Feldern */
-    color: #222; /* Textfarbe des ausgewählten Wertes */
+    color: black; /* Textfarbe des ausgewählten Wertes */
     padding: 0 25px;
     margin-bottom: 15px;
     border-radius: 30px;
@@ -161,6 +161,7 @@ section a{
     background: #fff url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMUwxIDIuNUw2IDcgMTAgMi41TDEyIDFsLTYgNkwwIDF6IiBmaWxsPSIjMDAwIi8+PC9zdmc+')
                 no-repeat right 20px center; /* Custom Arrow Icon */
     background-color: #fff; /* Hintergrundfarbe wie bei den Input-Feldern */
+    font-weight: 500;
 }
 
 /* Standardwert (Platzhalter) in Schwarz und in der gewünschten Schriftart */
