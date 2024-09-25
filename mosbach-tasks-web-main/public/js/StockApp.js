@@ -1,4 +1,6 @@
-﻿///* Login *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+﻿const APIKEY = 'Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D'; // Externer API-Schlüssel
+
+///* Login *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 let counter = 1;
 function login(profileSchema){
@@ -92,5 +94,66 @@ function toggleLabel() {
     } else {
         label.textContent = 'Quantity in $:';
         button.textContent = 'Switch to Stocks';
+    }
+}
+
+//////////////////////////////////////////// Aktienpreis //////////////////////////////////////////
+
+//Funktion, um den eingegebenen Aktiennamen innerhalb des Portfolios zu bekommen
+function getStockName() {
+    let stockNameLabel = document.getElementById("stock-name");
+    //console.log(stockNameLabel.value);
+    return stockNameLabel.value;
+
+}
+
+//Funktion, um den aktuellen Preis der eingegebenen Aktie zu bekommen 
+function getStockPrice() {
+    let stockName = getStockName(); // Ersetze dies mit dem Namen des Eingabefelds für das Stock Symbol
+    let url = `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`;
+
+    $.ajax({
+        url: url,
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            console.log(data); // Debugging: Überprüfe die Datenstruktur
+
+            if (data.status === 'OK' && data.results && data.results.length > 0) {
+                const closeValue = parseFloat(data.results[0].c); // Der Schlusskurs
+                const roundedCloseValue = closeValue.toFixed(2);
+                $('#price-display').text(`${roundedCloseValue}$`);
+            } else if (!data.results) {
+                $('#price-display').text('Aktie nicht gefunden oder keine Daten verfügbar.');
+            } else if (data.results.length === 0) {
+                $('#price-display').text('Keine Schlusskursdaten verfügbar.');
+            } else {
+                $('#price-display').text('Unbekannter Fehler beim Abrufen der Daten.');
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 429) {
+                $('#price-display').text('Zu viele Anfragen. Bitte versuche es später erneut.');
+            } else if (jqXHR.status === 404) {
+                $('#price-display').text('Aktie nicht gefunden.');
+            } else {
+                console.error('Fehler:', textStatus, errorThrown);
+                $('#price-display').text('Fehler beim Abrufen der Daten.');
+            }
+        }
+    });
+}
+
+//Funktion, um die Events zur Preisanzeige zu implementieren
+function showStockPriceViaEvent() {
+    const inputField = document.getElementById('stock-name');
+    inputField.addEventListener('keypress', handleInputKeypress);
+    inputField.addEventListener('blur', getStockPrice);
+}
+
+//Funktion, um eine Enter-Taste Eingabe zu empfangen
+function handleInputKeypress(e) {
+    if (e.key === 'Enter') { 
+        getStockPrice();
     }
 }
