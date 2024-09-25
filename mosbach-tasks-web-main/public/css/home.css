@@ -37,15 +37,20 @@ body {
     color: #33e39a;
 }
 .Login a {
+    display: inline-block;
+    justify-content: space-between;
+    align-items:end;
     font-size: 25px;
     color: white;
     text-decoration: none;
+    margin: 10px;
 }
 .Login a:hover {
     color: #33e39a;
 }
 .Login a i {
     font-size: 50px;
+    margin: 10px;
 }
 
 .navbar a{

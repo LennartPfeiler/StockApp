@@ -66,15 +66,15 @@ body {
 }
 
 .Login:hover {
-    transform: scale(1.06);
-    color: #900808;
+    transform: scale(1.10);
 }
 
+/* Stil für das <a>-Element */
 .Login a {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 60px;
+    width: 600px;
     height: 60px;
     background: transparent;
     text-decoration: none;
@@ -82,19 +82,20 @@ body {
     font-size: 25px;
     color: white;
     font-weight: 600;
+    transition: color 0.3s ease;
 }
 
-.Login a:hover {
-    color: #900808;
-}
-
+/* Stil für das <i>-Element */
 .Login a i {
     font-size: 50px;
-    color: white;
+    color: rgb(255, 255, 255);
+    transition: color 0.3s ease;
 }
 
-.Login a i:hover {
+/* Wenn über das <a> oder <i> gehovert wird, färbe sowohl <a> als auch <i> */
+.Login:hover a, .Login:hover a i {
     color: #900808;
+    text-shadow: 0px 0px 10px black;
 }
 
 /* Navbar Styling */
