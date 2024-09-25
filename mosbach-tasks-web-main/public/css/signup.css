@@ -16,6 +16,7 @@ body{
     opacity: 0;
     animation: slideRight 1s ease forwards;
     text-decoration: none;
+
 }
 .login-box{
     display: flex;
@@ -122,7 +123,7 @@ section a{
 
 }
 .Logo-Bild{
-    width: 60% ;
+    width: 50% ;
     height: auto;
 }
 
@@ -203,5 +204,17 @@ section a{
     100%{
         transform: translateY(0);
         opacity: 1;
+    }
+}
+
+@media (max-width: 1200px) {
+    .Logo-Bild {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+    }
+    .login-box {
+        margin-top: 400px;
     }
 }

@@ -119,8 +119,8 @@ section a{
 
 }
 .Logo-Bild{
-    width: 60% ;
-    height: 60%;
+    width: 50% ;
+    height: auto;
 }
 
 @keyframes slideRight {
@@ -142,5 +142,16 @@ section a{
     100%{
         transform: translateY(0);
         opacity: 1;
+    }
+}
+@media (max-width: 1200px) {
+    .Logo-Bild {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+    }
+    .login-box {
+        margin-top: 400px;
     }
 }
