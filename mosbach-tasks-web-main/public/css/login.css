@@ -15,6 +15,40 @@ body{
     opacity: 0;
     animation: slideRight 1s ease forwards;
 }
+.header {
+    position:absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 8%;
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
+.Login {
+    position: absolute;
+    top: 30px;
+    right: 40px; /* Positioniere den Link oben rechts */
+    z-index: 10; /* Stelle sicher, dass es über anderen Elementen steht */
+}
+
+.logintxt {
+    font-size: 25px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+/* Anpassung des Links beim Hovern */
+.Login .logintxt:hover {
+    text-decoration: none; /* Sicherstellen, dass es keinen Unterstrich gibt */
+    transform: scale(1.06);
+    color: #900808;
+}
+
 .login-box{
     display: flex;
     justify-content: center;
