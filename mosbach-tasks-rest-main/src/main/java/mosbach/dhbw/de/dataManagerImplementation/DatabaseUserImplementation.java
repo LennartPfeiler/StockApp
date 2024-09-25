@@ -1,8 +1,8 @@
-﻿package mosbach.dhbw.de.implementation;
+﻿package mosbach.dhbw.de.dataManagerImplementation;
 
 import mosbach.dhbw.de.model.User;
 
-public class DatabaseUserImplementation{
+public class DatabaseUserImplementation implements IUserManager{
 
     static DatabaseUserImplementation databaseUser = null;
 
