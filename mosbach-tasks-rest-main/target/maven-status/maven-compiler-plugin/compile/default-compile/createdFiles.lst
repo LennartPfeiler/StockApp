@@ -1,7 +1,7 @@
-mosbach\dhbw\de\cftestbackend\TasksBackendApplication.class
-mosbach\dhbw\de\model\StringAnswer.class
-mosbach\dhbw\de\controller\MappingController.class
-mosbach\dhbw\de\dataManagerImplementation\DatabaseUserImplementation.class
-mosbach\dhbw\de\model\User.class
-mosbach\dhbw\de\controller\PersonController.class
-mosbach\dhbw\de\dataManager\IUserManager.class
+mosbach\dhbw\de\stockwizzard\model\StringAnswer.class
+mosbach\dhbw\de\cftestbackend\StockWizzardBackendApplication.class
+mosbach\dhbw\de\stockwizzard\dataManager\IUserManager.class
+mosbach\dhbw\de\stockwizzard\model\User.class
+mosbach\dhbw\de\stockwizzard\controller\MappingController.class
+mosbach\dhbw\de\stockwizzard\controller\PersonController.class
+mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.class

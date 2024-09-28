@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.controller;
+package mosbach.dhbw.de.stockwizzard.controller;
 
 import org.springframework.web.bind.annotation.*;
 

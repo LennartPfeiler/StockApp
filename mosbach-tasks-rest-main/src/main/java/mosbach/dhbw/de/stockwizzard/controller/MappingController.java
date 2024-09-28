@@ -1,7 +1,8 @@
-package mosbach.dhbw.de.controller;
+package mosbach.dhbw.de.stockwizzard.controller;
 
-import mosbach.dhbw.de.model.User;
-import mosbach.dhbw.de.dataManagerImplementation.*;
+import mosbach.dhbw.de.stockwizzard.model.User;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.*;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -10,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 // @RequestMapping("/api")
 public class MappingController {
 
+    UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
     public MappingController() {
     }
 
-//     @GetMapping("/user")
-//     public User getUserProfile(@RequestParam(value = "userID", defaultValue = "0") int userID) {
-//         DatabaseUserImplementation db_user = new DatabaseUserImplementation();
-//         return db_user.getUserProfile(userID);   
-//     }
+    @GetMapping("/user")
+    public User getUserProfile(@RequestParam(value = "userID", defaultValue = "0") int userID) {
+        return userManager.getUserProfile(userID);   
+    }
 
 //     @PostMapping(                                                                               
 //             path = "/user",

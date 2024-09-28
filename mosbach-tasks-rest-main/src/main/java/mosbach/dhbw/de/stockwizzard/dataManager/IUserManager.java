@@ -1,6 +1,6 @@
-package mosbach.dhbw.de.dataManager;
+package mosbach.dhbw.de.stockwizzard.dataManager;
 
-import mosbach.dhbw.de.model.User;
+import mosbach.dhbw.de.stockwizzard.model.User;
 
 public interface IUserManager{
 
