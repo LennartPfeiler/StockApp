@@ -1,2 +1,7 @@
-/Users/michaelhartwig/Downloads/mosbach-tasks-rest/src/main/java/mosbach/dhbw/de/cftestbackend/TasksBackendApplication.java
-/Users/michaelhartwig/Downloads/mosbach-tasks-rest/src/main/java/mosbach/dhbw/de/cftestbackend/controller/PersonController.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\controller\MappingController.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\controller\PersonController.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\dataManager\IUserManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\dataManagerImplementation\DatabaseUserImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\model\StringAnswer.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\model\User.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\TasksBackendApplication.java

@@ -1,4 +1,4 @@
-﻿package mosbach.dhbw.de.dataManagerImplementation;
+package mosbach.dhbw.de.dataManager;
 
 import mosbach.dhbw.de.model.User;
 

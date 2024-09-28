@@ -1,9 +1,7 @@
-
 package mosbach.dhbw.de.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,14 +10,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "userID",
-    "firstname",
-    "lastname",
-    "email",
-    "password"
-})
-@Generated("jsonschema2pojo")
 public class User {
 
     @JsonProperty("userID")
@@ -70,22 +60,22 @@ public class User {
     }
 
     @JsonProperty("firstname")
-    public String getFirstname() {
+    public String getFirstName() {
         return firstname;
     }
 
     @JsonProperty("firstname")
-    public void setFirstname(String firstname) {
+    public void setFirstName(String firstname) {
         this.firstname = firstname;
     }
 
     @JsonProperty("lastname")
-    public String getLastname() {
+    public String getLastName() {
         return lastname;
     }
 
     @JsonProperty("lastname")
-    public void setLastname(String lastname) {
+    public void setLastName(String lastname) {
         this.lastname = lastname;
     }
 

@@ -1,10 +1,10 @@
 ---
 applications:
-- name: TasksBackend
+- name: StockWizzardBackend
   instances: 1
-  host: TasksBackend{random-word}
+  host: StockWizzardBackend{random-word}
   # create JAR with "mvn package" and use the path to the JAR file:
-  path: target/tasksBackend-0.0.1-SNAPSHOT.jar
+  path: target/stockWizzardBackend-0.0.1-SNAPSHOT.jar
   # Necessary:
   random-route: true
   memory: 1G
