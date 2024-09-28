@@ -2,20 +2,21 @@
 
 ///* Login *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-let counter = 1;
 function login(profileSchema){
-    setCookie("userID", profileSchema.userID.value);
+    setCookie("email", profileSchema.email.value);
     let password = profileSchema.password.value;
-    if(counter == 1){
-        counter += 1;
-        getProfile();
+    console.log(profileSchema.email.value);
+    let answer = getProfileByEmail();
+    if(answer.success == true){
+        if(password != getCookie("password"))
+            alert("Das Passwort ist falsch versuche es erneut!");
+        else{
+            document.location = "home.html";
+        }
     }
-    if(password != getCookie("password"))
-        alert("Das Passwort ist falsch versuche es erneut!");
     else{
-        counter = 1;
-        document.location = "index.html";
-    }
+        alert(answer.message);
+    }  
 }
 
 ///*Cookies*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,10 +55,10 @@ function testCookie(){
 
 // GET USER ID FROM COOKIE --------------------------------------------------------------------------------------------------------------------------------------------------------
 //getting Profile for user of the Website
-function getProfile(){
+function getProfileByEmail(){
     const settingsGetProfile = {
         "async": false,
-        "url": "https://sharearide-carpool.herokuapp.com/api/v1.0/user?userID="+ getCookie("userID"),
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/user?email="+ getCookie("email"),
         "method": "GET",
         "headers": {
             'Accept': 'application/json',
@@ -65,12 +66,20 @@ function getProfile(){
         }
     }
     $.ajax(settingsGetProfile).done(function (user) {
-        setCookie("userID", user.userID);
-        setCookie("firstName", user.firstName);
-        setCookie("lastName", user.lastName);
-        setCookie("eMail", user.eMail);
-        setCookie("phone", user.phone);
-        setCookie("password", user.password);
+        let success = true;
+        let message = "";
+        if (user) {
+            setCookie("userID", user.userID);
+            setCookie("firstName", user.firstName);
+            setCookie("lastName", user.lastName);
+            setCookie("email", user.email);
+            setCookie("password", user.password);
+            return {success: true, message: "Datenabruf erfolgreich!"}
+        } else {
+            return {success: false, message: "Bitte registrieren sie sich zuerst!"}
+        }
+    }).fail(function() {
+        return {success: false, message: "Fehler beim Abrufen der Benutzerdaten. Bitte versuchen Sie es später erneut."}
     });
 }
 
