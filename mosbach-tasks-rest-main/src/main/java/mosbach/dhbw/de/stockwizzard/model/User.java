@@ -12,8 +12,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class User {
 
-    @JsonProperty("userID")
-    private Integer userID;
     @JsonProperty("firstname")
     private String firstname;
     @JsonProperty("lastname")
@@ -36,27 +34,15 @@ public class User {
      * 
      * @param firstname
      * @param password
-     * @param userID
      * @param email
      * @param lastname
      */
-    public User(Integer userID, String firstname, String lastname, String email, String password) {
+    public User(String firstname, String lastname, String email, String password) {
         super();
-        this.userID = userID;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
-    }
-
-    @JsonProperty("userID")
-    public Integer getUserID() {
-        return userID;
-    }
-
-    @JsonProperty("userID")
-    public void setUserID(Integer userID) {
-        this.userID = userID;
     }
 
     @JsonProperty("firstname")

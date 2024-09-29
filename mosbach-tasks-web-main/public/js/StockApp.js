@@ -5,7 +5,6 @@
 function login(profileSchema){
     setCookie("email", profileSchema.email.value);
     let password = profileSchema.password.value;
-    console.log(profileSchema.email.value);
     let answer = getProfileByEmail();
     if(answer.success == true){
         if(password != getCookie("password"))
@@ -16,7 +15,7 @@ function login(profileSchema){
     }
     else{
         alert(answer.message);
-    }  
+    } 
 }
 
 ///*Cookies*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,6 +64,7 @@ function getProfileByEmail(){
             'Content-Type': 'application/json'
         }
     }
+    console.log(settingsGetProfile.url);
     $.ajax(settingsGetProfile).done(function (user) {
         let success = true;
         let message = "";

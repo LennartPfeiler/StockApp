@@ -23,42 +23,42 @@ public class UserManagerImplementation implements IUserManager{
         return databaseUser;
     }
 
-    public User getUserProfile(int userID) {
+    public User getUserProfile(String email) {
         Properties properties = new Properties();
         User user = null;
         try {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
                 if (resourceStream == null) {
-                    logger.log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    Logger.getLogger("GetUserReader").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
                     return null; // Datei nicht gefunden
                 }
                 properties.load(resourceStream);
             }
 
-            int i = 1; // Start mit User.1
+            int i = 1;
             while (true) {
-                String userIdKey = "User." + i + ".UserID";
-                String currentUserId = properties.getProperty(userIdKey);
-                if (currentUserId == null) {
-                    logger.log(Level.INFO, "Kein weiterer Benutzer gefunden (User.{0}.UserID).", i);
+                String userEmailKey = "User." + i + ".Email";
+                String currentUserEmail = properties.getProperty(userEmailKey);
+                if (currentUserEmail == null) {
+                    Logger.getLogger("GetUserReader").log(Level.INFO, "Kein weiterer Benutzer gefunden");
                     break; // Breche die Schleife ab, wenn kein Benutzer mehr gefunden wird
                 }
 
-                if (Integer.parseInt(currentUserId) == userID) {
+                // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
+                if (currentUserEmail.equalsIgnoreCase(email)) {
                     String firstName = properties.getProperty("User." + i + ".Firstname");
                     String lastName = properties.getProperty("User." + i + ".LastName");
-                    String email = properties.getProperty("User." + i + ".Email");
                     String password = properties.getProperty("User." + i + ".Password");
 
-                    user = new User(userID, firstName, lastName, email, password);
-                    logger.log(Level.INFO, "Benutzer gefunden: {0}", user);
+                    user = new User(firstName, lastName, currentUserEmail, password);
+                    Logger.getLogger("GetUserReader").log(Level.INFO, "Benutzer gefunden: {0}", user);
                     break; // Benutzer gefunden, Schleife verlassen
                 }
                 i++; // Nächsten Benutzer prüfen
             }
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
+            Logger.getLogger("GetUserReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
         }
         return user;
     }
@@ -67,7 +67,7 @@ public class UserManagerImplementation implements IUserManager{
     public int addUser(User user) {
         int userID = 0;
         // write the data into database
-        String addUser_database_query = "Insert into User (FirstName, LastName, EMail, Password) Values ('" + user.getFirstName() + "', '" + user.getLastName() + "', '" + user.getEmail()  +"', '" + user.getPassword() + "');";
+        // String addUser_database_query = "Insert into User (FirstName, LastName, EMail, Password) Values ('" + user.getFirstName() + "', '" + user.getLastName() + "', '" + user.getEmail()  +"', '" + user.getPassword() + "');";
         //Write into database
         return userID;
     }
@@ -75,10 +75,10 @@ public class UserManagerImplementation implements IUserManager{
     public boolean editUser(User user) {
         boolean edited = true;
         // change the data of user, found by id
-        String editUser_database_query = "UPDATE Users" +
-                "       SET FirstName = '" + user.getFirstName() + "', LastName = '" + user.getLastName() +
-                        "', EMail = '" + user.getEmail() + "', Password = '" + user.getPassword() + "'" +
-                "       WHERE UserID = " + user.getUserID() + ";";
+        // String editUser_database_query = "UPDATE Users" +
+        //         "       SET FirstName = '" + user.getFirstName() + "', LastName = '" + user.getLastName() +
+        //                 "', EMail = '" + user.getEmail() + "', Password = '" + user.getPassword() + "'" +
+        //         "       WHERE UserID = " + user.getUserID() + ";";
         //Write into database
         return edited;
     }
@@ -87,8 +87,8 @@ public class UserManagerImplementation implements IUserManager{
     public boolean deleteUser(int userID) {
         boolean deleted = true;
         // sql strings to delete the user and the connections, if he uses carpools (foreign key)
-        String deleteUser_database_query = "DELETE FROM Users" +
-                "       WHERE UserID = " + userID + ";";
+        // String deleteUser_database_query = "DELETE FROM Users" +
+        //         "       WHERE UserID = " + userID + ";";
         //Delete from database
         return deleted;
     }

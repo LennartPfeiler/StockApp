@@ -16,8 +16,8 @@ public class MappingController {
     }
 
     @GetMapping("/user")
-    public User getUserProfile(@RequestParam(value = "userID", defaultValue = "0") int userID) {
-        return userManager.getUserProfile(userID);   
+    public User getUserProfile(@RequestParam(value = "email", defaultValue = "") String email) {
+        return userManager.getUserProfile(email);   
     }
 
 //     @PostMapping(                                                                               

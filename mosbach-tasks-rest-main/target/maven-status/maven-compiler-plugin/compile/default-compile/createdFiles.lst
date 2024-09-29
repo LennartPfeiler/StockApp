@@ -3,5 +3,6 @@ mosbach\dhbw\de\cftestbackend\StockWizzardBackendApplication.class
 mosbach\dhbw\de\stockwizzard\dataManager\IUserManager.class
 mosbach\dhbw\de\stockwizzard\model\User.class
 mosbach\dhbw\de\stockwizzard\controller\MappingController.class
+AuthToken.class
 mosbach\dhbw\de\stockwizzard\controller\PersonController.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.class

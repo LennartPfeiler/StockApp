@@ -9,7 +9,7 @@ public interface IUserManager{
      * @param userID: UserID of the user
      * @return User object 
      */
-    public User getUserProfile(int userID);
+    public User getUserProfile(String email);
 
     /**
      * Create a new user
