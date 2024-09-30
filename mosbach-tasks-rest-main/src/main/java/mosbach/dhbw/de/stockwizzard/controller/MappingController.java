@@ -5,12 +5,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PortfolioManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
 import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
+import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
+import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -20,6 +23,7 @@ public class MappingController {
 
     UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
     AuthManagerImplementation authManager = AuthManagerImplementation.getAuthManager();
+    PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
     @PostMapping(
             path = "/auth",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -29,7 +33,7 @@ public class MappingController {
         String password = loginRequest.getPassword();
         System.err.println(email);
         //Überprüfen, ob der Benutzer in der Datenbank existiert
-        User user = userManager.getUserProfile(email); // Methode zur Suche nach Benutzer anhand E-Mail
+        User user = userManager.getUserProfile(email);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -56,14 +60,25 @@ public class MappingController {
         path = "/user",
         consumes = {MediaType.APPLICATION_JSON_VALUE}
 )
-    public ResponseEntity<TokenUser> createUser(@RequestBody RegisterRequest registerRequest){
-        userManager.createUser();
-        //authManager.generateSession();
-        // Erstelle eine TokenTask-Instanz mit dem generierten Token und dem Benutzer
-        StringAnswer sA = new StringAnswer("User successfully registered");
-
-        // Erfolgreiche Anmeldung: Antwort mit TokenTask zurückgeben
-        return ResponseEntity.ok(tokenUser);
+    public ResponseEntity<StringAnswer> createUser(@RequestBody RegisterRequest registerRequest){
+        EmailCheckResponse mailResponse = userManager.isEmailAlreadyRegistered(registerRequest.getEmail());
+        if(mailResponse.isRegistered() == true){
+            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Der Benutzer ist bereits registriert.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        else{
+            if(mailResponse.isRegistered() == false && mailResponse.getMessage().equals("Email ist noch nicht registriert.")){
+                userManager.addUser(new User(registerRequest.getFirstname(), registerRequest.getLastname(), registerRequest.getEmail(), registerRequest.getPassword()));
+                portfolioManager.createPortfolio(new Portfolio(2, registerRequest.getBudget(), registerRequest.getEmail()));
+                StringAnswer sA = new StringAnswer();
+                sA.setAnswer("User successfully registered");
+                return ResponseEntity.ok(sA);
+            }
+            else{
+                //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Fehler beim registrieren.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        }
     }
 
 

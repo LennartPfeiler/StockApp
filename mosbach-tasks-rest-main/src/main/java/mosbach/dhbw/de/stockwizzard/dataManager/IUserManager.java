@@ -2,6 +2,7 @@ package mosbach.dhbw.de.stockwizzard.dataManager;
 
 import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.User;
+import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 
 public interface IUserManager{
 
@@ -17,7 +18,7 @@ public interface IUserManager{
      * @param user: User object with data without ID
      * @return Returns generated ID of the new user
      */
-    public int createUser(RegisterRequest registerRequest);
+    public void addUser(User user);
 
     /**
      * Edit an existing user
@@ -33,5 +34,5 @@ public interface IUserManager{
      */
     public boolean deleteUser(int userID);
 
-    public boolean checkAlreadyRegistered(String email);
+    public EmailCheckResponse isEmailAlreadyRegistered(String email);
 }

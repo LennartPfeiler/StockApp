@@ -4,6 +4,7 @@ import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
 import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.User;
+import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,8 +25,38 @@ public class UserManagerImplementation implements IUserManager{
         return databaseUser;
     }
 
-    public boolean checkAlreadyRegistered(String email){
-        return true;
+    public EmailCheckResponse isEmailAlreadyRegistered(String email){
+        Properties properties = new Properties();
+        String message = "";
+        try {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
+                if (resourceStream == null) {
+                    Logger.getLogger("CheckalreadyRegisteredReader").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    message = "Fehler beim Laden der properties-Datei.";
+                    return new EmailCheckResponse(false, message);
+                }
+                properties.load(resourceStream);
+            }
+            int i = 1;
+            while (true) {
+                String userEmailKey = "User." + i + ".Email";
+                String currentUserEmail = properties.getProperty(userEmailKey);
+
+                // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
+                if (currentUserEmail.equalsIgnoreCase(email)) {
+                    message = "Email ist bereits registriert";
+                    return new EmailCheckResponse(true, message);
+                }
+                i++; // Nächsten Benutzer prüfen
+            }
+            //message="Email ist noch nicht registriert.";
+            //return new EmailCheckResponse(false, message);
+        } catch (IOException e) {
+            Logger.getLogger("CheckalreadyRegisteredReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
+            message = "Fehler beim Laden der properties-Datei.";
+            return new EmailCheckResponse(false, message);
+        }
     }
 
     public User getUserProfile(String email) {
@@ -64,12 +95,50 @@ public class UserManagerImplementation implements IUserManager{
     }
 
 
-    public int createUser(RegisterRequest registerRequest) {
-        int userID = 0;
-        // write the data into database
-        // String addUser_database_query = "Insert into User (FirstName, LastName, EMail, Password) Values ('" + user.getFirstName() + "', '" + user.getLastName() + "', '" + user.getEmail()  +"', '" + user.getPassword() + "');";
-        //Write into database
-        return userID;
+    public void addUser(User user) {
+        Properties properties = new Properties();
+        
+        try {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
+                if (resourceStream == null) {
+                    Logger.getLogger("GetUserReader").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    //return -1; // Datei nicht gefunden
+                }
+                properties.load(resourceStream);
+            }
+        } catch (IOException e) {
+            Logger.getLogger("GetUserReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
+        }    
+        int nextUserId = getNextUserId(properties);
+
+        // Erstelle die Schlüssel-Wert-Paare für den neuen Benutzer
+        properties.setProperty("User." + nextUserId + ".Firstname", user.getFirstName());
+        properties.setProperty("User." + nextUserId + ".Lastname", user.getLastName());
+        properties.setProperty("User." + nextUserId + ".Email", user.getEmail());
+        properties.setProperty("User." + nextUserId + ".Password", user.getPassword());
+        try {
+            properties.store(new FileOutputStream(fileName), null);
+        } catch (IOException e) {
+            Logger.getLogger("SetNewUserWriter").log(Level.INFO, "File can not be written to disk");
+        }
+    }
+
+    // Methode zum Ermitteln der nächsten User-ID
+    private int getNextUserId(Properties properties) {
+        int maxId = 0;
+        for (String key : properties.stringPropertyNames()) {
+            if (key.startsWith("User.") && key.endsWith(".Firstname")) {
+                // Extrahiere die ID zwischen "User." und ".Firstname"
+                try {
+                    int id = Integer.parseInt(key.split("\\.")[1]);
+                    maxId = Math.max(maxId, id);
+                } catch (NumberFormatException e) {
+                    Logger.getLogger("UserManager").log(Level.WARNING, "Ungültige ID in Properties-Datei: " + key, e);
+                }
+            }
+        }
+        return maxId + 1;
     }
 
     public boolean editUser(User user) {
