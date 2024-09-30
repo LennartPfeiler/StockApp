@@ -31,4 +31,6 @@ public interface IUserManager{
      * @return Returns true if successful, returns false if not successful
      */
     public boolean deleteUser(int userID);
+
+    public boolean checkAlreadyRegistered(String email);
 }

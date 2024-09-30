@@ -1,8 +1,11 @@
-mosbach\dhbw\de\stockwizzard\model\StringAnswer.class
-mosbach\dhbw\de\cftestbackend\StockWizzardBackendApplication.class
 mosbach\dhbw\de\stockwizzard\dataManager\IUserManager.class
+mosbach\dhbw\de\stockwizzard\controller\PersonController.class
+mosbach\dhbw\de\stockwizzard\dataManager\IAuthManager.class
+mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation.class
+mosbach\dhbw\de\stockwizzard\model\TokenUser.class
+mosbach\dhbw\de\stockwizzard\model\StringAnswer.class
+mosbach\dhbw\de\stockwizzard\model\LoginRequest.class
 mosbach\dhbw\de\stockwizzard\model\User.class
 mosbach\dhbw\de\stockwizzard\controller\MappingController.class
-AuthToken.class
-mosbach\dhbw\de\stockwizzard\controller\PersonController.class
+mosbach\dhbw\de\stockwizzard\StockWizzardBackendApplication.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.class

@@ -1,19 +1,56 @@
 package mosbach.dhbw.de.stockwizzard.controller;
 
-import mosbach.dhbw.de.stockwizzard.model.User;
-import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
-import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
+import mosbach.dhbw.de.stockwizzard.model.TokenUser;
+import mosbach.dhbw.de.stockwizzard.model.User;
+
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-
-// @RequestMapping("/api")
+@RequestMapping("/api")
 public class MappingController {
 
     UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
-    public MappingController() {
+    AuthManagerImplementation authManager = AuthManagerImplementation.getAuthManager();
+    @PostMapping(
+            path = "/auth",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResponseEntity<TokenUser> login(@RequestBody LoginRequest loginRequest){
+        String email = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
+        System.err.println(email);
+        //Überprüfen, ob der Benutzer in der Datenbank existiert
+        User user = userManager.getUserProfile(email); // Methode zur Suche nach Benutzer anhand E-Mail
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        // Passwortüberprüfung
+        if (!user.getPassword().equals(password)) {
+            // Falsches Passwort
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // Token generieren (Beispiel: JWT oder einfacher String-Token)
+        String token = authManager.generateToken();
+
+        //authManager.generateSession();
+        // Erstelle eine TokenTask-Instanz mit dem generierten Token und dem Benutzer
+        TokenUser tokenUser = new TokenUser(token, user);
+
+        // Erfolgreiche Anmeldung: Antwort mit TokenTask zurückgeben
+        return ResponseEntity.ok(tokenUser);
     }
+    
+
 
     @GetMapping("/user")
     public User getUserProfile(@RequestParam(value = "email", defaultValue = "") String email) {

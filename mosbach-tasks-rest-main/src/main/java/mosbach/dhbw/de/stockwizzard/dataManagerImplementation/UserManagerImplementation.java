@@ -23,6 +23,10 @@ public class UserManagerImplementation implements IUserManager{
         return databaseUser;
     }
 
+    public boolean checkAlreadyRegistered(String email){
+        return true;
+    }
+
     public User getUserProfile(String email) {
         Properties properties = new Properties();
         User user = null;
@@ -35,15 +39,10 @@ public class UserManagerImplementation implements IUserManager{
                 }
                 properties.load(resourceStream);
             }
-
             int i = 1;
             while (true) {
                 String userEmailKey = "User." + i + ".Email";
                 String currentUserEmail = properties.getProperty(userEmailKey);
-                if (currentUserEmail == null) {
-                    Logger.getLogger("GetUserReader").log(Level.INFO, "Kein weiterer Benutzer gefunden");
-                    break; // Breche die Schleife ab, wenn kein Benutzer mehr gefunden wird
-                }
 
                 // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
                 if (currentUserEmail.equalsIgnoreCase(email)) {
