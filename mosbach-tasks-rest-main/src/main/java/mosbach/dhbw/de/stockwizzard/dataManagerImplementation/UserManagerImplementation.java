@@ -2,6 +2,7 @@ package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
+import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -63,7 +64,7 @@ public class UserManagerImplementation implements IUserManager{
     }
 
 
-    public int addUser(User user) {
+    public int createUser(RegisterRequest registerRequest) {
         int userID = 0;
         // write the data into database
         // String addUser_database_query = "Insert into User (FirstName, LastName, EMail, Password) Values ('" + user.getFirstName() + "', '" + user.getLastName() + "', '" + user.getEmail()  +"', '" + user.getPassword() + "');";

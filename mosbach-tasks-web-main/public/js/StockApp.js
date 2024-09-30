@@ -82,7 +82,7 @@ function login(profileSchema){
     event.preventDefault();
     let email = profileSchema.email.value;
     let password = profileSchema.password.value;
-    const settingsGetProfile = {
+    const settingsLogin = {
         "async": true, // Asynchrone Anfrage
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
         "method": "POST",
@@ -117,10 +117,36 @@ function login(profileSchema){
         }
     };
 
-    console.log(settingsGetProfile.url);
-    $.ajax(settingsGetProfile);
+    $.ajax(settingsLogin);
 }
-    
+
+function register(profileSchema){
+    const settingsRegister = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
+        "method": "POST",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "firstname": profileSchema.firstname.value,
+            "lastname": profileSchema.lastname.value,
+            "email": profileSchema.email.value,
+            "password": profileSchema.password.value,
+            "budget": profileSchema.budget.value
+        }),
+        "success": function(data) {
+            alert(data);
+        },
+        "error": function(xhr) {
+            // Fehlerbehandlung je nach Statuscode
+            alert(error);
+        }
+    };
+    $.ajax(settingsRegister);
+}
+
 // Funktion, um den aktuellen Preis anzuzeigen (Portfolio-Seite)
 function showPrice() {
     var currentPrice = "220$";

@@ -1,5 +1,6 @@
 package mosbach.dhbw.de.stockwizzard.dataManager;
 
+import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.User;
 
 public interface IUserManager{
@@ -16,7 +17,7 @@ public interface IUserManager{
      * @param user: User object with data without ID
      * @return Returns generated ID of the new user
      */
-    public int addUser(User user);
+    public int createUser(RegisterRequest registerRequest);
 
     /**
      * Edit an existing user

@@ -7,6 +7,8 @@ import org.springframework.http.*;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
+import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
+import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
 
@@ -50,6 +52,19 @@ public class MappingController {
         return ResponseEntity.ok(tokenUser);
     }
     
+    @PostMapping(
+        path = "/user",
+        consumes = {MediaType.APPLICATION_JSON_VALUE}
+)
+    public ResponseEntity<TokenUser> createUser(@RequestBody RegisterRequest registerRequest){
+        userManager.createUser();
+        //authManager.generateSession();
+        // Erstelle eine TokenTask-Instanz mit dem generierten Token und dem Benutzer
+        StringAnswer sA = new StringAnswer("User successfully registered");
+
+        // Erfolgreiche Anmeldung: Antwort mit TokenTask zurückgeben
+        return ResponseEntity.ok(tokenUser);
+    }
 
 
     @GetMapping("/user")
