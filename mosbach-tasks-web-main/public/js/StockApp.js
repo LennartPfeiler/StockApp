@@ -2,21 +2,45 @@
 
 ///* Login *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function login(profileSchema){
-    setCookie("email", profileSchema.email.value);
+function login(profileSchema) {
+    let email = profileSchema.email.value;
     let password = profileSchema.password.value;
-    let answer = getProfileByEmail();
-    if(answer.success == true){
-        if(password != getCookie("password"))
-            alert("Das Passwort ist falsch versuche es erneut!");
-        else{
-            document.location = "home.html";
+    console.log("Test");
+    const settingsLogin = {
+        "async": false,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
+        "method": "POST",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "email": email,
+            "password": password
+        })
+    };
+
+    $.ajax(settingsLogin).done(function(data) {
+        // Erfolgreicher Login
+        setCookie("token", data.token);
+        setCookie("firstName", data.User.firstName);
+        setCookie("lastName", data.User.lastName);
+        setCookie("email", data.User.email);
+        setCookie("password", data.User.password);
+        document.location = "home.html"; // Weiterleitung zur Startseite
+    }).fail(function(xhr) {
+        // Fehlerbehandlung
+        if (xhr.status === 401) {
+            alert("Email oder Passwort ist falsch!");
+        } else if (xhr.status === 500) {
+            alert("Bitte registrieren Sie sich erst!");
+        } else {
+            alert("Es ist ein unbekannter Fehler aufgetreten.");
         }
-    }
-    else{
-        alert(answer.message);
-    } 
+    });
 }
+
+
 
 ///*Cookies*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -54,35 +78,49 @@ function testCookie(){
 
 // GET USER ID FROM COOKIE --------------------------------------------------------------------------------------------------------------------------------------------------------
 //getting Profile for user of the Website
-function getProfileByEmail(){
+function login(profileSchema){
+    event.preventDefault();
+    let email = profileSchema.email.value;
+    let password = profileSchema.password.value;
     const settingsGetProfile = {
-        "async": false,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/user?email="+ getCookie("email"),
-        "method": "GET",
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
+        "method": "POST",
         "headers": {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "email": email,
+            "password": password
+        }),
+        "success": function(data) {
+            // Erfolgreicher Aufruf
+            setCookie("token", data.token);
+            setCookie("firstName", data.User.firstName);
+            setCookie("lastName", data.User.lastName);
+            setCookie("email", data.User.email);
+            setCookie("password", data.User.password); // Passwort nicht speichern
+            document.location="home.html";
+        },
+        "error": function(xhr) {
+            // Fehlerbehandlung je nach Statuscode
+            let message;
+            if (xhr.status === 401) {
+                alert("Email oder Passwort ist falsch!");
+            } else if (xhr.status === 500) {
+                alert("Bitte registrieren Sie sich erst!")
+            }
+            else{
+                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            }
         }
-    }
-    console.log(settingsGetProfile.url);
-    $.ajax(settingsGetProfile).done(function (user) {
-        let success = true;
-        let message = "";
-        if (user) {
-            setCookie("userID", user.userID);
-            setCookie("firstName", user.firstName);
-            setCookie("lastName", user.lastName);
-            setCookie("email", user.email);
-            setCookie("password", user.password);
-            return {success: true, message: "Datenabruf erfolgreich!"}
-        } else {
-            return {success: false, message: "Bitte registrieren sie sich zuerst!"}
-        }
-    }).fail(function() {
-        return {success: false, message: "Fehler beim Abrufen der Benutzerdaten. Bitte versuchen Sie es später erneut."}
-    });
-}
+    };
 
+    console.log(settingsGetProfile.url);
+    $.ajax(settingsGetProfile);
+}
+    
 // Funktion, um den aktuellen Preis anzuzeigen (Portfolio-Seite)
 function showPrice() {
     var currentPrice = "220$";
