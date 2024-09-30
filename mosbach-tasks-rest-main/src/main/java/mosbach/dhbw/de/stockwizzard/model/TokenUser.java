@@ -1,4 +1,4 @@
-// package mosbach.dhbw.de.stockwizzard.model;
+package mosbach.dhbw.de.stockwizzard.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,10 +10,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AuthToken {
+public class TokenUser {
 
     @JsonProperty("token")
     private String token;
+    @JsonProperty("User")
+    private User user;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -21,16 +23,18 @@ public class AuthToken {
      * No args constructor for use in serialization
      * 
      */
-    public AuthToken() {
+    public TokenUser() {
     }
 
     /**
      * 
+     * @param user
      * @param token
      */
-    public AuthToken(String token) {
+    public TokenUser(String token, User user) {
         super();
         this.token = token;
+        this.user = user;
     }
 
     @JsonProperty("token")
@@ -39,8 +43,18 @@ public class AuthToken {
     }
 
     @JsonProperty("token")
-    public void setTocken(String token) {
+    public void setToken(String token) {
         this.token = token;
+    }
+
+    @JsonProperty("User")
+    public User getUser() {
+        return user;
+    }
+
+    @JsonProperty("User")
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @JsonAnyGetter
