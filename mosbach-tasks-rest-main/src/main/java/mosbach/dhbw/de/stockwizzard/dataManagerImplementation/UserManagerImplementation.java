@@ -25,9 +25,10 @@ public class UserManagerImplementation implements IUserManager{
         return databaseUser;
     }
 
-    public EmailCheckResponse isEmailAlreadyRegistered(String email){
+    public EmailCheckResponse isEmailAlreadyRegistered(String email) {
         Properties properties = new Properties();
-        String message = "";
+        String message;
+    
         try {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
@@ -38,26 +39,33 @@ public class UserManagerImplementation implements IUserManager{
                 }
                 properties.load(resourceStream);
             }
+    
             int i = 1;
             while (true) {
                 String userEmailKey = "User." + i + ".Email";
                 String currentUserEmail = properties.getProperty(userEmailKey);
-
+    
                 // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
+                if (currentUserEmail == null) {
+                    break; // Breche die Schleife, wenn keine weiteren Benutzer vorhanden sind
+                }
+    
                 if (currentUserEmail.equalsIgnoreCase(email)) {
                     message = "Email ist bereits registriert";
                     return new EmailCheckResponse(true, message);
                 }
                 i++; // Nächsten Benutzer prüfen
             }
-            //message="Email ist noch nicht registriert.";
-            //return new EmailCheckResponse(false, message);
+    
+            message = "Email ist noch nicht registriert.";
+            return new EmailCheckResponse(false, message);
+    
         } catch (IOException e) {
             Logger.getLogger("CheckalreadyRegisteredReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
             message = "Fehler beim Laden der properties-Datei.";
             return new EmailCheckResponse(false, message);
         }
-    }
+    }    
 
     public User getUserProfile(String email) {
         Properties properties = new Properties();
@@ -79,7 +87,7 @@ public class UserManagerImplementation implements IUserManager{
                 // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
                 if (currentUserEmail.equalsIgnoreCase(email)) {
                     String firstName = properties.getProperty("User." + i + ".Firstname");
-                    String lastName = properties.getProperty("User." + i + ".LastName");
+                    String lastName = properties.getProperty("User." + i + ".Lastname");
                     String password = properties.getProperty("User." + i + ".Password");
 
                     user = new User(firstName, lastName, currentUserEmail, password);
@@ -117,6 +125,7 @@ public class UserManagerImplementation implements IUserManager{
         properties.setProperty("User." + nextUserId + ".Lastname", user.getLastName());
         properties.setProperty("User." + nextUserId + ".Email", user.getEmail());
         properties.setProperty("User." + nextUserId + ".Password", user.getPassword());
+
         try {
             properties.store(new FileOutputStream(fileName), null);
         } catch (IOException e) {

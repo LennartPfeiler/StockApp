@@ -121,6 +121,7 @@ function login(profileSchema){
 }
 
 function register(profileSchema){
+    event.preventDefault();
     const settingsRegister = {
         "async": true, // Asynchrone Anfrage
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
@@ -137,11 +138,17 @@ function register(profileSchema){
             "budget": profileSchema.budget.value
         }),
         "success": function(data) {
-            alert(data);
+            console.log(data);
+            alert("Erfolgreich registriert! Sie können sich nun einloggen.");
         },
         "error": function(xhr) {
-            // Fehlerbehandlung je nach Statuscode
-            alert(error);
+            console.log(xhr);
+            if (xhr.status === 401) {
+                alert("Sie sind bereits registriert! Bitte loggen Sie sich ein.");
+            }
+            else{
+                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            }
         }
     };
     $.ajax(settingsRegister);

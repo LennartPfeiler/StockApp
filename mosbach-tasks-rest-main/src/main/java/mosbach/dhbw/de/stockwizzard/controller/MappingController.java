@@ -69,7 +69,7 @@ public class MappingController {
         else{
             if(mailResponse.isRegistered() == false && mailResponse.getMessage().equals("Email ist noch nicht registriert.")){
                 userManager.addUser(new User(registerRequest.getFirstname(), registerRequest.getLastname(), registerRequest.getEmail(), registerRequest.getPassword()));
-                portfolioManager.createPortfolio(new Portfolio(2, registerRequest.getBudget(), registerRequest.getEmail()));
+                portfolioManager.addPortfolio(new Portfolio(null, registerRequest.getBudget(), registerRequest.getEmail()));
                 StringAnswer sA = new StringAnswer();
                 sA.setAnswer("User successfully registered");
                 return ResponseEntity.ok(sA);
@@ -87,6 +87,10 @@ public class MappingController {
         return userManager.getUserProfile(email);   
     }
 
+    @GetMapping("/portfolio")
+    public Portfolio getUserPortfolio(@RequestParam(value = "email", defaultValue = "") String email) {
+        return portfolioManager.getUserPortfolio(email);   
+    }
 //     @PostMapping(                                                                               
 //             path = "/user",
 //             consumes = {MediaType.APPLICATION_JSON_VALUE}
