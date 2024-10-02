@@ -2,6 +2,7 @@ package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 public class UserManagerImplementation implements IUserManager{
 
     private String fileName = "users.properties";
+    PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
 
     static UserManagerImplementation databaseUser = null;
 
@@ -124,7 +126,7 @@ public class UserManagerImplementation implements IUserManager{
         properties.setProperty("User." + nextUserId + ".Firstname", user.getFirstName());
         properties.setProperty("User." + nextUserId + ".Lastname", user.getLastName());
         properties.setProperty("User." + nextUserId + ".Email", user.getEmail());
-        properties.setProperty("User." + nextUserId + ".Password", user.getPassword());
+        properties.setProperty("User." + nextUserId + ".Password", passwordManager.hashPassword(user.getPassword()));
 
         try {
             properties.store(new FileOutputStream(fileName), null);

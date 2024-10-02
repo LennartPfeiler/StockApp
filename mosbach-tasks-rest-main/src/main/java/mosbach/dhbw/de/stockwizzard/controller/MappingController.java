@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PortfolioManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
@@ -24,6 +25,7 @@ public class MappingController {
     UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
     AuthManagerImplementation authManager = AuthManagerImplementation.getAuthManager();
     PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
+    PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
     @PostMapping(
             path = "/auth",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -40,7 +42,7 @@ public class MappingController {
         }
 
         // Passwortüberprüfung
-        if (!user.getPassword().equals(password)) {
+        if (!passwordManager.checkPassword(password, user.getPassword())) {
             // Falsches Passwort
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

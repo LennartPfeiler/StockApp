@@ -7,7 +7,9 @@ mosbach\dhbw\de\stockwizzard\dataManager\IAuthManager.class
 mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioManager.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\model\TokenUser.class
+mosbach\dhbw\de\stockwizzard\dataManager\IPasswordManager.class
 mosbach\dhbw\de\stockwizzard\model\StringAnswer.class
+mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PasswordManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\model\LoginRequest.class
 mosbach\dhbw\de\stockwizzard\model\User.class
 mosbach\dhbw\de\stockwizzard\controller\MappingController.class
