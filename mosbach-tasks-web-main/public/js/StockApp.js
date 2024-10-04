@@ -26,7 +26,7 @@ function login(profileSchema) {
         setCookie("firstName", data.User.firstName);
         setCookie("lastName", data.User.lastName);
         setCookie("email", data.User.email);
-        setCookie("password", data.User.password);
+        //setCookie("password", data.User.password);
         document.location = "home.html"; // Weiterleitung zur Startseite
     }).fail(function(xhr) {
         // Fehlerbehandlung
@@ -100,7 +100,7 @@ function login(profileSchema){
             setCookie("firstName", data.User.firstName);
             setCookie("lastName", data.User.lastName);
             setCookie("email", data.User.email);
-            setCookie("password", data.User.password); // Passwort nicht speichern
+            //setCookie("password", data.User.password); // Passwort nicht speichern
             document.location="home.html";
         },
         "error": function(xhr) {
@@ -214,8 +214,6 @@ function getStockPrice() {
         error: function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 429) {
                 $('#price-display').text('Zu viele Anfragen. Bitte versuche es später erneut.');
-            } else if (jqXHR.status === 404) {
-                $('#price-display').text('Aktie nicht gefunden.');
             } else {
                 console.error('Fehler:', textStatus, errorThrown);
                 $('#price-display').text('Fehler beim Abrufen der Daten.');
