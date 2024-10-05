@@ -8,6 +8,7 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImpleme
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PortfolioManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.SessionManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
 import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
@@ -15,7 +16,7 @@ import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
-
+import mosbach.dhbw.de.stockwizzard.model.Session;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -26,6 +27,7 @@ public class MappingController {
     AuthManagerImplementation authManager = AuthManagerImplementation.getAuthManager();
     PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
     PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
+    SessionManagerImplementation sessionManager = SessionManagerImplementation.getSessionManager();
     @PostMapping(
             path = "/auth",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -47,9 +49,8 @@ public class MappingController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        // Token generieren (Beispiel: JWT oder einfacher String-Token)
         String token = authManager.generateToken();
-
+        sessionManager.createSession(user.getEmail(), token);
         //authManager.generateSession();
         // Erstelle eine TokenTask-Instanz mit dem generierten Token und dem Benutzer
         TokenUser tokenUser = new TokenUser(token, user);
@@ -83,6 +84,10 @@ public class MappingController {
         }
     }
 
+    @GetMapping("/session")
+    public Session getSession(@RequestParam(value = "email", defaultValue = "") String email) {
+        return sessionManager.getSession(email);   
+    }
 
     @GetMapping("/user")
     public User getUserProfile(@RequestParam(value = "email", defaultValue = "") String email) {
