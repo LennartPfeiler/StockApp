@@ -20,6 +20,8 @@ public class User {
     private String email;
     @JsonProperty("password")
     private String password;
+    @JsonProperty("budget")
+    private Double budget;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -36,13 +38,15 @@ public class User {
      * @param password
      * @param email
      * @param lastname
+     * * @param budget
      */
-    public User(String firstname, String lastname, String email, String password) {
+    public User(String firstname, String lastname, String email, String password, Double budget) {
         super();
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
+        this.budget = budget;
     }
 
     @JsonProperty("firstname")
@@ -85,6 +89,16 @@ public class User {
         this.password = password;
     }
 
+    @JsonProperty("budget")
+    public Double getBudget() {
+        return budget;
+    }
+
+    @JsonProperty("budget")
+    public void setBudget(Double budget) {
+        this.budget = budget;
+    }
+    
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;

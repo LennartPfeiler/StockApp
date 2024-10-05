@@ -63,16 +63,16 @@ public class MappingController {
         path = "/user",
         consumes = {MediaType.APPLICATION_JSON_VALUE}
 )
-    public ResponseEntity<StringAnswer> createUser(@RequestBody RegisterRequest registerRequest){
-        EmailCheckResponse mailResponse = userManager.isEmailAlreadyRegistered(registerRequest.getEmail());
+    public ResponseEntity<StringAnswer> createUser(@RequestBody User user){
+        EmailCheckResponse mailResponse = userManager.isEmailAlreadyRegistered(user.getEmail());
         if(mailResponse.isRegistered() == true){
             //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Der Benutzer ist bereits registriert.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         else{
             if(mailResponse.isRegistered() == false && mailResponse.getMessage().equals("Email ist noch nicht registriert.")){
-                userManager.addUser(new User(registerRequest.getFirstname(), registerRequest.getLastname(), registerRequest.getEmail(), registerRequest.getPassword()));
-                portfolioManager.addPortfolio(new Portfolio(null, registerRequest.getBudget(), registerRequest.getEmail()));
+                userManager.addUser(new User(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getBudget()));
+                portfolioManager.addPortfolio(new Portfolio(null, user.getBudget(), user.getEmail()));
                 StringAnswer sA = new StringAnswer();
                 sA.setAnswer("User successfully registered");
                 return ResponseEntity.ok(sA);

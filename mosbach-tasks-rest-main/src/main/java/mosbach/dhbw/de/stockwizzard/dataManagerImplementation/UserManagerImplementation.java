@@ -91,8 +91,9 @@ public class UserManagerImplementation implements IUserManager{
                     String firstName = properties.getProperty("User." + i + ".Firstname");
                     String lastName = properties.getProperty("User." + i + ".Lastname");
                     String password = properties.getProperty("User." + i + ".Password");
+                    Double budget = Double.valueOf(properties.getProperty("User." + i + ".Budget"));
 
-                    user = new User(firstName, lastName, currentUserEmail, password);
+                    user = new User(firstName, lastName, currentUserEmail, password, budget);
                     Logger.getLogger("GetUserReader").log(Level.INFO, "Benutzer gefunden: {0}", user);
                     break; // Benutzer gefunden, Schleife verlassen
                 }
@@ -127,6 +128,7 @@ public class UserManagerImplementation implements IUserManager{
         properties.setProperty("User." + nextUserId + ".Lastname", user.getLastName());
         properties.setProperty("User." + nextUserId + ".Email", user.getEmail());
         properties.setProperty("User." + nextUserId + ".Password", passwordManager.hashPassword(user.getPassword()));
+        properties.setProperty("User." + nextUserId + ".Budget", user.getBudget().toString());
 
         try {
             properties.store(new FileOutputStream(fileName), null);
