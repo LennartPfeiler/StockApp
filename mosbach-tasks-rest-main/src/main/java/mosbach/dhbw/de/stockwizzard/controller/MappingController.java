@@ -118,6 +118,16 @@ public class MappingController {
             return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
         }
     }
+
+    @PostMapping(
+            path = "/order/buy",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> createOrder(@RequestBody TokenTransaction tokenTransaction){
+        String token = tokenTransaction.getToken();
+        Transaction transaction = tokenTransaction.getTransaction();
+
+    }
         
         
         
