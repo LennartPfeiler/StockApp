@@ -3,14 +3,12 @@ package mosbach.dhbw.de.stockwizzard.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
-
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PortfolioManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.SessionManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
-import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
@@ -98,6 +96,35 @@ public class MappingController {
     public Portfolio getUserPortfolio(@RequestParam(value = "email", defaultValue = "") String email) {
         return portfolioManager.getUserPortfolio(email);   
     }
+
+    @PutMapping(
+            path = "/user",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> Token(@RequestBody TokenUser tokenUser){
+        String token = tokenUser.getToken();
+        String email = tokenUser.getUser().getEmail();
+
+         if (token != null && email != null) {
+        // Führe Validierung oder eine weitere Aktion durch
+        // Beispiel: Prüfen, ob der Token gültig ist
+        boolean isValid = sessionManager.validToken(token, email);
+        if (isValid) {
+            return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+        }
+        } else {
+            return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
+        }
+    }
+        
+        
+        
+
+
+
+
 //     @PostMapping(                                                                               
 //             path = "/user",
 //             consumes = {MediaType.APPLICATION_JSON_VALUE}

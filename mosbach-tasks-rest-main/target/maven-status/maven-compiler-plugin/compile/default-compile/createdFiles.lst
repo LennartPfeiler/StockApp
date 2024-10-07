@@ -1,5 +1,4 @@
 mosbach\dhbw\de\stockwizzard\model\EmailCheckResponse.class
-mosbach\dhbw\de\stockwizzard\model\RegisterRequest.class
 mosbach\dhbw\de\stockwizzard\dataManager\ISessionManager.class
 mosbach\dhbw\de\stockwizzard\controller\PersonController.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\SessionManagerImplementation.class
