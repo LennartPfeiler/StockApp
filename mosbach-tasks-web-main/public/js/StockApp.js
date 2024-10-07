@@ -96,9 +96,10 @@ function login(profileSchema){
         }),
         "success": function(data) {
             // Erfolgreicher Aufruf
+            console.log(data)
             setCookie("token", data.token);
-            setCookie("firstname", data.User.firstName);
-            setCookie("lastname", data.User.lastName);
+            setCookie("firstname", data.User.firstname);
+            setCookie("lastname", data.User.lastname);
             setCookie("email", data.User.email);
             //setCookie("password", data.User.password); // Passwort nicht speichern
             document.location="home.html";
@@ -240,7 +241,7 @@ function setProfileValues(){
     console.log(getCookie("firstName"));
     console.log(document.cookie)
     // Setze den Wert des Vorname-Feldes
-    document.getElementById("first-name").value = getCookie("lastname");
+    document.getElementById("first-name").value = getCookie("firstname");
     // Setze den Wert des Nachname-Feldes
     document.getElementById("last-name").value = getCookie("lastname");
     // Setze den Wert des E-Mail-Feldes
