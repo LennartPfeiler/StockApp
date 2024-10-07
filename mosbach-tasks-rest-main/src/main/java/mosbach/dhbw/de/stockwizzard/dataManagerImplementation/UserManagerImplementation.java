@@ -5,6 +5,7 @@ import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
+import mosbach.dhbw.de.stockwizzard.model.EditRequest;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +13,10 @@ import java.util.logging.Logger;
 public class UserManagerImplementation implements IUserManager{
 
     private String fileName = "users.properties";
+    private String transactionFile = "transactions.properties";
+    private String sessionsFile = "sessions.properties";
+    private String portoliosFile = "portfolios.properties";
+    
     PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
 
     static UserManagerImplementation databaseUser = null;
@@ -153,18 +158,147 @@ public class UserManagerImplementation implements IUserManager{
         return maxId + 1;
     }
 
-    public boolean editUser(User user) {
-        boolean edited = true;
+    public boolean editUser(String currentEmail, User user) {
+         Properties propertiesU = new Properties();
+    
+        try {
+            ClassLoader loaderU = Thread.currentThread().getContextClassLoader();
+            try (InputStream resourceStream = loaderU.getResourceAsStream(fileName)) {
+                if (resourceStream == null) {
+                    Logger.getLogger("EditUserUsers").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    return false;
+                }
+                propertiesU.load(resourceStream);
+            }
 
+            Properties propertiesT = new Properties();
+
+            ClassLoader loaderT = Thread.currentThread().getContextClassLoader();
+            try (InputStream resourceStream = loaderT.getResourceAsStream(transactionFile)) {
+                if (resourceStream == null) {
+                    Logger.getLogger("EditUserTransactions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    return false;
+                }
+                propertiesT.load(resourceStream);
+            }
+
+            Properties propertiesS = new Properties();
+
+            ClassLoader loaderS = Thread.currentThread().getContextClassLoader();
+            try (InputStream resourceStream = loaderS.getResourceAsStream(sessionsFile)) {
+                if (resourceStream == null) {
+                    Logger.getLogger("EditUserSessions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    return false;
+                }
+                propertiesS.load(resourceStream);
+            }
+
+            Properties propertiesP = new Properties();
+
+            ClassLoader loaderP = Thread.currentThread().getContextClassLoader();
+            try (InputStream resourceStream = loaderP.getResourceAsStream(portoliosFile)) {
+                if (resourceStream == null) {
+                    Logger.getLogger("EditUserPortfolios").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    return false;
+                }
+                propertiesP.load(resourceStream);
+            }
+
+        int i = 1;
+        while (true){
+            String emailKey = "User." + i + ".Email";
+            String currentUserEmailUsers = propertiesU.getProperty(emailKey);
+
+            if(currentUserEmailUsers == null){
+                return false;
+            }
+
+            if(currentUserEmailUsers.equals(currentEmail)){
+                String newEmail = user.getEmail();
+                String newFirstname = user.getFirstName();
+                String newLastname = user.getLastName();
+                String newPassword = user.getPassword();
+                String newBudget = user.getBudget().toString();
+                String firstnameKey = "User." + i + ".Firstname";
+                String lastnameKey = "User." + i + ".Lastname";
+                String passwordKey = "User." + i + ".Password";
+                String budgetKey = "User." + i + ".Budget";
+                
+                propertiesU.setProperty(firstnameKey, newFirstname);
+                propertiesU.setProperty(lastnameKey, newLastname);
+                propertiesU.setProperty(passwordKey, newPassword);
+                propertiesU.setProperty(budgetKey, newBudget);
+
+                if(!currentEmail.equalsIgnoreCase(newEmail)){
+                   int t = 1;
+                   while (true){
+                    String transEmailKey = "Transaction." + t + ".Email";
+                    String currentUserEmailTrans = propertiesT.getProperty(transEmailKey);
+
+                    if(currentUserEmailTrans == null){
+                        break;
+                    }
+
+                    if(currentUserEmailTrans.equals(currentEmail)){
+                        propertiesT.setProperty(transEmailKey, newEmail);
+
+                    }
+                    t++;
+
+                   }
+                    int s = 1;
+                   while (true){
+                    String sessionEmailKey = "Session." + s + ".Email";
+                    String currentUserEmailSession = propertiesS.getProperty(sessionEmailKey);
+
+                    if(currentUserEmailSession == null){
+                        break;
+                    }
+
+                    if(currentUserEmailSession.equals(currentEmail)){
+                        propertiesS.setProperty(sessionEmailKey, newEmail);
+
+                    }
+                    s++;
+
+                   }
+                    int p = 1;
+                   while (true){
+                    String portfolioEmailKey = "Portfolio." + p + ".Email";
+                    String currentUserEmailPortfolio = propertiesP.getProperty(portfolioEmailKey);
+
+                    if(currentUserEmailPortfolio == null){
+                        break;
+                    }
+
+                    if(currentUserEmailPortfolio.equals(currentEmail)){
+                        propertiesP.setProperty(portfolioEmailKey, newEmail);
+
+                    }
+                    p++;
+
+                   }
+                   propertiesU.setProperty(emailKey, newEmail);
+                }
+            }
+            i++;
+
+            return true;
+        }
         
+
+     } catch (IOException e) {
+            Logger.getLogger("EditUser").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
+        }
+        return false;
+    }
         // change the data of user, found by id
         // String editUser_database_query = "UPDATE Users" +
         //         "       SET FirstName = '" + user.getFirstName() + "', LastName = '" + user.getLastName() +
         //                 "', EMail = '" + user.getEmail() + "', Password = '" + user.getPassword() + "'" +
         //         "       WHERE UserID = " + user.getUserID() + ";";
         //Write into database
-        return edited;
-    }
+    
 
     @Override
     public boolean deleteUser(int userID) {
