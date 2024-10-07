@@ -122,4 +122,44 @@ public class SessionManagerImplementation implements ISessionManager{
         }
         return maxId + 1;
     }
+
+    public boolean validToken(String token, String email){
+         Properties properties = new Properties();
+    
+        try {
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
+                if (resourceStream == null) {
+                    Logger.getLogger("CheckTokenValidation").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+                    return false;
+                }
+                properties.load(resourceStream);
+            }
+
+            int i = 1;
+            while (true) {
+                String sessionTokenKey = "Session." + i + ".Token";
+                String currentSessionToken = properties.getProperty(sessionTokenKey);
+
+                if(currentSessionToken == null){
+                    return false;
+                }
+
+                if (currentSessionToken.equals(token)){
+                    String currentEmailKey = "Session." + i + ".Email";
+                    String currentEmail = properties.getProperty(currentEmailKey);
+                    if (currentEmail.equals(email) && currentEmail != null){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
+                i++;
+            }
+        }catch (IOException e) {
+            Logger.getLogger("CheckTokenValidation").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
+        }
+
+        return false; // Fehler beim Laden der Datei oder keine Übereinstimmung gefunden
+    }
 }

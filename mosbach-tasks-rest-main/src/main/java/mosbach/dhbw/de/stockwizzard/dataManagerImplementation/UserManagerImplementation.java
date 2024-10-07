@@ -3,7 +3,6 @@ package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
-import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import java.util.Properties;
@@ -156,6 +155,8 @@ public class UserManagerImplementation implements IUserManager{
 
     public boolean editUser(User user) {
         boolean edited = true;
+
+        
         // change the data of user, found by id
         // String editUser_database_query = "UPDATE Users" +
         //         "       SET FirstName = '" + user.getFirstName() + "', LastName = '" + user.getLastName() +

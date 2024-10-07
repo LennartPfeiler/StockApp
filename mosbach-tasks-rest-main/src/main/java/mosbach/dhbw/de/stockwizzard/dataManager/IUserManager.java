@@ -1,6 +1,5 @@
 package mosbach.dhbw.de.stockwizzard.dataManager;
 
-import mosbach.dhbw.de.stockwizzard.model.RegisterRequest;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 
