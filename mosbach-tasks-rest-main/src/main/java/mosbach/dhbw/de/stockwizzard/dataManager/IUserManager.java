@@ -34,4 +34,6 @@ public interface IUserManager{
     public boolean deleteUser(int userID);
 
     public EmailCheckResponse isEmailAlreadyRegistered(String email);
+
+    public boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser);
 }

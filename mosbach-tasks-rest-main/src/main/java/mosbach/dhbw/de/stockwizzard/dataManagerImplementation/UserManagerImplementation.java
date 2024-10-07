@@ -31,6 +31,18 @@ public class UserManagerImplementation implements IUserManager{
         return databaseUser;
     }
 
+    public boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser){
+        // Überprüfen, ob das benötigte Budget größer ist als das verfügbare Budget
+        if(needed > currentUser.getBudget()){
+            return false; // Nicht genug Budget vorhanden
+        }
+    
+        // Ansonsten: Genug Budget vorhanden
+        return true;
+    }
+    
+
+
     public EmailCheckResponse isEmailAlreadyRegistered(String email) {
         Properties properties = new Properties();
         String message;

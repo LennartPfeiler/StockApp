@@ -2,6 +2,10 @@ package mosbach.dhbw.de.stockwizzard.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.springframework.http.*;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
@@ -124,15 +128,22 @@ public class MappingController {
         }
     }
 
-    // @PostMapping(
-    //         path = "/order/buy",
-    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
-    // ) 
-    // public ResponseEntity<?> createOrder(@RequestBody TokenTransaction tokenTransaction){
-    //     String token = tokenTransaction.getToken();
-    //     Transaction transaction = tokenTransaction.getTransaction();
-
-    // }
+    @PostMapping(
+            path = "/order/buy",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> createOrder(@RequestBody TokenTransaction tokenTransaction){
+        String token = tokenTransaction.getToken();
+        Transaction transaction = tokenTransaction.getTransaction();
+        User currentUser = userManager.getUserProfile(transaction.getEmail());
+        boolean enoughBudget = userManager.CheckIfEnoughBudgetLeft(transaction.getTotalPrice(), currentUser);
+        if(enoughBudget == false){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        else{
+            return ResponseEntity.ok("Token gültig");
+        }
+    }
         
         
         
