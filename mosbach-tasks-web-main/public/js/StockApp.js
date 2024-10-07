@@ -2,43 +2,6 @@
 
 ///* Login *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// function login(profileSchema) {
-//     let email = profileSchema.email.value;
-//     let password = profileSchema.password.value;
-//     console.log("Test");
-//     const settingsLogin = {
-//         "async": false,
-//         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
-//         "method": "POST",
-//         "headers": {
-//             'Accept': 'application/json',
-//             'Content-Type': 'application/json'
-//         },
-//         "data": JSON.stringify({
-//             "email": email,
-//             "password": password
-//         })
-//     };
-
-//     $.ajax(settingsLogin).done(function(data) {
-//         // Erfolgreicher Login
-//         setCookie("token", data.token);
-//         setCookie("firstName", data.User.firstName);
-//         setCookie("lastName", data.User.lastName);
-//         setCookie("email", data.User.email);
-//         //setCookie("password", data.User.password);
-//         document.location = "home.html"; // Weiterleitung zur Startseite
-//     }).fail(function(xhr) {
-//         // Fehlerbehandlung
-//         if (xhr.status === 401) {
-//             alert("Email oder Passwort ist falsch!");
-//         } else if (xhr.status === 500) {
-//             alert("Bitte registrieren Sie sich erst!");
-//         } else {
-//             alert("Es ist ein unbekannter Fehler aufgetreten.");
-//         }
-//     });
-// }
 
 
 
@@ -101,8 +64,17 @@ function login(profileSchema){
             setCookie("firstname", data.User.firstname);
             setCookie("lastname", data.User.lastname);
             setCookie("email", data.User.email);
-            //setCookie("password", data.User.password); // Passwort nicht speichern
+            setCookie("budget", data.User.budget);
+            setCookie("password", data.User.password);
+            // localStorage.setItem("token", data.token);
+            // localStorage.setItem("firstname", data.User.firstname);
+            // localStorage.setItem("lastname", data.User.lastname);
+            // localStorage.setItem("email", data.User.email);
+            // console.log("Werte gespeichert:", localStorage.getItem("firstname"), localStorage.getItem("lastname"), localStorage.getItem("email"));
+            // //setCookie("password", data.User.password); // Passwort nicht speichern
             document.location="home.html";
+            // console.log("Werte gespeichert:", localStorage.getItem("firstname"), localStorage.getItem("lastname"), localStorage.getItem("email"));
+            
         },
         "error": function(xhr) {
             // Fehlerbehandlung je nach Statuscode
@@ -178,6 +150,43 @@ function toggleLabel() {
     }
 }
 
+
+function editUser(){
+    event.preventDefault();
+    const editRegister = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
+        "method": "PUT",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "currentmail": getCookie("email"),
+            "user": {
+            "firstname": $('#first-name').value,
+            "lastname": $('#last-name').value,
+            "email": $('#email').value,
+            "password": getCookie("password"),
+            "budget": getCookie("budget")
+        }}),
+        "success": function(data) {
+            alert("Erfolgreich geändert!.");
+        },
+        "error": function(xhr) {
+            console.log(xhr);
+            if (xhr.status === 401) {
+                alert("Sie sind nciht berechtigt das Profil zu ändern!.");
+            }
+            else{
+                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            }
+        }
+    };
+
+    $.ajax(editRegister);
+}
 //////////////////////////////////////////// Aktienpreis //////////////////////////////////////////
 
 //Funktion, um den eingegebenen Aktiennamen innerhalb des Portfolios zu bekommen
@@ -238,12 +247,22 @@ function handleInputKeypress(e) {
 }
 
 function setProfileValues(){
-    console.log(getCookie("firstName"));
-    console.log(document.cookie)
+    // console.log("Vor dem Abrufen der Werte:");
+    // console.log("Firstname:", localStorage.getItem("firstname"));
+    // console.log("Lastname:", localStorage.getItem("lastname"));
+    // console.log("Email:", localStorage.getItem("email"));
+
+    // console.log(getCookie("firstName"));
+    // console.log(document.cookie)
     // Setze den Wert des Vorname-Feldes
     document.getElementById("first-name").value = getCookie("firstname");
     // Setze den Wert des Nachname-Feldes
     document.getElementById("last-name").value = getCookie("lastname");
     // Setze den Wert des E-Mail-Feldes
-    document.getElementById("email").value = getCookie("email");;
+    document.getElementById("email").value = getCookie("email");
+    // document.getElementById("first-name").value = localStorage.getItem("firstname");
+    // // Setze den Wert des Nachname-Feldes
+    // document.getElementById("last-name").value = localStorage.getItem("lastname");
+    // // Setze den Wert des E-Mail-Feldes
+    // document.getElementById("email").value = localStorage.getItem("email");
 }
