@@ -2,43 +2,43 @@
 
 ///* Login *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function login(profileSchema) {
-    let email = profileSchema.email.value;
-    let password = profileSchema.password.value;
-    console.log("Test");
-    const settingsLogin = {
-        "async": false,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
-        "method": "POST",
-        "headers": {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        "data": JSON.stringify({
-            "email": email,
-            "password": password
-        })
-    };
+// function login(profileSchema) {
+//     let email = profileSchema.email.value;
+//     let password = profileSchema.password.value;
+//     console.log("Test");
+//     const settingsLogin = {
+//         "async": false,
+//         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
+//         "method": "POST",
+//         "headers": {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json'
+//         },
+//         "data": JSON.stringify({
+//             "email": email,
+//             "password": password
+//         })
+//     };
 
-    $.ajax(settingsLogin).done(function(data) {
-        // Erfolgreicher Login
-        setCookie("token", data.token);
-        setCookie("firstName", data.User.firstName);
-        setCookie("lastName", data.User.lastName);
-        setCookie("email", data.User.email);
-        //setCookie("password", data.User.password);
-        document.location = "home.html"; // Weiterleitung zur Startseite
-    }).fail(function(xhr) {
-        // Fehlerbehandlung
-        if (xhr.status === 401) {
-            alert("Email oder Passwort ist falsch!");
-        } else if (xhr.status === 500) {
-            alert("Bitte registrieren Sie sich erst!");
-        } else {
-            alert("Es ist ein unbekannter Fehler aufgetreten.");
-        }
-    });
-}
+//     $.ajax(settingsLogin).done(function(data) {
+//         // Erfolgreicher Login
+//         setCookie("token", data.token);
+//         setCookie("firstName", data.User.firstName);
+//         setCookie("lastName", data.User.lastName);
+//         setCookie("email", data.User.email);
+//         //setCookie("password", data.User.password);
+//         document.location = "home.html"; // Weiterleitung zur Startseite
+//     }).fail(function(xhr) {
+//         // Fehlerbehandlung
+//         if (xhr.status === 401) {
+//             alert("Email oder Passwort ist falsch!");
+//         } else if (xhr.status === 500) {
+//             alert("Bitte registrieren Sie sich erst!");
+//         } else {
+//             alert("Es ist ein unbekannter Fehler aufgetreten.");
+//         }
+//     });
+// }
 
 
 
@@ -97,8 +97,8 @@ function login(profileSchema){
         "success": function(data) {
             // Erfolgreicher Aufruf
             setCookie("token", data.token);
-            setCookie("firstName", data.User.firstName);
-            setCookie("lastName", data.User.lastName);
+            setCookie("firstname", data.User.firstName);
+            setCookie("lastname", data.User.lastName);
             setCookie("email", data.User.email);
             //setCookie("password", data.User.password); // Passwort nicht speichern
             document.location="home.html";
@@ -234,4 +234,15 @@ function handleInputKeypress(e) {
     if (e.key === 'Enter') { 
         getStockPrice();
     }
+}
+
+function setProfileValues(){
+    console.log(getCookie("firstName"));
+    console.log(document.cookie)
+    // Setze den Wert des Vorname-Feldes
+    document.getElementById("first-name").value = getCookie("lastname");
+    // Setze den Wert des Nachname-Feldes
+    document.getElementById("last-name").value = getCookie("lastname");
+    // Setze den Wert des E-Mail-Feldes
+    document.getElementById("email").value = getCookie("email");;
 }
