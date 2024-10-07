@@ -155,6 +155,8 @@ public class UserManagerImplementation implements IUserManager{
 
     public boolean editUser(User user) {
         boolean edited = true;
+
+        
         // change the data of user, found by id
         // String editUser_database_query = "UPDATE Users" +
         //         "       SET FirstName = '" + user.getFirstName() + "', LastName = '" + user.getLastName() +

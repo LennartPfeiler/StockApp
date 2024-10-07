@@ -101,14 +101,15 @@ public class MappingController {
             path = "/user",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     ) 
-    public ResponseEntity<?> Token(@RequestBody TokenUser tokenUser){
-        String token = tokenUser.getToken();
-        String email = tokenUser.getUser().getEmail();
+    public ResponseEntity<?> EditUser(@RequestBody EditRequest editRequest){
+        String token = editRequest.getToken();
+        String currentEmail = editRequest.getCurrentmail();
+        User user = editRequest.getUser();
 
          if (token != null && email != null) {
         // Führe Validierung oder eine weitere Aktion durch
         // Beispiel: Prüfen, ob der Token gültig ist
-        boolean isValid = sessionManager.validToken(token, email);
+        boolean isValid = sessionManager.validToken(token, currentEmail);
         if (isValid) {
             return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
         } else {
