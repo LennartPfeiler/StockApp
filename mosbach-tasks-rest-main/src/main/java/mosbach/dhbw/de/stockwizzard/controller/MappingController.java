@@ -15,6 +15,9 @@ import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.Session;
+import mosbach.dhbw.de.stockwizzard.model.EditRequest;
+import mosbach.dhbw.de.stockwizzard.model.TokenTransaction;
+import mosbach.dhbw.de.stockwizzard.model.Transaction;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -101,16 +104,17 @@ public class MappingController {
             path = "/user",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     ) 
-    public ResponseEntity<?> EditUser(@RequestBody EditRequest editRequest){
+    public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
         String token = editRequest.getToken();
         String currentEmail = editRequest.getCurrentmail();
         User user = editRequest.getUser();
 
-         if (token != null && email != null) {
+         if (token != null && currentEmail != null) {
         // Führe Validierung oder eine weitere Aktion durch
         // Beispiel: Prüfen, ob der Token gültig ist
         boolean isValid = sessionManager.validToken(token, currentEmail);
         if (isValid) {
+            userManager.editUser(currentEmail, user);
             return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
@@ -120,15 +124,15 @@ public class MappingController {
         }
     }
 
-    @PostMapping(
-            path = "/order/buy",
-            consumes = {MediaType.APPLICATION_JSON_VALUE}
-    ) 
-    public ResponseEntity<?> createOrder(@RequestBody TokenTransaction tokenTransaction){
-        String token = tokenTransaction.getToken();
-        Transaction transaction = tokenTransaction.getTransaction();
+    // @PostMapping(
+    //         path = "/order/buy",
+    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
+    // ) 
+    // public ResponseEntity<?> createOrder(@RequestBody TokenTransaction tokenTransaction){
+    //     String token = tokenTransaction.getToken();
+    //     Transaction transaction = tokenTransaction.getTransaction();
 
-    }
+    // }
         
         
         
