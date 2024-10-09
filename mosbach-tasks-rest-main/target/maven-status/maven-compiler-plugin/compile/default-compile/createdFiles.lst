@@ -1,5 +1,6 @@
 mosbach\dhbw\de\stockwizzard\model\EmailCheckResponse.class
 mosbach\dhbw\de\stockwizzard\model\Transaction.class
+mosbach\dhbw\de\stockwizzard\model\TransactionContent.class
 mosbach\dhbw\de\stockwizzard\dataManager\ISessionManager.class
 mosbach\dhbw\de\stockwizzard\controller\PersonController.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\SessionManagerImplementation.class
@@ -7,9 +8,11 @@ mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation
 mosbach\dhbw\de\stockwizzard\model\User.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\model\Portfolio.class
+mosbach\dhbw\de\stockwizzard\model\TokenTransactionContent.class
 mosbach\dhbw\de\stockwizzard\model\EditRequest.class
-mosbach\dhbw\de\stockwizzard\model\TokenTransaction.class
 mosbach\dhbw\de\stockwizzard\dataManager\IUserManager.class
+mosbach\dhbw\de\stockwizzard\dataManagerImplementation\TransactionManagerImplementation.class
+mosbach\dhbw\de\stockwizzard\dataManager\ITransactionManager.class
 mosbach\dhbw\de\stockwizzard\dataManager\IAuthManager.class
 mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioManager.class
 mosbach\dhbw\de\stockwizzard\model\TokenUser.class

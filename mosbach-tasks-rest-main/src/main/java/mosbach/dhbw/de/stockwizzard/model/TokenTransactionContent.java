@@ -11,12 +11,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TokenTransaction {
+public class TokenTransactionContent {
 
     @JsonProperty("token")
     private String token;
-    @JsonProperty("transaction")
-    private Transaction transaction;
+    @JsonProperty("transactionContent")
+    private TransactionContent transactionContent;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -24,18 +24,18 @@ public class TokenTransaction {
      * No args constructor for use in serialization
      * 
      */
-    public TokenTransaction() {
+    public TokenTransactionContent() {
     }
 
     /**
      * 
-     * @param transaction
+     * @param transactionContent
      * @param token
      */
-    public TokenTransaction(String token, Transaction transaction) {
+    public TokenTransactionContent(String token, TransactionContent transactionContent) {
         super();
         this.token = token;
-        this.transaction = transaction;
+        this.transactionContent = transactionContent;
     }
 
     @JsonProperty("token")
@@ -48,14 +48,14 @@ public class TokenTransaction {
         this.token = token;
     }
 
-    @JsonProperty("transaction")
-    public Transaction getTransaction() {
-        return transaction;
+    @JsonProperty("transactionContent")
+    public TransactionContent getTransactionContent() {
+        return transactionContent;
     }
 
-    @JsonProperty("transaction")
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
+    @JsonProperty("transactionContent")
+    public void setTransactionContent(TransactionContent transactionContent) {
+        this.transactionContent = transactionContent;
     }
 
     @JsonAnyGetter

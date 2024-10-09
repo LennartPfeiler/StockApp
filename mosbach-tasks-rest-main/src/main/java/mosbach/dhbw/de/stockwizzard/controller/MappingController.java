@@ -12,6 +12,7 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImp
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PortfolioManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.SessionManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.TransactionManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
@@ -20,14 +21,16 @@ import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.Session;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
-import mosbach.dhbw.de.stockwizzard.model.TokenTransaction;
+import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
+import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api")
 public class MappingController {
 
+    TransactionManagerImplementation transactionManager = TransactionManagerImplementation.getTransactionManager();
     UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
     AuthManagerImplementation authManager = AuthManagerImplementation.getAuthManager();
     PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
@@ -104,6 +107,11 @@ public class MappingController {
         return portfolioManager.getUserPortfolio(email);   
     }
 
+    @GetMapping("/transaction")
+    public Transaction getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
+        return transactionManager.getTransaction(transactionID);  
+    }
+
     @PutMapping(
             path = "/user",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -132,16 +140,24 @@ public class MappingController {
             path = "/order/buy",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     ) 
-    public ResponseEntity<?> createOrder(@RequestBody TokenTransaction tokenTransaction){
-        String token = tokenTransaction.getToken();
-        Transaction transaction = tokenTransaction.getTransaction();
-        User currentUser = userManager.getUserProfile(transaction.getEmail());
-        boolean enoughBudget = userManager.CheckIfEnoughBudgetLeft(transaction.getTotalPrice(), currentUser);
-        if(enoughBudget == false){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<?> createOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+        String token = tokenTransactionContent.getToken();
+        TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+
+        Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+        if (isValid) {
+            User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+            Boolean enoughBudget = userManager.CheckIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
+            if(enoughBudget == true){
+                transactionManager.addTransaction(transactionContent);
+                return ResponseEntity.ok("Token gültig");
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
         }
         else{
-            return ResponseEntity.ok("Token gültig");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
         
