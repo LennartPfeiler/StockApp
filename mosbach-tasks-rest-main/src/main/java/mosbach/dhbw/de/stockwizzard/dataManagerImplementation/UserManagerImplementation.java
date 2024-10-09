@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -6,29 +6,69 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImp
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.hibernate.Session;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.*;
 
 public class UserManagerImplementation implements IUserManager{
 
-    private String fileName = "users.properties";
-    private String transactionFile = "transactions.properties";
-    private String sessionsFile = "sessions.properties";
-    private String portoliosFile = "portfolios.properties";
+    String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
+    URI dbUri;
+    String username = "";
+    String password = "";
+    String dbUrl = "";
     
     PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
 
     static UserManagerImplementation databaseUser = null;
 
     private UserManagerImplementation(){
-        
+        try {
+            dbUri = new URI(databaseConnectionnUrl);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        username = dbUri.getUserInfo().split(":")[0];
+        password = dbUri.getUserInfo().split(":")[1];
+        dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
     }
 
     static public UserManagerImplementation getUserManager() {
         if (databaseUser == null)
             databaseUser = new UserManagerImplementation();
         return databaseUser;
+    }
+
+    public void createUserTable() {
+
+        Statement stmt = null;
+        Connection connection = null;
+
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+            String dropTable = "DROP TABLE IF EXISTS group12User";
+            stmt.executeUpdate(dropTable);
+
+            String createTable = "CREATE TABLE group12User (" +
+                    "email VARCHAR(100) NOT NULL PRIMARY KEY, " +
+                    "firstname VARCHAR(100) NOT NULL, " +
+                    "lastname VARCHAR(100) NOT NULL, " +
+                    "password VARCHAR(100) NOT NULL, " +
+                    "budget DOUBLE PRECISION NOT NULL)";
+
+            stmt.executeUpdate(createTable);
+            stmt.close();
+            connection.close();
+
+        } catch (Exception e) {
+            // TODO: Add a proper printout of the error
+            e.printStackTrace();
+        }
     }
 
     public boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser){
@@ -86,89 +126,78 @@ public class UserManagerImplementation implements IUserManager{
     }    
 
     public User getUserProfile(String email) {
-        Properties properties = new Properties();
-        User user = null;
-        try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("GetUserReader").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    return null; // Datei nicht gefunden
-                }
-                properties.load(resourceStream);
-            }
-            int i = 1;
-            while (true) {
-                String userEmailKey = "User." + i + ".Email";
-                String currentUserEmail = properties.getProperty(userEmailKey);
+    Statement stmt = null;
+    Connection connection = null;
+    User user = null;
+    Logger.getLogger("GetUserByEmail").log(Level.INFO, "Start getUserProfile-method");
+    
+    try {
+        // Verbindung zur Datenbank herstellen
+        connection = DriverManager.getConnection(dbUrl, username, password);
+        stmt = connection.createStatement();
 
-                // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
-                if (currentUserEmail.equalsIgnoreCase(email)) {
-                    String firstName = properties.getProperty("User." + i + ".Firstname");
-                    String lastName = properties.getProperty("User." + i + ".Lastname");
-                    String password = properties.getProperty("User." + i + ".Password");
-                    Double budget = Double.valueOf(properties.getProperty("User." + i + ".Budget"));
+        // SQL-Abfrage definieren
+        String selectSQL = "SELECT * FROM group12User WHERE email = '" + email + "'";
 
-                    user = new User(firstName, lastName, currentUserEmail, password, budget);
-                    Logger.getLogger("GetUserReader").log(Level.INFO, "Benutzer gefunden: {0}", user);
-                    break; // Benutzer gefunden, Schleife verlassen
-                }
-                i++; // Nächsten Benutzer prüfen
-            }
-        } catch (IOException e) {
-            Logger.getLogger("GetUserReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
+        // Ausführen der SELECT-Abfrage
+        ResultSet rs = stmt.executeQuery(selectSQL);
+
+        // Prüfen, ob ein Ergebnis zurückgegeben wurde
+        if (rs.next()) {
+            // Benutzerobjekt basierend auf den Ergebnissen erstellen
+            user = new User();
+            user.setEmail(rs.getString("email"));
+            user.setFirstName(rs.getString("firstname"));
+            user.setLastName(rs.getString("lastname"));
+            user.setPassword(rs.getString("password"));
+            user.setBudget(rs.getDouble("budget"));
         }
-        return user;
+        rs.close();
+        stmt.close();
+        connection.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
-
+    return user;
+}
 
     public void addUser(User user) {
-        Properties properties = new Properties();
-        
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("SetNewUserWriter").log(Level.INFO, "Start addUser-method");
         try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("GetUserReader").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    //return -1; // Datei nicht gefunden
-                }
-                properties.load(resourceStream);
-            }
-        } catch (IOException e) {
-            Logger.getLogger("GetUserReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
-        }    
-        int nextUserId = getNextUserId(properties);
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+            String udapteSQL = "INSERT into group12User (email, firstname, lastname, password, budget) VALUES (" +
+                    "'" + user.getEmail() + "', " +
+                    "'" + user.getFirstName() + "', " +
+                    "'" + user.getLastName() + "', " +
+                    "'" + user.getPassword() + "', " +
+                    "'" + user.getBudget() + "')";
 
-        // Erstelle die Schlüssel-Wert-Paare für den neuen Benutzer
-        properties.setProperty("User." + nextUserId + ".Firstname", user.getFirstName());
-        properties.setProperty("User." + nextUserId + ".Lastname", user.getLastName());
-        properties.setProperty("User." + nextUserId + ".Email", user.getEmail());
-        properties.setProperty("User." + nextUserId + ".Password", passwordManager.hashPassword(user.getPassword()));
-        properties.setProperty("User." + nextUserId + ".Budget", user.getBudget().toString());
-
-        try {
-            properties.store(new FileOutputStream(fileName), null);
-        } catch (IOException e) {
-            Logger.getLogger("SetNewUserWriter").log(Level.INFO, "File can not be written to disk");
+            stmt.executeUpdate(udapteSQL);     
+            stmt.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
-
     // Methode zum Ermitteln der nächsten User-ID
-    private int getNextUserId(Properties properties) {
-        int maxId = 0;
-        for (String key : properties.stringPropertyNames()) {
-            if (key.startsWith("User.") && key.endsWith(".Firstname")) {
-                // Extrahiere die ID zwischen "User." und ".Firstname"
-                try {
-                    int id = Integer.parseInt(key.split("\\.")[1]);
-                    maxId = Math.max(maxId, id);
-                } catch (NumberFormatException e) {
-                    Logger.getLogger("UserManager").log(Level.WARNING, "Ungültige ID in Properties-Datei: " + key, e);
-                }
-            }
-        }
-        return maxId + 1;
-    }
+    // private int getNextUserId(Properties properties) {
+    //     int maxId = 0;
+    //     for (String key : properties.stringPropertyNames()) {
+    //         if (key.startsWith("User.") && key.endsWith(".Firstname")) {
+    //             // Extrahiere die ID zwischen "User." und ".Firstname"
+    //             try {
+    //                 int id = Integer.parseInt(key.split("\\.")[1]);
+    //                 maxId = Math.max(maxId, id);
+    //             } catch (NumberFormatException e) {
+    //                 Logger.getLogger("UserManager").log(Level.WARNING, "Ungültige ID in Properties-Datei: " + key, e);
+    //             }
+    //         }
+    //     }
+    //     return maxId + 1;
+    // }
 
     public boolean editUser(String currentEmail, User user) {
          Properties propertiesU = new Properties();

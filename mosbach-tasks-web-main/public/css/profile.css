@@ -1,6 +1,5 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
-/* Global Styles */
 * {
     margin: 0;
     padding: 0;
@@ -8,17 +7,10 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Body Styling */
+/* Body Background */
 body {
     background-color: black; /* Dark background for entire page */
     color: #eaeaea; /* Light text color for contrast */
-}
-
-/* Main Container */
-main {
-    padding-top: 200px; /* Abstand nach oben, damit das Editorfeld unterhalb der Navbar beginnt */
-    display: flex;
-    justify-content: center;
 }
 
 /* Header Styling */
@@ -36,12 +28,23 @@ main {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow for better separation */
 }
 
-/* Logo Styling */
 .logo img {
     width: 150px;
     height: 150px;
     opacity: 0;
     animation: slideRight 1s ease forwards;
+}
+
+/* Logo Animation */
+@keyframes slideRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 /* Login Styling */
@@ -66,6 +69,7 @@ main {
     transform: scale(1.10);
 }
 
+/* Stil für das <a>-Element */
 .Login a {
     display: inline-flex;
     justify-content: center;
@@ -81,12 +85,14 @@ main {
     transition: color 0.3s ease;
 }
 
+/* Stil für das <i>-Element */
 .Login a i {
     font-size: 50px;
     color: rgb(255, 255, 255);
     transition: color 0.3s ease;
 }
 
+/* Wenn über das <a> oder <i> gehovert wird, färbe sowohl <a> als auch <i> */
 .Login:hover a, .Login:hover a i {
     color: #900808;
     text-shadow: 0px 0px 10px black;
@@ -106,6 +112,18 @@ main {
     animation-delay: calc(.2s * var(--i));
 }
 
+/* Navbar Animation */
+@keyframes slideTop {
+    0% {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .navbar a:hover,
 .navbar a.active {
     color: #33e39a; /* Highlight active or hovered links */
@@ -122,6 +140,7 @@ main {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Leichter Schatten für Tiefe */
 }
 
+/* Input Felder Styling */
 .profile input {
     width: 100%;
     padding: 10px;
@@ -136,6 +155,7 @@ main {
     color: #b0b0b0; /* Platzhalterfarbe etwas heller */
 }
 
+/* Button Styling */
 .profile button {
     width: 48%; /* Beide Buttons nehmen jeweils 48% des verfügbaren Platzes ein */
     padding: 10px;
@@ -152,6 +172,7 @@ main {
     background-color: #28c883; /* Dunklere Farbe beim Hover */
 }
 
+/* Spezifisch für den "Delete Profile"-Button */
 .profile .delete-btn {
     background-color: #d9534f; /* Rote Farbe für Löschen */
 }
@@ -159,7 +180,25 @@ main {
 .profile .delete-btn:hover {
     background-color: #c9302c; /* Dunkleres Rot beim Hover */
 }
+.profile .reset-btn{
+    width: 98%; /* Beide Buttons nehmen jeweils 48% des verfügbaren Platzes ein */
+    margin-top: 10px;
+    padding: 10px;
+    background-color: grey; /* Grüne Farbe für den Apply-Button */
+    border: none;
+    border-radius: 4px;
+    color:whitesmoke;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
 
+}
+
+.profile .reset-btn:hover{
+    background-color: #fbcf04 ;
+}
+
+/* Section Title Styling */
 .profile h2 {
     text-align: center;
     margin-bottom: 20px;
@@ -172,36 +211,18 @@ main {
     height: 35px;
 }
 
-/* Animations */
-@keyframes slideRight {
-    0% {
-        opacity: 0;
-        transform: translateX(-50px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0);
-    }
+main {
+    padding-top: 200px; /* Abstand nach oben, damit das Editorfeld unterhalb der Navbar beginnt */
+    display: flex;
+    justify-content: center;
 }
 
-@keyframes slideTop {
-    0% {
-        opacity: 0;
-        transform: translateY(100px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideSci {
-    0% {
-        opacity: 0;
-        transform: translateX(100px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateX(0);
-    }
+#amount-selection {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #424242;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #eaeaea;
 }
