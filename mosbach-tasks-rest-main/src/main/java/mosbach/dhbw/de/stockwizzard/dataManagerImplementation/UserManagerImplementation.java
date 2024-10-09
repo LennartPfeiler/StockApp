@@ -1,4 +1,4 @@
-﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -6,6 +6,8 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImp
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
+
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hibernate.Session;
@@ -62,16 +64,21 @@ public class UserManagerImplementation implements IUserManager{
                     "budget DOUBLE PRECISION NOT NULL)";
 
             stmt.executeUpdate(createTable);
-            stmt.close();
-            connection.close();
-
         } catch (Exception e) {
-            // TODO: Add a proper printout of the error
-            e.printStackTrace();
+            Logger.getLogger("CreateUserTableLogger").log(Level.INFO, "User table cannot be created. Error: {0}", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("CreateUserTableLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
         }
     }
 
-    public boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser){
+    public Boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser){
         // Überprüfen, ob das benötigte Budget größer ist als das verfügbare Budget
         if(needed > currentUser.getBudget()){
             return false; // Nicht genug Budget vorhanden
@@ -80,86 +87,62 @@ public class UserManagerImplementation implements IUserManager{
         // Ansonsten: Genug Budget vorhanden
         return true;
     }
-    
-
 
     public EmailCheckResponse isEmailAlreadyRegistered(String email) {
-        Properties properties = new Properties();
         String message;
-    
-        try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("CheckalreadyRegisteredReader").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    message = "Fehler beim Laden der properties-Datei.";
-                    return new EmailCheckResponse(false, message);
-                }
-                properties.load(resourceStream);
-            }
-    
-            int i = 1;
-            while (true) {
-                String userEmailKey = "User." + i + ".Email";
-                String currentUserEmail = properties.getProperty(userEmailKey);
-    
-                // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
-                if (currentUserEmail == null) {
-                    break; // Breche die Schleife, wenn keine weiteren Benutzer vorhanden sind
-                }
-    
-                if (currentUserEmail.equalsIgnoreCase(email)) {
-                    message = "Email ist bereits registriert";
-                    return new EmailCheckResponse(true, message);
-                }
-                i++; // Nächsten Benutzer prüfen
-            }
-    
+        User user = getUserProfile(email);
+        if(user == null){
             message = "Email ist noch nicht registriert.";
             return new EmailCheckResponse(false, message);
-    
-        } catch (IOException e) {
-            Logger.getLogger("CheckalreadyRegisteredReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
-            message = "Fehler beim Laden der properties-Datei.";
-            return new EmailCheckResponse(false, message);
+        }
+        else{
+            message = "Email ist bereits registriert";
+            return new EmailCheckResponse(true, message);
         }
     }    
 
     public User getUserProfile(String email) {
-    Statement stmt = null;
-    Connection connection = null;
-    User user = null;
-    Logger.getLogger("GetUserByEmail").log(Level.INFO, "Start getUserProfile-method");
-    
-    try {
-        // Verbindung zur Datenbank herstellen
-        connection = DriverManager.getConnection(dbUrl, username, password);
-        stmt = connection.createStatement();
+        Statement stmt = null;
+        Connection connection = null;
+        User user = null;
+        Logger.getLogger("GetUserByEmail").log(Level.INFO, "Start getUserProfile-method");
+        
+        try {
+            // Verbindung zur Datenbank herstellen
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
 
-        // SQL-Abfrage definieren
-        String selectSQL = "SELECT * FROM group12User WHERE email = '" + email + "'";
+            // SQL-Abfrage definieren
+            String selectSQL = "SELECT * FROM group12user WHERE email = '" + email + "'";
 
-        // Ausführen der SELECT-Abfrage
-        ResultSet rs = stmt.executeQuery(selectSQL);
+            // Ausführen der SELECT-Abfrage
+            ResultSet rs = stmt.executeQuery(selectSQL);
 
-        // Prüfen, ob ein Ergebnis zurückgegeben wurde
-        if (rs.next()) {
-            // Benutzerobjekt basierend auf den Ergebnissen erstellen
-            user = new User();
-            user.setEmail(rs.getString("email"));
-            user.setFirstName(rs.getString("firstname"));
-            user.setLastName(rs.getString("lastname"));
-            user.setPassword(rs.getString("password"));
-            user.setBudget(rs.getDouble("budget"));
+            // Prüfen, ob ein Ergebnis zurückgegeben wurde
+            if (rs.next()) {
+                // Benutzerobjekt basierend auf den Ergebnissen erstellen
+                user = new User();
+                user.setEmail(rs.getString("email"));
+                user.setFirstName(rs.getString("firstname"));
+                user.setLastName(rs.getString("lastname"));
+                user.setPassword(rs.getString("password"));
+                user.setBudget(rs.getDouble("budget"));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("GetUserByEmail").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
         }
-        rs.close();
-        stmt.close();
-        connection.close();
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return user;
     }
-    return user;
-}
 
     public void addUser(User user) {
         Statement stmt = null;
@@ -168,171 +151,162 @@ public class UserManagerImplementation implements IUserManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String udapteSQL = "INSERT into group12User (email, firstname, lastname, password, budget) VALUES (" +
+            String udapteSQL = "INSERT into group12user (email, firstname, lastname, password, budget) VALUES (" +
                     "'" + user.getEmail() + "', " +
                     "'" + user.getFirstName() + "', " +
                     "'" + user.getLastName() + "', " +
-                    "'" + user.getPassword() + "', " +
+                    "'" + passwordManager.hashPassword(user.getPassword()) + "', " +
                     "'" + user.getBudget() + "')";
 
             stmt.executeUpdate(udapteSQL);     
-            stmt.close();
-            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
         }
     }
-    // Methode zum Ermitteln der nächsten User-ID
-    // private int getNextUserId(Properties properties) {
-    //     int maxId = 0;
-    //     for (String key : properties.stringPropertyNames()) {
-    //         if (key.startsWith("User.") && key.endsWith(".Firstname")) {
-    //             // Extrahiere die ID zwischen "User." und ".Firstname"
-    //             try {
-    //                 int id = Integer.parseInt(key.split("\\.")[1]);
-    //                 maxId = Math.max(maxId, id);
-    //             } catch (NumberFormatException e) {
-    //                 Logger.getLogger("UserManager").log(Level.WARNING, "Ungültige ID in Properties-Datei: " + key, e);
+
+    // public boolean editUser(String currentEmail, User user) {
+    //      Properties propertiesU = new Properties();
+    
+    //     try {
+    //         ClassLoader loaderU = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderU.getResourceAsStream(fileName)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserUsers").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesU.load(resourceStream);
+    //         }
+
+    //         Properties propertiesT = new Properties();
+
+    //         ClassLoader loaderT = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderT.getResourceAsStream(transactionFile)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserTransactions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesT.load(resourceStream);
+    //         }
+
+    //         Properties propertiesS = new Properties();
+
+    //         ClassLoader loaderS = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderS.getResourceAsStream(sessionsFile)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserSessions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesS.load(resourceStream);
+    //         }
+
+    //         Properties propertiesP = new Properties();
+
+    //         ClassLoader loaderP = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderP.getResourceAsStream(portoliosFile)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserPortfolios").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesP.load(resourceStream);
+    //         }
+
+    //     int i = 1;
+    //     while (true){
+    //         String emailKey = "User." + i + ".Email";
+    //         String currentUserEmailUsers = propertiesU.getProperty(emailKey);
+
+    //         if(currentUserEmailUsers == null){
+    //             return false;
+    //         }
+
+    //         if(currentUserEmailUsers.equals(currentEmail)){
+    //             String newEmail = user.getEmail();
+    //             String newFirstname = user.getFirstName();
+    //             String newLastname = user.getLastName();
+    //             String newPassword = user.getPassword();
+    //             String newBudget = user.getBudget().toString();
+    //             String firstnameKey = "User." + i + ".Firstname";
+    //             String lastnameKey = "User." + i + ".Lastname";
+    //             String passwordKey = "User." + i + ".Password";
+    //             String budgetKey = "User." + i + ".Budget";
+                
+    //             propertiesU.setProperty(firstnameKey, newFirstname);
+    //             propertiesU.setProperty(lastnameKey, newLastname);
+    //             propertiesU.setProperty(passwordKey, newPassword);
+    //             propertiesU.setProperty(budgetKey, newBudget);
+
+    //             if(!currentEmail.equalsIgnoreCase(newEmail)){
+    //                int t = 1;
+    //                while (true){
+    //                 String transEmailKey = "Transaction." + t + ".Email";
+    //                 String currentUserEmailTrans = propertiesT.getProperty(transEmailKey);
+
+    //                 if(currentUserEmailTrans == null){
+    //                     break;
+    //                 }
+
+    //                 if(currentUserEmailTrans.equals(currentEmail)){
+    //                     propertiesT.setProperty(transEmailKey, newEmail);
+
+    //                 }
+    //                 t++;
+
+    //                }
+    //                 int s = 1;
+    //                while (true){
+    //                 String sessionEmailKey = "Session." + s + ".Email";
+    //                 String currentUserEmailSession = propertiesS.getProperty(sessionEmailKey);
+
+    //                 if(currentUserEmailSession == null){
+    //                     break;
+    //                 }
+
+    //                 if(currentUserEmailSession.equals(currentEmail)){
+    //                     propertiesS.setProperty(sessionEmailKey, newEmail);
+
+    //                 }
+    //                 s++;
+
+    //                }
+    //                 int p = 1;
+    //                while (true){
+    //                 String portfolioEmailKey = "Portfolio." + p + ".Email";
+    //                 String currentUserEmailPortfolio = propertiesP.getProperty(portfolioEmailKey);
+
+    //                 if(currentUserEmailPortfolio == null){
+    //                     break;
+    //                 }
+
+    //                 if(currentUserEmailPortfolio.equals(currentEmail)){
+    //                     propertiesP.setProperty(portfolioEmailKey, newEmail);
+
+    //                 }
+    //                 p++;
+
+    //                }
+    //                propertiesU.setProperty(emailKey, newEmail);
     //             }
     //         }
+    //         i++;
+
+    //         return true;
     //     }
-    //     return maxId + 1;
-    // }
-
-    public boolean editUser(String currentEmail, User user) {
-         Properties propertiesU = new Properties();
-    
-        try {
-            ClassLoader loaderU = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loaderU.getResourceAsStream(fileName)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("EditUserUsers").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    return false;
-                }
-                propertiesU.load(resourceStream);
-            }
-
-            Properties propertiesT = new Properties();
-
-            ClassLoader loaderT = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loaderT.getResourceAsStream(transactionFile)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("EditUserTransactions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    return false;
-                }
-                propertiesT.load(resourceStream);
-            }
-
-            Properties propertiesS = new Properties();
-
-            ClassLoader loaderS = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loaderS.getResourceAsStream(sessionsFile)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("EditUserSessions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    return false;
-                }
-                propertiesS.load(resourceStream);
-            }
-
-            Properties propertiesP = new Properties();
-
-            ClassLoader loaderP = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loaderP.getResourceAsStream(portoliosFile)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("EditUserPortfolios").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    return false;
-                }
-                propertiesP.load(resourceStream);
-            }
-
-        int i = 1;
-        while (true){
-            String emailKey = "User." + i + ".Email";
-            String currentUserEmailUsers = propertiesU.getProperty(emailKey);
-
-            if(currentUserEmailUsers == null){
-                return false;
-            }
-
-            if(currentUserEmailUsers.equals(currentEmail)){
-                String newEmail = user.getEmail();
-                String newFirstname = user.getFirstName();
-                String newLastname = user.getLastName();
-                String newPassword = user.getPassword();
-                String newBudget = user.getBudget().toString();
-                String firstnameKey = "User." + i + ".Firstname";
-                String lastnameKey = "User." + i + ".Lastname";
-                String passwordKey = "User." + i + ".Password";
-                String budgetKey = "User." + i + ".Budget";
-                
-                propertiesU.setProperty(firstnameKey, newFirstname);
-                propertiesU.setProperty(lastnameKey, newLastname);
-                propertiesU.setProperty(passwordKey, newPassword);
-                propertiesU.setProperty(budgetKey, newBudget);
-
-                if(!currentEmail.equalsIgnoreCase(newEmail)){
-                   int t = 1;
-                   while (true){
-                    String transEmailKey = "Transaction." + t + ".Email";
-                    String currentUserEmailTrans = propertiesT.getProperty(transEmailKey);
-
-                    if(currentUserEmailTrans == null){
-                        break;
-                    }
-
-                    if(currentUserEmailTrans.equals(currentEmail)){
-                        propertiesT.setProperty(transEmailKey, newEmail);
-
-                    }
-                    t++;
-
-                   }
-                    int s = 1;
-                   while (true){
-                    String sessionEmailKey = "Session." + s + ".Email";
-                    String currentUserEmailSession = propertiesS.getProperty(sessionEmailKey);
-
-                    if(currentUserEmailSession == null){
-                        break;
-                    }
-
-                    if(currentUserEmailSession.equals(currentEmail)){
-                        propertiesS.setProperty(sessionEmailKey, newEmail);
-
-                    }
-                    s++;
-
-                   }
-                    int p = 1;
-                   while (true){
-                    String portfolioEmailKey = "Portfolio." + p + ".Email";
-                    String currentUserEmailPortfolio = propertiesP.getProperty(portfolioEmailKey);
-
-                    if(currentUserEmailPortfolio == null){
-                        break;
-                    }
-
-                    if(currentUserEmailPortfolio.equals(currentEmail)){
-                        propertiesP.setProperty(portfolioEmailKey, newEmail);
-
-                    }
-                    p++;
-
-                   }
-                   propertiesU.setProperty(emailKey, newEmail);
-                }
-            }
-            i++;
-
-            return true;
-        }
         
 
-     } catch (IOException e) {
-            Logger.getLogger("EditUser").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
-        }
-        return false;
-    }
+    //  } catch (IOException e) {
+    //         Logger.getLogger("EditUser").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
+    //     }
+    //     return false;
+    // }
         // change the data of user, found by id
         // String editUser_database_query = "UPDATE Users" +
         //         "       SET FirstName = '" + user.getFirstName() + "', LastName = '" + user.getLastName() +
@@ -341,7 +315,7 @@ public class UserManagerImplementation implements IUserManager{
         //Write into database
     
 
-    @Override
+    //@Override
     public boolean deleteUser(int userID) {
         boolean deleted = true;
         // sql strings to delete the user and the connections, if he uses carpools (foreign key)

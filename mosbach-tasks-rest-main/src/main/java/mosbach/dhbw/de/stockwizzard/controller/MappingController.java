@@ -1,6 +1,5 @@
 package mosbach.dhbw.de.stockwizzard.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.logging.Level;
@@ -36,6 +35,7 @@ public class MappingController {
     PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
     PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
     SessionManagerImplementation sessionManager = SessionManagerImplementation.getSessionManager();
+
     @PostMapping(
             path = "/auth",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -59,7 +59,6 @@ public class MappingController {
 
         String token = authManager.generateToken();
         sessionManager.createSession(user.getEmail(), token);
-        //authManager.generateSession();
         // Erstelle eine TokenTask-Instanz mit dem generierten Token und dem Benutzer
         TokenUser tokenUser = new TokenUser(token, user);
 
@@ -71,7 +70,7 @@ public class MappingController {
         path = "/user",
         consumes = {MediaType.APPLICATION_JSON_VALUE}
 )
-    public ResponseEntity<StringAnswer> createUser(@RequestBody User user){
+    public ResponseEntity<?> createUser(@RequestBody User user){
         EmailCheckResponse mailResponse = userManager.isEmailAlreadyRegistered(user.getEmail());
         if(mailResponse.isRegistered() == true){
             //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Der Benutzer ist bereits registriert.");
@@ -86,7 +85,6 @@ public class MappingController {
                 return ResponseEntity.ok(sA);
             }
             else{
-                //return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Fehler beim registrieren.");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         }
@@ -99,7 +97,6 @@ public class MappingController {
 
     @GetMapping("/user")
     public User getUserProfile(@RequestParam(value = "email", defaultValue = "") String email) {
-        usermanager.createTable();
         return userManager.getUserProfile(email);   
     }
 
@@ -110,57 +107,61 @@ public class MappingController {
 
     @GetMapping("/transaction")
     public Transaction getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
-        return transactionManager.getTransaction(transactionID);  
+        userManager.createUserTable();
+        portfolioManager.createPortfolioTable();
+        sessionManager.createSessionTable();
+        //return transactionManager.getTransaction(transactionID);
+        return new Transaction(null, null, null, null, null, null, null, null);   
     }
 
-    @PutMapping(
-            path = "/user",
-            consumes = {MediaType.APPLICATION_JSON_VALUE}
-    ) 
-    public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
-        String token = editRequest.getToken();
-        String currentEmail = editRequest.getCurrentmail();
-        User user = editRequest.getUser();
+    // @PutMapping(
+    //         path = "/user",
+    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
+    // ) 
+    // public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
+    //     String token = editRequest.getToken();
+    //     String currentEmail = editRequest.getCurrentmail();
+    //     User user = editRequest.getUser();
 
-         if (token != null && currentEmail != null) {
-        // Führe Validierung oder eine weitere Aktion durch
-        // Beispiel: Prüfen, ob der Token gültig ist
-        boolean isValid = sessionManager.validToken(token, currentEmail);
-        if (isValid) {
-            userManager.editUser(currentEmail, user);
-            return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
-        }
-        } else {
-            return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
-        }
-    }
+    //      if (token != null && currentEmail != null) {
+    //     // Führe Validierung oder eine weitere Aktion durch
+    //     // Beispiel: Prüfen, ob der Token gültig ist
+    //     boolean isValid = sessionManager.validToken(token, currentEmail);
+    //     if (isValid) {
+    //         userManager.editUser(currentEmail, user);
+    //         return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
+    //     } else {
+    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+    //     }
+    //     } else {
+    //         return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
+    //     }
+    // }
 
-    @PostMapping(
-            path = "/order/buy",
-            consumes = {MediaType.APPLICATION_JSON_VALUE}
-    ) 
-    public ResponseEntity<?> createOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
-        String token = tokenTransactionContent.getToken();
-        TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+    // @PostMapping(
+    //         path = "/order/buy",
+    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
+    // ) 
+    // public ResponseEntity<?> createOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+    //     String token = tokenTransactionContent.getToken();
+    //     TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
 
-        Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
-        if (isValid) {
-            User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-            Boolean enoughBudget = userManager.CheckIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
-            if(enoughBudget == true){
-                transactionManager.addTransaction(transactionContent);
-                return ResponseEntity.ok("Token gültig");
-            }
-            else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
+    //     Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+    //     if (isValid) {
+    //         User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+    //         Boolean enoughBudget = userManager.CheckIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
+    //         if(enoughBudget == true){
+    //             transactionManager.addTransaction(transactionContent);
+    //             return ResponseEntity.ok("Token gültig");
+    //         }
+    //         else{
+    //             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    //         }
+    //     }
+    //     else{
+    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    //     }
+    // }
         
         
         

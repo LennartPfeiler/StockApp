@@ -24,16 +24,16 @@ public interface IUserManager{
      * @param user: The user which is currently logged in
      * @return Returns true if successful, returns false if not successful
      */
-    public boolean editUser(String currentEmail, User user);
+    //public boolean editUser(String currentEmail, User user);
 
     /**
      * Delete an existing user
      * @param userID: UserID of the user
      * @return Returns true if successful, returns false if not successful
      */
-    public boolean deleteUser(int userID);
+    //public boolean deleteUser(int userID);
 
     public EmailCheckResponse isEmailAlreadyRegistered(String email);
 
-    public boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser);
+    public Boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser);
 }

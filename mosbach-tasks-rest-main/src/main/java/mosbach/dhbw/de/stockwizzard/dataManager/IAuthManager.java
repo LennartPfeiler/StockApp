@@ -4,5 +4,4 @@ public interface IAuthManager{
 
     public String generateToken();
 
-    public void generateSession();
 }

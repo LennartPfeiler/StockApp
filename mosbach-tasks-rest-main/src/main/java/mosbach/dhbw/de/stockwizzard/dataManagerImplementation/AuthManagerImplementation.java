@@ -28,8 +28,4 @@ public class AuthManagerImplementation implements IAuthManager{
         return uuidAsString;
     }
 
-    public void generateSession(){
-
-    }
-
 }

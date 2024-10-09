@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Portfolio {
+public class PortfolioStock {
 
     @JsonProperty("portfolioID")
     private Integer portfolioID;
@@ -61,7 +61,7 @@ public class Portfolio {
     }
 
     @JsonProperty("symbol")
-    public Double getSymbol() {
+    public String getSymbol() {
         return symbol;
     }
 

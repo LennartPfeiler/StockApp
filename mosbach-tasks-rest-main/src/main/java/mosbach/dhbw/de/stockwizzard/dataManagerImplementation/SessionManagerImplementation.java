@@ -8,15 +8,29 @@ import java.util.UUID;
 import mosbach.dhbw.de.stockwizzard.dataManager.ISessionManager;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.Session;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.*;
 
 public class SessionManagerImplementation implements ISessionManager{
 
-    private String fileName = "sessions.properties";
+    String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
+    URI dbUri;
+    String username = "";
+    String password = "";
+    String dbUrl = "";
 
     static SessionManagerImplementation databaseUser = null;
 
     private SessionManagerImplementation(){
-        
+        try {
+            dbUri = new URI(databaseConnectionnUrl);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        username = dbUri.getUserInfo().split(":")[0];
+        password = dbUri.getUserInfo().split(":")[1];
+        dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath() + "?sslmode=require";
     }
 
     static public SessionManagerImplementation getSessionManager() {
@@ -25,81 +39,99 @@ public class SessionManagerImplementation implements ISessionManager{
         return databaseUser;
     }
 
+    public void createSessionTable() {
+        Statement stmt = null;
+        Connection connection = null;
+
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+            String dropTable = "DROP TABLE IF EXISTS group12session";
+            stmt.executeUpdate(dropTable);
+
+            String createTable = "CREATE TABLE group12session (" +
+                     "token VARCHAR(100) NOT NULL PRIMARY KEY, " +
+                     "email VARCHAR(100) NOT NULL, " +
+                     "FOREIGN KEY (email) REFERENCES group12user(email) ON DELETE CASCADE)";
+
+            stmt.executeUpdate(createTable);
+        } catch (Exception e) {
+            Logger.getLogger("CreateSessionTableLogger").log(Level.INFO, "Session table cannot be created. Error: {0}", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("CreateSessionTableLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
+    }
 
     public void createSession(String email, String token){
-        Properties properties = new Properties();
-        
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("SetNewSessionWriter").log(Level.INFO, "Start createSession-method");
         try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("AddSessionWriter").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    //return -1; // Datei nicht gefunden
-                }
-                properties.load(resourceStream);
-            }
-        } catch (IOException e) {
-            Logger.getLogger("AddSessionWriter").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
-        }    
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+            String udapteSQL = "INSERT into group12session (token, email) VALUES (" +
+                    "'" + token + "', " +
+                    "'" + email + "')";
 
-        int nextSessionId = getNextSessionId(properties);
-        // Erstelle die Schlüssel-Wert-Paare für den neuen Benutzer
-        properties.setProperty("Session." + nextSessionId + ".Email", email);
-        properties.setProperty("Session." + nextSessionId + ".Token", token);
-        Logger.getLogger("AddSessionWriter").log(Level.INFO, "{0} und {1}", new Object[]{email , token});
-        Logger.getLogger("AddSessionWriter").log(Level.INFO, "token nr: {0}", nextSessionId);
-        try {
-            properties.store(new FileOutputStream(fileName), null);
-            Logger.getLogger("AddSessionWriter").log(Level.INFO, "worked");
-        } catch (IOException e) {
-            Logger.getLogger("AddSessionWriter").log(Level.INFO, "File can not be written to disk");
+            stmt.executeUpdate(udapteSQL);     
+        } catch (SQLException e) {
+            Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Fehler beim Hinzufügen der Sessiondaten in die Datenbank.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
         }
     }
     
     public Session getSession(String email) {
-        Properties properties = new Properties();
+        Statement stmt = null;
+        Connection connection = null;
         Session session = null;
+        Logger.getLogger("GetSessionByEmail").log(Level.INFO, "Start getSession-method");
+        
         try {
-            // Lade die properties-Datei
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("GetSessionReader").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    return null; // Datei nicht gefunden
-                }
-                properties.load(resourceStream);
+            // Verbindung zur Datenbank herstellen
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Abfrage definieren
+            String selectSQL = "SELECT * FROM group12session WHERE email = '" + email + "'";
+
+            // Ausführen der SELECT-Abfrage
+            ResultSet rs = stmt.executeQuery(selectSQL);
+
+            // Prüfen, ob ein Ergebnis zurückgegeben wurde
+            if (rs.next()) {
+                // Benutzerobjekt basierend auf den Ergebnissen erstellen
+                session = new Session();
+                session.setToken(rs.getString("token"));
+                session.setEmail(rs.getString("email"));
             }
-    
-            int i = 1;
-            while (true) {
-                // E-Mail-Adresse des aktuellen Portfolios abrufen
-                String userEmailKey = "Session." + i + ".Email";
-                String currentUserEmail = properties.getProperty(userEmailKey);
-    
-                // Überprüfen, ob weitere Einträge vorhanden sind
-                if (currentUserEmail == null) {
-                    Logger.getLogger("GetSessionReader").log(Level.INFO, "Keine weiteren Portfolios gefunden. Abbruch bei Index: {0}", i);
-                    break; // Kein weiterer Eintrag vorhanden, Schleife verlassen
-                }
-    
-                // Überprüfen, ob die aktuelle E-Mail der gesuchten E-Mail entspricht
-                if (currentUserEmail.equalsIgnoreCase(email)) {
-                    try {
-                        String token = properties.getProperty("Session." + i + ".Token");
-                        session = new Session(email, token);
-                        Logger.getLogger("GetSessionReader").log(Level.INFO, "Session gefunden: {0}", session);
-                        break; // Benutzer gefunden, Schleife verlassen
-                    } catch (NumberFormatException e) {
-                        Logger.getLogger("GetSessionReader").log(Level.WARNING, "Fehler bei der Konvertierung der Portfolio-Daten.", e);
-                        return null; // Abbruch, da die Daten fehlerhaft sind
-                    }
-                }
-                i++; // Nächsten Benutzer prüfen
+            rs.close();
+        } catch (SQLException e) {
+            Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Fehler beim Abrufen der Sessiondaten aus der Datenbank.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
             }
-        } catch (IOException e) {
-            Logger.getLogger("GetSessionReader").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
         }
-    
         return session;
     }
 
@@ -107,59 +139,45 @@ public class SessionManagerImplementation implements ISessionManager{
 
     }
 
-    private int getNextSessionId(Properties properties) {
-        int maxId = 0;
-        for (String key : properties.stringPropertyNames()) {
-            if (key.startsWith("Session.") && key.endsWith(".Email")) {
-                // Extrahiere die ID zwischen "User." und ".Firstname"
-                try {
-                    int id = Integer.parseInt(key.split("\\.")[1]);
-                    maxId = Math.max(maxId, id);
-                } catch (NumberFormatException e) {
-                    Logger.getLogger("SessionManager").log(Level.WARNING, "Ungültige Session in Properties-Datei: " + key, e);
-                }
-            }
-        }
-        return maxId + 1;
-    }
-
     public boolean validToken(String token, String email){
-         Properties properties = new Properties();
-    
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("ValidTokenLogger").log(Level.INFO, "Start validToken-method");
+
         try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            try (InputStream resourceStream = loader.getResourceAsStream(fileName)) {
-                if (resourceStream == null) {
-                    Logger.getLogger("CheckTokenValidation").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-                    return false;
-                }
-                properties.load(resourceStream);
+            // Verbindung zur Datenbank herstellen
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Abfrage definieren
+            String selectSQL = "SELECT * FROM group12session WHERE token = '" + token + "'";
+
+            // Ausführen der SELECT-Abfrage
+            ResultSet rs = stmt.executeQuery(selectSQL);
+
+            // Prüfen, ob ein Ergebnis zurückgegeben wurde
+            if (rs.next()) {
+                // Benutzerobjekt basierend auf den Ergebnissen erstellen
+                String currentEmail = rs.getString("email");
+                rs.close();
+                return currentEmail.equals(email);
+            } else {
+                rs.close();
+                return false; // Token nicht gefunden
             }
-
-            int i = 1;
-            while (true) {
-                String sessionTokenKey = "Session." + i + ".Token";
-                String currentSessionToken = properties.getProperty(sessionTokenKey);
-
-                if(currentSessionToken == null){
-                    return false;
-                }
-
-                if (currentSessionToken.equals(token)){
-                    String currentEmailKey = "Session." + i + ".Email";
-                    String currentEmail = properties.getProperty(currentEmailKey);
-                    if (currentEmail.equals(email) && currentEmail != null){
-                        return true;
-                    }else{
-                        return false;
-                    }
-                }
-                i++;
+            
+        } catch (SQLException e) {
+            Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Fehler beim Abrufen der Sessiondaten aus der Datenbank.", e);
+            return false;
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
             }
-        }catch (IOException e) {
-            Logger.getLogger("CheckTokenValidation").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
         }
-
-        return false; // Fehler beim Laden der Datei oder keine Übereinstimmung gefunden
     }
 }
