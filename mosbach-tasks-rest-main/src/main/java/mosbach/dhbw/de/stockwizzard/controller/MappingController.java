@@ -96,6 +96,7 @@ public class MappingController {
 
     @GetMapping("/user")
     public User getUserProfile(@RequestParam(value = "email", defaultValue = "") String email) {
+        usermanager.createTable();
         return userManager.getUserProfile(email);   
     }
 
