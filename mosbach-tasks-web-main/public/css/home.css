@@ -344,5 +344,6 @@ animation-delay: 1.6s;
 
     body{
         overflow: scroll;
+        margin-top: 100px;
     }
 }
