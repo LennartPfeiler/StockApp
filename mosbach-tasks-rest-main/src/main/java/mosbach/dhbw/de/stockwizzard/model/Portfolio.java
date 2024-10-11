@@ -17,6 +17,8 @@ public class Portfolio {
     private Integer portfolioID;
     @JsonProperty("value")
     private Double value;
+    @JsonProperty("startValue")
+    private Double startValue;
     @JsonProperty("email")
     private String email;
     @JsonIgnore
@@ -35,10 +37,11 @@ public class Portfolio {
      * @param value
      * @param email
      */
-    public Portfolio(Integer portfolioID, Double value, String email) {
+    public Portfolio(Integer portfolioID, Double value, Double startValue, String email) {
         super();
         this.portfolioID = portfolioID;
         this.value = value;
+        this.startValue = startValue;
         this.email = email;
     }
 
@@ -60,6 +63,16 @@ public class Portfolio {
     @JsonProperty("value")
     public void setValue(Double value) {
         this.value = value;
+    }
+
+    @JsonProperty("startValue")
+    public Double getStartValue() {
+        return startValue;
+    }
+
+    @JsonProperty("startValue")
+    public void setStartValue(Double startValue) {
+        this.startValue = startValue;
     }
 
     @JsonProperty("email")

@@ -9,8 +9,10 @@ import org.springframework.http.*;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PortfolioManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PortfolioStockManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.UserManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.SessionManagerImplementation;
+import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.StockManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.TransactionManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
@@ -35,12 +37,14 @@ public class MappingController {
     PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
     PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
     SessionManagerImplementation sessionManager = SessionManagerImplementation.getSessionManager();
+    StockManagerImplementation stockManager = StockManagerImplementation.getStockManager();
+    PortfolioStockManagerImplementation portfolioStockManager = PortfolioStockManagerImplementation.getPortfolioStockManager();
 
     @PostMapping(
             path = "/auth",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     )
-    public ResponseEntity<TokenUser> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         System.err.println(email);
@@ -48,13 +52,13 @@ public class MappingController {
         User user = userManager.getUserProfile(email);
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("Please register first!"));
         }
 
         // Passwortüberprüfung
         if (!passwordManager.checkPassword(password, user.getPassword())) {
             // Falsches Passwort
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Incorrect email or password!"));
         }
 
         String token = authManager.generateToken();
@@ -67,28 +71,28 @@ public class MappingController {
     }
     
     @PostMapping(
-        path = "/user",
-        consumes = {MediaType.APPLICATION_JSON_VALUE}
-)
-    public ResponseEntity<?> createUser(@RequestBody User user){
-        EmailCheckResponse mailResponse = userManager.isEmailAlreadyRegistered(user.getEmail());
-        if(mailResponse.isRegistered() == true){
-            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Der Benutzer ist bereits registriert.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        else{
-            if(mailResponse.isRegistered() == false && mailResponse.getMessage().equals("Email ist noch nicht registriert.")){
+            path = "/user",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            // Überprüfen, ob die E-Mail bereits registriert ist
+            Boolean isRegistered = userManager.isEmailAlreadyRegistered(user.getEmail());
+            if (isRegistered) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("You are already registered!"));
+            } else {
+                // Neuen Benutzer hinzufügen
                 userManager.addUser(new User(user.getFirstName(), user.getLastName(), user.getEmail(), user.getPassword(), user.getBudget()));
-                portfolioManager.addPortfolio(new Portfolio(null, user.getBudget(), user.getEmail()));
-                StringAnswer sA = new StringAnswer();
-                sA.setAnswer("User successfully registered");
-                return ResponseEntity.ok(sA);
+                // Neuen Portfolio hinzufügen
+                portfolioManager.addPortfolio(new Portfolio(null, user.getBudget(), user.getBudget(), user.getEmail()));
+                return ResponseEntity.ok(new StringAnswer("User successfully registered"));
             }
-            else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
         }
     }
+    
+    
 
     @GetMapping("/session")
     public Session getSession(@RequestParam(value = "email", defaultValue = "") String email) {
@@ -108,8 +112,13 @@ public class MappingController {
     @GetMapping("/transaction")
     public Transaction getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
         userManager.createUserTable();
-        portfolioManager.createPortfolioTable();
         sessionManager.createSessionTable();
+        portfolioManager.createPortfolioTable();
+        stockManager.createStockTable();
+        portfolioStockManager.createPortfolioStockTable();
+        portfolioManager.createPortfolioTable();
+        transactionManager.createTransactionTable();
+        stockManager.createStockTable();
         //return transactionManager.getTransaction(transactionID);
         return new Transaction(null, null, null, null, null, null, null, null);   
     }
@@ -138,30 +147,38 @@ public class MappingController {
     //     }
     // }
 
-    // @PostMapping(
-    //         path = "/order/buy",
-    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
-    // ) 
-    // public ResponseEntity<?> createOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
-    //     String token = tokenTransactionContent.getToken();
-    //     TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+    @PostMapping(
+            path = "/order/buy",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> createOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+        String token = tokenTransactionContent.getToken();
+        TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
 
-    //     Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
-    //     if (isValid) {
-    //         User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-    //         Boolean enoughBudget = userManager.CheckIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
-    //         if(enoughBudget == true){
-    //             transactionManager.addTransaction(transactionContent);
-    //             return ResponseEntity.ok("Token gültig");
-    //         }
-    //         else{
-    //             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    //         }
-    //     }
-    //     else{
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    //     }
-    // }
+        Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+        if (isValid) {
+            User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+            Boolean enoughBudget = userManager.CheckIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
+            if(enoughBudget == true){
+                transactionManager.addTransaction(transactionContent);
+                Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+                //PortfolioStock hinzufügen
+                portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getPricePerStock());
+                
+                //Budget ändern
+                userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice());
+                //Portfoliowert ändern
+                //portfolioManager.editPortfolioValue(userPortfolio.getPortfolioID(), userPortfolio.getValue(), transactionContent.getTotalPrice());
+                return ResponseEntity.ok(new StringAnswer("Token gültig"));
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Not enough budget for this transaction!"));
+            }
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+        }
+    }
         
         
         

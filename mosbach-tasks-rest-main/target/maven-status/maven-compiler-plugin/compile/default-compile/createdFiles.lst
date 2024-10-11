@@ -8,6 +8,7 @@ mosbach\dhbw\de\stockwizzard\dataManager\ISessionManager.class
 mosbach\dhbw\de\stockwizzard\controller\PersonController.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\SessionManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation.class
+mosbach\dhbw\de\stockwizzard\dataManager\IStockManager.class
 mosbach\dhbw\de\stockwizzard\model\User.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\model\Portfolio.class
@@ -18,6 +19,7 @@ mosbach\dhbw\de\stockwizzard\dataManagerImplementation\TransactionManagerImpleme
 mosbach\dhbw\de\stockwizzard\model\Stock.class
 mosbach\dhbw\de\stockwizzard\dataManager\ITransactionManager.class
 mosbach\dhbw\de\stockwizzard\dataManager\IAuthManager.class
+mosbach\dhbw\de\stockwizzard\dataManagerImplementation\StockManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioManager.class
 mosbach\dhbw\de\stockwizzard\model\TokenUser.class
 mosbach\dhbw\de\stockwizzard\dataManager\IPasswordManager.class

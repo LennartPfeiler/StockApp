@@ -53,10 +53,10 @@ public class UserManagerImplementation implements IUserManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String dropTable = "DROP TABLE IF EXISTS group12User";
+            String dropTable = "DROP TABLE IF EXISTS group12user";
             stmt.executeUpdate(dropTable);
 
-            String createTable = "CREATE TABLE group12User (" +
+            String createTable = "CREATE TABLE group12user (" +
                     "email VARCHAR(100) NOT NULL PRIMARY KEY, " +
                     "firstname VARCHAR(100) NOT NULL, " +
                     "lastname VARCHAR(100) NOT NULL, " +
@@ -88,16 +88,13 @@ public class UserManagerImplementation implements IUserManager{
         return true;
     }
 
-    public EmailCheckResponse isEmailAlreadyRegistered(String email) {
-        String message;
+    public Boolean isEmailAlreadyRegistered(String email) {
         User user = getUserProfile(email);
         if(user == null){
-            message = "Email ist noch nicht registriert.";
-            return new EmailCheckResponse(false, message);
+            return false;
         }
         else{
-            message = "Email ist bereits registriert";
-            return new EmailCheckResponse(true, message);
+            return true;
         }
     }    
 
@@ -169,6 +166,36 @@ public class UserManagerImplementation implements IUserManager{
             } catch (SQLException e) {
                 // Fehler beim Schließen protokollieren
                 Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
+    }
+
+    public void editUserBudget(String email, Double oldValue, Double bougthValue){
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("UpdatePortfolioValueLogger").log(Level.INFO, "Start updatePortfolioValue method");
+
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
+            String updateSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
+                            " WHERE email = '" + email + "'";
+
+            // Führe die SQL-Anweisung aus
+            stmt.executeUpdate(updateSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error updating portfolio value.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error closing resources.", e);
             }
         }
     }

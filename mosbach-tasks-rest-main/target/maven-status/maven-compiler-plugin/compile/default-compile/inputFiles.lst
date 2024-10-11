@@ -5,6 +5,7 @@ C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mos
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioManager.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioStockManager.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\ISessionManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IStockManager.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\ITransactionManager.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IUserManager.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation.java
@@ -12,6 +13,7 @@ C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mos
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PortfolioManagerImplementation.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PortfolioStockManagerImplementation.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\SessionManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\StockManagerImplementation.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\TransactionManagerImplementation.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditRequest.java

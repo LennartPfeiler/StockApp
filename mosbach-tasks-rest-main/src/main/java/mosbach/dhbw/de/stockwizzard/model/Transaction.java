@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.sql.Timestamp;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Transaction {
@@ -20,7 +21,7 @@ public class Transaction {
     @JsonProperty("stockAmount")
     private Double stockAmount;
     @JsonProperty("date")
-    private String date;
+    private Timestamp date;
     @JsonProperty("pricePerStock")
     private Double pricePerStock;
     @JsonProperty("totalPrice")
@@ -50,7 +51,7 @@ public class Transaction {
      * @param transactionID
      * @param email
      */
-    public Transaction(Integer transactionID, Integer transactionType, Double stockAmount, String date, Double pricePerStock, Double totalPrice, String email, String symbol) {
+    public Transaction(Integer transactionID, Integer transactionType, Double stockAmount, Timestamp date, Double pricePerStock, Double totalPrice, String email, String symbol) {
         super();
         this.transactionID = transactionID;
         this.transactionType = transactionType;
@@ -93,12 +94,12 @@ public class Transaction {
     }
 
     @JsonProperty("date")
-    public String getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
     @JsonProperty("date")
-    public void setDate(String date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 
