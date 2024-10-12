@@ -44,7 +44,7 @@ public class UserManagerImplementation implements IUserManager{
             databaseUser = new UserManagerImplementation();
         return databaseUser;
     }
-
+    //user
     public void createUserTable() {
 
         Statement stmt = null;
