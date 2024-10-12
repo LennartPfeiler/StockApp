@@ -17,8 +17,8 @@ C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mos
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\TransactionManagerImplementation.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditRequest.java
-C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EmailCheckResponse.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LoginRequest.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LogoutRequest.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Portfolio.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\PortfolioStock.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Session.java

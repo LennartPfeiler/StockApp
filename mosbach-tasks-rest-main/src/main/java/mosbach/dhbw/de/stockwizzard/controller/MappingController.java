@@ -15,10 +15,10 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.SessionManagerImpl
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.StockManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.TransactionManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
+import mosbach.dhbw.de.stockwizzard.model.LogoutRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
-import mosbach.dhbw.de.stockwizzard.model.EmailCheckResponse;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.Session;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
@@ -69,6 +69,27 @@ public class MappingController {
         // Erfolgreiche Anmeldung: Antwort mit TokenTask zurückgeben
         return ResponseEntity.ok(tokenUser);
     }
+
+    @DeleteMapping(
+        path = "/auth",
+        consumes = {MediaType.APPLICATION_JSON_VALUE}
+)
+public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
+    try{
+        String email = logoutRequest.getEmail();
+        String token = logoutRequest.getToken();
+        Boolean isValid = sessionManager.validToken(token, email);
+        if (isValid) {
+            sessionManager.deleteSession(email, token);
+            return ResponseEntity.ok(new StringAnswer("Logout successfully!"));
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this logout!"));
+        }
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
+    }
+}
     
     @PostMapping(
             path = "/user",
@@ -169,7 +190,7 @@ public class MappingController {
                 userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice());
                 //Portfoliowert ändern
                 //portfolioManager.editPortfolioValue(userPortfolio.getPortfolioID(), userPortfolio.getValue(), transactionContent.getTotalPrice());
-                return ResponseEntity.ok(new StringAnswer("Token gültig"));
+                return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
             }
             else{
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Not enough budget for this transaction!"));

@@ -136,7 +136,26 @@ public class SessionManagerImplementation implements ISessionManager{
     }
 
     public void deleteSession(String email, String token){
-
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("DeleteSessionWriter").log(Level.INFO, "Start deleteSession-method");
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+            String deleteSQL = "DELETE FROM group12session WHERE email = '" + email + "' AND token = '" + token + "'";
+            stmt.executeUpdate(deleteSQL);     
+        } catch (SQLException e) {
+            Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Fehler beim Löschen der Session aus der Datenbank.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
     }
 
     public boolean validToken(String token, String email){
