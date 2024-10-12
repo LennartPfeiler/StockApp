@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -44,7 +44,7 @@ public class UserManagerImplementation implements IUserManager{
             databaseUser = new UserManagerImplementation();
         return databaseUser;
     }
-
+    //user
     public void createUserTable() {
 
         Statement stmt = null;
@@ -170,8 +170,82 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
+    public void editUserBudget(String email, Double oldValue, Double bougthValue){
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("UpdatePortfolioValueLogger").log(Level.INFO, "Start updatePortfolioValue method");
+
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
+            String updateSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
+                            " WHERE email = '" + email + "'";
+
+            // Führe die SQL-Anweisung aus
+            stmt.executeUpdate(updateSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error updating portfolio value.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
+    }
+
     // public boolean editUser(String currentEmail, User user) {
-    //     
+    //      Properties propertiesU = new Properties();
+    
+    //     try {
+    //         ClassLoader loaderU = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderU.getResourceAsStream(fileName)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserUsers").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesU.load(resourceStream);
+    //         }
+
+    //         Properties propertiesT = new Properties();
+
+    //         ClassLoader loaderT = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderT.getResourceAsStream(transactionFile)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserTransactions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesT.load(resourceStream);
+    //         }
+
+    //         Properties propertiesS = new Properties();
+
+    //         ClassLoader loaderS = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderS.getResourceAsStream(sessionsFile)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserSessions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesS.load(resourceStream);
+    //         }
+
+    //         Properties propertiesP = new Properties();
+
+    //         ClassLoader loaderP = Thread.currentThread().getContextClassLoader();
+    //         try (InputStream resourceStream = loaderP.getResourceAsStream(portoliosFile)) {
+    //             if (resourceStream == null) {
+    //                 Logger.getLogger("EditUserPortfolios").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
+    //                 return false;
+    //             }
+    //             propertiesP.load(resourceStream);
+    //         }
+
     //     int i = 1;
     //     while (true){
     //         String emailKey = "User." + i + ".Email";
