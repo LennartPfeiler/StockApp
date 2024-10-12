@@ -199,147 +199,83 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    // public boolean editUser(String currentEmail, User user) {
-    //      Properties propertiesU = new Properties();
-    
-    //     try {
-    //         ClassLoader loaderU = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderU.getResourceAsStream(fileName)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserUsers").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesU.load(resourceStream);
-    //         }
+    public boolean editUser(String currentEmail, User user) {
+    Logger.getLogger("EditUser").log(Level.WARNING, "Start editUser-method");
 
-    //         Properties propertiesT = new Properties();
+    // Prüfen, ob die E-Mail geändert werden muss
+    String newEmail = user.getEmail();
+    boolean emailChanged = !newEmail.equals(currentEmail);
 
-    //         ClassLoader loaderT = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderT.getResourceAsStream(transactionFile)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserTransactions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesT.load(resourceStream);
-    //         }
+    try (Connection connection = DriverManager.getConnection(dbUrl, username, password)) {
+        connection.setAutoCommit(false); // Beginne Transaktion
 
-    //         Properties propertiesS = new Properties();
+        // 1. Aktualisiere group12user-Tabelle (ohne Email)
+        try (PreparedStatement stmtUpdateUser = connection.prepareStatement(
+                "UPDATE group12user SET firstname = ?, lastname = ?, budget = ? WHERE email = ?")) {
 
-    //         ClassLoader loaderS = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderS.getResourceAsStream(sessionsFile)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserSessions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesS.load(resourceStream);
-    //         }
+            stmtUpdateUser.setString(1, user.getFirstName());
+            stmtUpdateUser.setString(2, user.getLastName());
+            stmtUpdateUser.setDouble(3, user.getBudget());
+            stmtUpdateUser.setString(4, currentEmail); // Alte E-Mail als Bedingung
 
-    //         Properties propertiesP = new Properties();
+            int rowsAffected = stmtUpdateUser.executeUpdate();
+            if (rowsAffected == 0) {
+                // Kein Benutzer mit der angegebenen E-Mail gefunden, Abbruch
+                connection.rollback();
+                return false;
+            }
+        }
 
-    //         ClassLoader loaderP = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderP.getResourceAsStream(portoliosFile)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserPortfolios").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesP.load(resourceStream);
-    //         }
+        // 2. Aktualisiere andere Tabellen, falls die E-Mail geändert wurde
+        if (emailChanged) {
+            try (PreparedStatement stmtUpdatePortfolio = connection.prepareStatement(
+                    "UPDATE group12portfolio SET email = ? WHERE email = ?");
+                 PreparedStatement stmtUpdateSession = connection.prepareStatement(
+                     "UPDATE group12session SET email = ? WHERE email = ?");
+                 PreparedStatement stmtUpdateTransaction = connection.prepareStatement(
+                     "UPDATE group12transaction SET email = ? WHERE email = ?")) {
 
-    //     int i = 1;
-    //     while (true){
-    //         String emailKey = "User." + i + ".Email";
-    //         String currentUserEmailUsers = propertiesU.getProperty(emailKey);
+                // Setze Parameter für alle Fremdschlüssel-Tabellen
+                stmtUpdatePortfolio.setString(1, newEmail);
+                stmtUpdatePortfolio.setString(2, currentEmail);
+                stmtUpdateSession.setString(1, newEmail);
+                stmtUpdateSession.setString(2, currentEmail);
+                stmtUpdateTransaction.setString(1, newEmail);
+                stmtUpdateTransaction.setString(2, currentEmail);
 
-    //         if(currentUserEmailUsers == null){
-    //             return false;
-    //         }
+                // Führe die Updates aus
+                stmtUpdatePortfolio.executeUpdate();
+                stmtUpdateSession.executeUpdate();
+                stmtUpdateTransaction.executeUpdate();
+            }
 
-    //         if(currentUserEmailUsers.equals(currentEmail)){
-    //             String newEmail = user.getEmail();
-    //             String newFirstname = user.getFirstName();
-    //             String newLastname = user.getLastName();
-    //             String newPassword = user.getPassword();
-    //             String newBudget = user.getBudget().toString();
-    //             String firstnameKey = "User." + i + ".Firstname";
-    //             String lastnameKey = "User." + i + ".Lastname";
-    //             String passwordKey = "User." + i + ".Password";
-    //             String budgetKey = "User." + i + ".Budget";
-                
-    //             propertiesU.setProperty(firstnameKey, newFirstname);
-    //             propertiesU.setProperty(lastnameKey, newLastname);
-    //             propertiesU.setProperty(passwordKey, newPassword);
-    //             propertiesU.setProperty(budgetKey, newBudget);
+            // 3. Aktualisiere die Email in der group12user-Tabelle
+            try (PreparedStatement stmtUpdateUserEmail = connection.prepareStatement(
+                    "UPDATE group12user SET email = ? WHERE email = ?")) {
 
-    //             if(!currentEmail.equalsIgnoreCase(newEmail)){
-    //                int t = 1;
-    //                while (true){
-    //                 String transEmailKey = "Transaction." + t + ".Email";
-    //                 String currentUserEmailTrans = propertiesT.getProperty(transEmailKey);
+                stmtUpdateUserEmail.setString(1, newEmail);
+                stmtUpdateUserEmail.setString(2, currentEmail);
+                stmtUpdateUserEmail.executeUpdate();
+            }
+        }
 
-    //                 if(currentUserEmailTrans == null){
-    //                     break;
-    //                 }
+        // Alle Updates erfolgreich, commit
+        connection.commit();
+        return true;
 
-    //                 if(currentUserEmailTrans.equals(currentEmail)){
-    //                     propertiesT.setProperty(transEmailKey, newEmail);
+    } catch (SQLException e) {
+        Logger.getLogger("EditUser").log(Level.SEVERE, "Error editing user", e);
+        try {
+            if (connection != null) {
+                connection.rollback(); // Rollback bei Fehler
+            }
+        } catch (SQLException rollbackEx) {
+            Logger.getLogger("EditUser").log(Level.SEVERE, "Error during rollback", rollbackEx);
+        }
+        return false;
+    }
+}
 
-    //                 }
-    //                 t++;
-
-    //                }
-    //                 int s = 1;
-    //                while (true){
-    //                 String sessionEmailKey = "Session." + s + ".Email";
-    //                 String currentUserEmailSession = propertiesS.getProperty(sessionEmailKey);
-
-    //                 if(currentUserEmailSession == null){
-    //                     break;
-    //                 }
-
-    //                 if(currentUserEmailSession.equals(currentEmail)){
-    //                     propertiesS.setProperty(sessionEmailKey, newEmail);
-
-    //                 }
-    //                 s++;
-
-    //                }
-    //                 int p = 1;
-    //                while (true){
-    //                 String portfolioEmailKey = "Portfolio." + p + ".Email";
-    //                 String currentUserEmailPortfolio = propertiesP.getProperty(portfolioEmailKey);
-
-    //                 if(currentUserEmailPortfolio == null){
-    //                     break;
-    //                 }
-
-    //                 if(currentUserEmailPortfolio.equals(currentEmail)){
-    //                     propertiesP.setProperty(portfolioEmailKey, newEmail);
-
-    //                 }
-    //                 p++;
-
-    //                }
-    //                propertiesU.setProperty(emailKey, newEmail);
-    //             }
-    //         }
-    //         i++;
-
-    //         return true;
-    //     }
-        
-
-    //  } catch (IOException e) {
-    //         Logger.getLogger("EditUser").log(Level.SEVERE, "Fehler beim Laden der properties-Datei.", e);
-    //     }
-    //     return false;
-    // }
-        // change the data of user, found by id
-        // String editUser_database_query = "UPDATE Users" +
-        //         "       SET FirstName = '" + user.getFirstName() + "', LastName = '" + user.getLastName() +
-        //                 "', EMail = '" + user.getEmail() + "', Password = '" + user.getPassword() + "'" +
-        //         "       WHERE UserID = " + user.getUserID() + ";";
-        //Write into database
-    
 
     //@Override
     public boolean deleteUser(int userID) {
