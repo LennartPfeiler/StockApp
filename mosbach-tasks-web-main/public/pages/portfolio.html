@@ -42,7 +42,7 @@
             <div class="d-flex align-items-center mb-3">
                 <div class="me-2">
                     <label for="stock-name" class="form-label">Stock name:</label>
-                    <input type="text" id="stock-name" value="AAPL" class="form-control">
+                    <input type="text" id="stock-name" value="AAPL" class="form-control" oninput="checkFields()">
                 </div>
                 <div class="price-container"> <br/>
                     <div id="price-display" class="price-display"></div>
@@ -52,12 +52,12 @@
             <span id="current-price">220$</span>
             <div class="mb-3">
                 <label for="quantity" id="quantity-label" class="form-label">Quantity in $:</label>
-                <input type="number" id="quantity" value="8000" class="form-control">
+                <input type="number" id="quantity" value="8000" class="form-control" oninput="checkFields()">
             </div>
             <div class="mb-4">
                 <button id="toggle-label" class="btn btn-secondary mt-2" onclick="toggleLabel()">Switch to Stocks</button>
             </div>
-            <button id="buy-stock" class="btn btn-success mt-2">Buy stock</button>
+            <button id="buy-stock" class="btn btn-success mt-2" onclick="buyStock()">Buy stock</button>
             <button id="sell-stock" class="btn btn-danger mt-2">Sell stock</button>
         </section>
         <section class="portfolio">

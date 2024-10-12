@@ -53,10 +53,10 @@ public class UserManagerImplementation implements IUserManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String dropTable = "DROP TABLE IF EXISTS group12User";
+            String dropTable = "DROP TABLE IF EXISTS group12user";
             stmt.executeUpdate(dropTable);
 
-            String createTable = "CREATE TABLE group12User (" +
+            String createTable = "CREATE TABLE group12user (" +
                     "email VARCHAR(100) NOT NULL PRIMARY KEY, " +
                     "firstname VARCHAR(100) NOT NULL, " +
                     "lastname VARCHAR(100) NOT NULL, " +
@@ -88,16 +88,13 @@ public class UserManagerImplementation implements IUserManager{
         return true;
     }
 
-    public EmailCheckResponse isEmailAlreadyRegistered(String email) {
-        String message;
+    public Boolean isEmailAlreadyRegistered(String email) {
         User user = getUserProfile(email);
         if(user == null){
-            message = "Email ist noch nicht registriert.";
-            return new EmailCheckResponse(false, message);
+            return false;
         }
         else{
-            message = "Email ist bereits registriert";
-            return new EmailCheckResponse(true, message);
+            return true;
         }
     }    
 
@@ -171,47 +168,6 @@ public class UserManagerImplementation implements IUserManager{
                 Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
             }
         }
-    }
-
-    public boolean editUser(String currentEmail, User user) {
-        Logger.getLogger("EditUser").log(Level.WARNING, "Start editUser-method");
-
-            User oldUser = getUserProfile(currentEmail);
-
-            String newEmail = user.getEmail();
-
-            if (newEmail.equals(currentEmail)){
-                try{
-                    connection = DriverManager.getConnection(dbUrl, username, password);
-                    stmt = connection.createStatement();
-                    String updateSQLUser = "UPDATE group12user SET " +
-                        "firstname = '" + user.getFirstName() + "', " +
-                        "lastname = '" + user.getLastName() + "', " +
-                        "budget = '" + user.getBudget() + oldUser.getBudget() + "' " +
-                        "WHERE email = '" + user.getEmail() + "'";
-
-                     ResultSet rsUser = stmt.executeQuery(updateSQLUser);
-            } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                // Schließen von ResultSet, Statement und Connection, um Ressourcen freizugeben
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("EditUserByEmail").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
-            }
-        }
-
-            
-
-            
-
-        }
-
-   
     }
 
     // public boolean editUser(String currentEmail, User user) {

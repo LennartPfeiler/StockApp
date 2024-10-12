@@ -78,14 +78,10 @@ function login(profileSchema){
         },
         "error": function(xhr) {
             // Fehlerbehandlung je nach Statuscode
-            let message;
-            if (xhr.status === 401) {
-                alert("Email oder Passwort ist falsch!");
-            } else if (xhr.status === 500) {
-                alert("Bitte registrieren Sie sich erst!")
-            }
-            else{
-                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            if (xhr.status === 401 || xhr.status === 404) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else{
+                alert("An unexpected error occurred. Status: " + xhr.status);
             }
         }
     };
@@ -111,21 +107,124 @@ function register(profileSchema){
             "budget": profileSchema.budget.value
         }),
         "success": function(data) {
-            console.log(data);
+            console.log(data.answer);
             alert("Erfolgreich registriert! Sie können sich nun einloggen.");
         },
         "error": function(xhr) {
             console.log(xhr);
-            if (xhr.status === 401) {
-                alert("Sie sind bereits registriert! Bitte loggen Sie sich ein.");
-            }
-            else{
+            if (xhr.status === 401 || xhr.status === 404) {
+                alert(JSON.parse(xhr.responseText).answer);
+                console.log(xhr);
+            } else{
                 alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
             }
         }
     };
     $.ajax(settingsRegister);
 }
+
+function checkIfPriceIsDisplayed(){
+    const priceDisplay = document.getElementById("price-display").textContent.trim();
+    
+    // Überprüfen, ob der Inhalt eine gültige Zahl ist
+    const price = parseFloat(priceDisplay);
+
+    // Prüfen, ob price eine Zahl ist
+    if (isNaN(price)) {
+        alert("Es ist kein gültiger Preis angegeben.");
+    } else {
+        alert("Es ist kein gültiger Preis angegeben.");
+    }
+}
+
+function getCurrentDateTime() {
+    const now = new Date(); // Aktuelles Datum und Uhrzeit
+
+    // Formatieren der einzelnen Teile
+    const year = now.getFullYear(); // Jahr
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Monat (0-basiert, also +1 und 2-stellig)
+    const day = String(now.getDate()).padStart(2, '0'); // Tag
+    const hours = String(now.getHours()).padStart(2, '0'); // Stunden
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Minuten
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // Sekunden
+
+    // Zusammensetzen im gewünschten Format
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+}
+
+function roundDownToTwoDecimalPlaces(num) {
+    return Math.floor(num * 100) / 100;
+}
+
+function roundToTwoDecimalPlaces(value) {
+    return Math.round(value * 100) / 100;
+}
+
+function buyStock(){
+    event.preventDefault();
+    let stockAmount;
+    const priceDisplay = document.getElementById("price-display").textContent.trim();
+    // Entferne das Dollarzeichen und parse den Preis
+    const price = parseFloat(priceDisplay.replace('$', '').trim());
+    console.log(price);
+
+    if (isNaN(price)) {
+        alert("Enter a valid stock!");
+        return;
+    }
+    if ($("#quantity-label").text() === "Quantity in $:") {
+        // Hier ist die Division
+        const quantity = parseFloat($('#quantity').val());
+        console.log(quantity);
+        if (isNaN(quantity) || quantity <= 0) {
+            alert("Enter a valid quantity in $!");
+            return;
+        }
+        stockAmount = roundDownToTwoDecimalPlaces(quantity / price); // Berechnung für die Menge
+    } else {
+        stockAmount = parseFloat($('#quantity').val());
+        if (isNaN(stockAmount) || stockAmount <= 0) {
+            alert("Enter a valid stock amount!");
+            return;
+        }
+    }
+    const settingsBuyStock = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy",
+        "method": "POST",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "transactionContent": {
+                "transactionType": 1,
+                "stockAmount": stockAmount,
+                "date": getCurrentDateTime(),
+                "pricePerStock": price,
+                "totalPrice": roundToTwoDecimalPlaces(price * stockAmount),
+                "email": getCookie("email"),
+                "symbol": $('#stock-name').val()
+            }
+        })
+        ,
+        "success": function(data) {
+            console.log(data);
+            alert(data.answer);
+        },
+        "error": function(xhr) {
+            if (xhr.status === 401 || xhr.status === 400) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else{
+                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            }
+        }
+    };
+    $.ajax(settingsBuyStock);
+}
+    
+
 
 // Funktion, um den aktuellen Preis anzuzeigen (Portfolio-Seite)
 function showPrice() {
@@ -199,7 +298,7 @@ function getStockName() {
 
 //Funktion, um den aktuellen Preis der eingegebenen Aktie zu bekommen 
 function getStockPrice() {
-    let stockName = getStockName(); // Ersetze dies mit dem Namen des Eingabefelds für das Stock Symbol
+    let stockName = getStockName(); // Replace this with the input field name for the stock symbol
     let url = `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`;
 
     $.ajax({
@@ -207,26 +306,26 @@ function getStockPrice() {
         method: 'GET',
         dataType: 'json',
         success: function(data) {
-            console.log(data); // Debugging: Überprüfe die Datenstruktur
+            console.log(data); // Debugging: Check the data structure
 
             if (data.status === 'OK' && data.results && data.results.length > 0) {
-                const closeValue = parseFloat(data.results[0].c); // Der Schlusskurs
+                const closeValue = parseFloat(data.results[0].c); // The closing price
                 const roundedCloseValue = closeValue.toFixed(2);
                 $('#price-display').text(`${roundedCloseValue}$`);
             } else if (!data.results) {
-                $('#price-display').text('Aktie nicht gefunden oder keine Daten verfügbar.');
+                $('#price-display').text('Stock not found or no data available.');
             } else if (data.results.length === 0) {
-                $('#price-display').text('Keine Schlusskursdaten verfügbar.');
+                $('#price-display').text('No closing price data available.');
             } else {
-                $('#price-display').text('Unbekannter Fehler beim Abrufen der Daten.');
+                $('#price-display').text('Unknown error retrieving data.');
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 429) {
-                $('#price-display').text('Zu viele Anfragen. Bitte versuche es später erneut.');
+                $('#price-display').text('Too many requests. Please try again later.');
             } else {
-                console.error('Fehler:', textStatus, errorThrown);
-                $('#price-display').text('Fehler beim Abrufen der Daten.');
+                console.error('Error:', textStatus, errorThrown);
+                $('#price-display').text('Error retrieving data.');
             }
         }
     });
@@ -265,4 +364,21 @@ function setProfileValues(){
     // document.getElementById("last-name").value = localStorage.getItem("lastname");
     // // Setze den Wert des E-Mail-Feldes
     // document.getElementById("email").value = localStorage.getItem("email");
+}
+
+function checkFields() {
+    const stockName = document.getElementById('stock-name').value.trim();
+    const quantity = document.getElementById('quantity').value.trim();
+
+    const buyButton = document.getElementById('buy-stock');
+    const sellButton = document.getElementById('sell-stock');
+
+    // Überprüfen, ob beide Felder ausgefüllt sind
+    if (stockName !== "" && quantity !== "") {
+        buyButton.disabled = false; // Button aktivieren
+        sellButton.disabled = false; // Button aktivieren
+    } else {
+        buyButton.disabled = true; // Button deaktivieren
+        sellButton.disabled = true; // Button deaktivieren
+    }
 }

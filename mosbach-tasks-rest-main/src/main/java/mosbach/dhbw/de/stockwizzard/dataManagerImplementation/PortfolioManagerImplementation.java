@@ -51,6 +51,7 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             String createTable = "CREATE TABLE group12portfolio (" +
                      "portfolioid SERIAL PRIMARY KEY, " +
                      "value DOUBLE PRECISION NOT NULL, " +
+                     "startValue DOUBLE PRECISION NOT NULL, " +
                      "email VARCHAR(100) NOT NULL, " +
                      "FOREIGN KEY (email) REFERENCES group12user(email) ON DELETE CASCADE)";
 
@@ -80,15 +81,16 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             stmt = connection.createStatement();
     
             // SQL-Anweisung für das Einfügen eines neuen Portfolios
-            String insertSQL = "INSERT INTO group12portfolio (value, email) VALUES (" +
+            String insertSQL = "INSERT INTO group12portfolio (value, startValue, email) VALUES (" +
                     portfolioData.getValue() + ", " +
+                    portfolioData.getStartValue() + ", " +
                     "'" + portfolioData.getEmail() + "')";
     
             // Führe die SQL-Anweisung aus
             stmt.executeUpdate(insertSQL);
             
             Logger.getLogger("SetNewPortfolioWriter").log(Level.INFO, "Portfolio erfolgreich hinzugefügt: Value = {0}, Email = {1}",
-                    new Object[]{portfolioData.getValue(), portfolioData.getEmail()});
+                    new Object[]{portfolioData.getValue(), portfolioData.getStartValue(), portfolioData.getEmail()});
             
             // Schließe das Statement und die Verbindung
         } catch (SQLException e) {
@@ -126,10 +128,11 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
                 // Extrahiere die Werte aus dem ResultSet
                 int portfolioID = rs.getInt("portfolioid");
                 double value = rs.getDouble("value");
+                double startValue = rs.getDouble("startValue");
                 String userEmail = rs.getString("email");
 
                 // Erstelle ein neues Portfolio-Objekt
-                portfolio = new Portfolio(portfolioID, value, userEmail);
+                portfolio = new Portfolio(portfolioID, value, startValue, userEmail);
                 Logger.getLogger("GetPortfolioReader").log(Level.INFO, "Portfolio gefunden: {0}", portfolio);
             } else {
                 Logger.getLogger("GetPortfolioReader").log(Level.INFO, "Kein Portfolio für die E-Mail {0} gefunden.", email);
@@ -150,5 +153,35 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             }
         }
         return portfolio;
+    }
+
+    public void editPortfolioValue(Integer portfolioId, Double oldValue, Double addition){
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("UpdatePortfolioValueLogger").log(Level.INFO, "Start updatePortfolioValue method");
+
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
+            String updateSQL = "UPDATE group12portfolio SET value = " + (oldValue + addition) +
+                            " WHERE portfolioid = " + portfolioId;
+
+            // Führe die SQL-Anweisung aus
+            stmt.executeUpdate(updateSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error updating portfolio value.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
     }
 }
