@@ -173,52 +173,49 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
+    public boolean editUser(String currentEmail, User user) {
+        Logger.getLogger("EditUser").log(Level.WARNING, "Start editUser-method");
+
+            User oldUser = getUserProfile(currentEmail);
+
+            String newEmail = user.getEmail();
+
+            if (newEmail.equals(currentEmail)){
+                try{
+                    connection = DriverManager.getConnection(dbUrl, username, password);
+                    stmt = connection.createStatement();
+                    String updateSQLUser = "UPDATE group12user SET " +
+                        "firstname = '" + user.getFirstName() + "', " +
+                        "lastname = '" + user.getLastName() + "', " +
+                        "budget = '" + user.getBudget() + oldUser.getBudget() + "' " +
+                        "WHERE email = '" + user.getEmail() + "'";
+
+                     ResultSet rsUser = stmt.executeQuery(updateSQLUser);
+            } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // Schließen von ResultSet, Statement und Connection, um Ressourcen freizugeben
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("EditUserByEmail").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
+
+            
+
+            
+
+        }
+
+   
+    }
+
     // public boolean editUser(String currentEmail, User user) {
-    //      Properties propertiesU = new Properties();
-    
-    //     try {
-    //         ClassLoader loaderU = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderU.getResourceAsStream(fileName)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserUsers").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesU.load(resourceStream);
-    //         }
-
-    //         Properties propertiesT = new Properties();
-
-    //         ClassLoader loaderT = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderT.getResourceAsStream(transactionFile)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserTransactions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesT.load(resourceStream);
-    //         }
-
-    //         Properties propertiesS = new Properties();
-
-    //         ClassLoader loaderS = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderS.getResourceAsStream(sessionsFile)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserSessions").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesS.load(resourceStream);
-    //         }
-
-    //         Properties propertiesP = new Properties();
-
-    //         ClassLoader loaderP = Thread.currentThread().getContextClassLoader();
-    //         try (InputStream resourceStream = loaderP.getResourceAsStream(portoliosFile)) {
-    //             if (resourceStream == null) {
-    //                 Logger.getLogger("EditUserPortfolios").log(Level.WARNING, "Die properties-Datei {0} wurde nicht gefunden.", fileName);
-    //                 return false;
-    //             }
-    //             propertiesP.load(resourceStream);
-    //         }
-
+    //     
     //     int i = 1;
     //     while (true){
     //         String emailKey = "User." + i + ".Email";
