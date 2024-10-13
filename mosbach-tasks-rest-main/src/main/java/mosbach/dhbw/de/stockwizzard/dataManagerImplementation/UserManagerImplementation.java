@@ -286,7 +286,7 @@ public class UserManagerImplementation implements IUserManager{
         User currentUser = getUserProfile(currentEmail);
         Double oldBudget = currentUser.getBudget();
 
-        if(!emailChanged){
+        if(emailChanged == false){
             try{
                 connection = DriverManager.getConnection(dbUrl, username, password);
                 stmt = connection.createStatement();
@@ -323,7 +323,7 @@ public class UserManagerImplementation implements IUserManager{
                     "'" + user.getFirstName() + "', " +
                     "'" + user.getLastName() + "', " +
                     "'" + passwordManager.hashPassword(user.getPassword()) + "', " +
-                    "'" + user.getBudget() + oldBudget + "')";
+                     + (user.getBudget() + oldBudget) + ")";
                 String updateSessionsSQL = "UPDATE group12session SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
                 String updateTransactionsSQL = "UPDATE group12transaction SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
                 String updatePortfolioSQL = "UPDATE group12portfolio SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
