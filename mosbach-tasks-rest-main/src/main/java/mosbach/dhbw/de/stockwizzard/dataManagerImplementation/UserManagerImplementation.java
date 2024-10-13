@@ -349,20 +349,20 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    public User resetProfile(User user){
+    public User resetProfile(String email){
         Statement stmt = null;
         Connection connection = null;
-        Logger.getLogger("ResetProfileLogger").log(Level.INFO, "Start resetProfile method: {0}", user.getEmail());
+        Logger.getLogger("ResetProfileLogger").log(Level.INFO, "Start resetProfile method");
 
         try {
             // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            String deletePortfolioStocks = "DELETE FROM group12portfoliostock WHERE portfolioid = (SELECT portfolioid FROM group12portfolio WHERE email= '" + user.getEmail() + "')";
-            String deleteTransactions = "DELETE FROM group12transaction WHERE email= '" + user.getEmail() + "'";
-            String updatePortfolio = "UPDATE group12portfolio SET value = (SELECT startvalue from group12portfolio WHERE email = '" + user.getEmail() + "') WHERE email = '" + user.getEmail() + "' "; 
-            String updateUser = "UPDATE group12user SET budget = (SELECT startvalue from group12portfolio WHERE email = '" + user.getEmail() + "') WHERE email = '" + user.getEmail() + "' "; 
+            String deletePortfolioStocks = "DELETE FROM group12portfoliostock WHERE portfolioid = (SELECT portfolioid FROM group12portfolio WHERE email= '" + email + "')";
+            String deleteTransactions = "DELETE FROM group12transaction WHERE email= '" + email + "'";
+            String updatePortfolio = "UPDATE group12portfolio SET value = (SELECT startvalue from group12portfolio WHERE email = '" + email + "') WHERE email = '" + email + "' "; 
+            String updateUser = "UPDATE group12user SET budget = (SELECT startvalue from group12portfolio WHERE email = '" + email + "') WHERE email = '" + email + "' "; 
 
             // Führe die SQL-Anweisung au
             stmt.executeUpdate(deletePortfolioStocks);
@@ -381,18 +381,37 @@ public class UserManagerImplementation implements IUserManager{
                 Logger.getLogger("ResetProfileLogger").log(Level.SEVERE, "Error closing resources.", e);
             }
         }
-        return getUserProfile(user.getEmail());
+        return getUserProfile(email);
     }
 
 
     //@Override
-    public boolean deleteUser(int userID) {
-        boolean deleted = true;
-        // sql strings to delete the user and the connections, if he uses carpools (foreign key)
-        // String deleteUser_database_query = "DELETE FROM Users" +
-        //         "       WHERE UserID = " + userID + ";";
-        //Delete from database
-        return deleted;
+    public void deleteUser(String email) {
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("DeleteProfileLogger").log(Level.INFO, "Start deleteProfile method");
+
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            String deleteProfile = "DELETE FROM group12user WHERE email= '" + email + "'";
+            
+            // Führe die SQL-Anweisung au
+            stmt.executeUpdate(deleteProfile);
+        } catch (SQLException e) {
+            Logger.getLogger("DeleteProfileLogger").log(Level.SEVERE, "Error deleting user.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("DeleteProfileLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
     }
 
 }

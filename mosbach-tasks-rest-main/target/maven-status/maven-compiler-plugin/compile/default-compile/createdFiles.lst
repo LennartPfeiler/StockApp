@@ -1,4 +1,5 @@
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\TransactionManagerImplementation.class
+mosbach\dhbw\de\stockwizzard\model\TokenEmail.class
 mosbach\dhbw\de\stockwizzard\dataManager\ITransactionManager.class
 mosbach\dhbw\de\stockwizzard\controller\MappingController.class
 mosbach\dhbw\de\stockwizzard\StockWizzardBackendApplication.class

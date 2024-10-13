@@ -282,7 +282,7 @@ function editUser(){
 
 function resetProfile(){
     event.preventDefault();
-    const editRegister = {
+    const resetRegister = {
         "async": true, // Asynchrone Anfrage
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user/reset",
         "method": "PUT",
@@ -292,16 +292,14 @@ function resetProfile(){
         },
         "data": JSON.stringify({
             "token": getCookie("token"),
-            "User": {
-            "firstname": getCookie("firstname"),
-            "lastname": getCookie("lastname"),
             "email": getCookie("email"),
-            "password": getCookie("password"),
-            "budget": getCookie("budget")
-        }}),
+        }),
         "success": function(data) {
-            alert("Profile successfully resetted!.");
+            const confirmation = confirm("Are you sure you want to reset your profile?");
+            if (confirmation) {
+                alert("Profile successfully resetted!.");
             setCookie("budget", data.budget);
+            } 
         },
         "error": function(xhr) {
             if (xhr.status === 401 || xhr.status === 400) {
@@ -312,7 +310,40 @@ function resetProfile(){
         }
     };
 
-    $.ajax(editRegister);
+    $.ajax(resetRegister);
+}
+
+function deleteProfile(){
+    event.preventDefault();
+    const deleteRegister = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
+        "method": "DELETE",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "email": getCookie("email"),
+        }),
+        "success": function(data) {
+            const confirmation = confirm("Are you sure you want to delete your profile?");
+            if (confirmation) {
+                alert(data.answer);
+                document.location="vorHome.html";
+            } 
+        },
+        "error": function(xhr) {
+            if (xhr.status === 401 || xhr.status === 400) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else{
+                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            }
+        }
+    };
+
+    $.ajax(deleteRegister);
 }
 //////////////////////////////////////////// Aktienpreis //////////////////////////////////////////
 

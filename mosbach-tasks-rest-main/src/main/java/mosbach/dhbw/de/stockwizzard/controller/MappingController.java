@@ -19,6 +19,7 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.TransactionManager
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
 import mosbach.dhbw.de.stockwizzard.model.LogoutRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
+import mosbach.dhbw.de.stockwizzard.model.TokenEmail;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
@@ -120,23 +121,41 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             path = "/user/reset",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     ) 
-    public ResponseEntity<?> resetProfile(@RequestBody TokenUser tokenUser){
+    public ResponseEntity<?> resetProfile(@RequestBody TokenEmail tokenEmail){
         try{
-            String token = tokenUser.getToken();
-            User user = tokenUser.getUser();
+            String token = tokenEmail.getToken();
+            String email = tokenEmail.getEmail();
             User newUser;
-            Logger.getLogger("AAAAAAAAAAAAAAALOGGER").log(Level.INFO, "AAAAAAAAAAAAAA");
-            boolean isValid = sessionManager.validToken(token, user.getEmail());
+            boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
-                newUser = userManager.resetProfile(user);
+                newUser = userManager.resetProfile(email);
                 return ResponseEntity.ok(newUser); // Gültiger Token - gib TokenUser zurück
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!")); // Ungültiger Token - gib Fehlerstatus zurück
             }
         } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during resetting."));
             } 
-        
+    }
+
+    @DeleteMapping(
+            path = "/user",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> deleteProfile(@RequestBody TokenEmail tokenEmail){
+        try{
+            String token = tokenEmail.getToken();
+            String email = tokenEmail.getEmail();
+            boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                userManager.deleteUser(email);
+                return ResponseEntity.ok(new StringAnswer("Profile successfully deleted")); // Gültiger Token - gib TokenUser zurück
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!")); // Ungültiger Token - gib Fehlerstatus zurück
+            }
+        } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during resetting."));
+            } 
     }
     
     @GetMapping("/portfolioStocks")
