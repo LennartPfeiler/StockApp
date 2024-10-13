@@ -212,6 +212,7 @@ function buyStock(){
         "success": function(data) {
             console.log(data);
             alert(data.answer);
+            loadPortfolioDataFromDatabase();
         },
         "error": function(xhr) {
             if (xhr.status === 401 || xhr.status === 400) {
@@ -224,17 +225,6 @@ function buyStock(){
     $.ajax(settingsBuyStock);
 }
     
-
-
-// Funktion, um den aktuellen Preis anzuzeigen (Portfolio-Seite)
-function showPrice() {
-    var currentPrice = "220$";
-    var priceDisplay = document.getElementById('price-display');
-    priceDisplay.textContent = currentPrice;
-    var currentPriceSpan = document.getElementById('current-price');
-    currentPriceSpan.style.display = 'none';
-}
-
 // Funktion, um das Label und den Button zu toggeln (Portfolio-Seite)
 function toggleLabel() {
     var label = document.getElementById('quantity-label');
@@ -392,9 +382,10 @@ function loadPortfolioDataFromDatabase(){
 
 
 function getAllTransactions(){
+    event.preventDefault();
     const settingsGetAllTransactions = {
         "async": false,
-        "url": "GET https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/transactions?email=" + getCookie("email") + "&token=" + getCookie("token") + "&sortby=date",
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/transactions?email=" + getCookie("email") + "&token=" + getCookie("token") + "&sortby=date",
         "method": "GET",
         "headers": {
             'Accept': 'application/json',
@@ -404,29 +395,36 @@ function getAllTransactions(){
     $.ajax(settingsGetAllTransactions).done(function (transactions) {
         console.log(transactions);
         displayTransactionHistory(transactions);
-        //localStorage.setItem("transactionArray", JSON.stringify(transactions));
     });
 }
 
 function displayTransactionHistory(transactions) {
     const transactionHistoryContainer = document.querySelector('.transaction-history');
     transactionHistoryContainer.innerHTML = ''; // Vorherige Inhalte entfernen
-
+    let type;
     const heading = document.createElement('h2');
     heading.textContent = 'Transaction History';
     transactionHistoryContainer.appendChild(heading);
 
     transactions.forEach(transaction => {
+        console.log(transaction);
         const transactionDiv = document.createElement('div');
-        transactionDiv.textContent = `${transaction.type} ${transaction.symbol} at price of ${transaction.price}$ for ${transaction.amount}$`;
+        if(transaction.transactionType === 1){
+            type = "Bought"
+        }
+        else{
+            type = "Sold"
+        }
+        transactionDiv.textContent = `${type} ${transaction.stockAmount} ${transaction.symbol} at price of ${transaction.pricePerStock}$ for ${transaction.totalPrice}$`;
         transactionHistoryContainer.appendChild(transactionDiv);
     });
 }
 
 function getAllPortfolioStocks(){
+    event.preventDefault();
     const settingsGetAllPortfolioStocks = {
         "async": false,
-        "url": "GET https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&sortby=symbol",
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStocks?email=" + getCookie("email") + "&token=" + getCookie("token") + "&sortby=symbol",
         "method": "GET",
         "headers": {
             'Accept': 'application/json',
@@ -443,17 +441,59 @@ function getAllPortfolioStocks(){
 function displayPortfolioStocks(portfolioStocks) {
     const stockListContainer = document.querySelector('.portfolio .stock-list');
     stockListContainer.innerHTML = ''; // Vorherige Inhalte entfernen
+    let totalCurrentPortfolioValue = 0; // Initialisierung auf 0
+    let totalBoughtPortfolioValue = 0; // Initialisierung auf 0
 
     portfolioStocks.forEach(stock => {
+        totalCurrentPortfolioValue += stock.currentValue;
+        totalBoughtPortfolioValue += stock.boughtValue;
         const stockDiv = document.createElement('div');
-        const stockValue = parseFloat(stock.value).toFixed(2); // Wert auf 2 Dezimalstellen runden
-        const percentageChange = parseFloat(stock.percentageChange).toFixed(2); // Prozentuale Änderung runden
+        const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentValue));
 
-        // Positiven oder negativen Wert überprüfen
-        const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
-        const sign = percentageChange >= 0 ? '+' : '';
+        // Berechne die prozentuale Änderung mit der neuen Methode
+        const { percentageChange, changeClass } = calculatePercentage(stock.boughtValue, stock.currentValue);
 
-        stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${sign}${percentageChange}%</span>`;
+        // Füge die Daten in das Div-Element ein
+        stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
         stockListContainer.appendChild(stockDiv);
     });
+
+    // Gesamtwerte anzeigen
+    displayTotalPortfolioValues(totalCurrentPortfolioValue, totalBoughtPortfolioValue);
+}
+
+
+
+function calculatePercentage(boughtValue, currentValue) {
+    // Berechne die prozentuale Änderung
+    const percentageChange = ((currentValue - boughtValue) / boughtValue * 100).toFixed(2);
+
+    // Überprüfe, ob der Wert positiv oder negativ ist, und lege die CSS-Klasse fest
+    const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
+    const sign = percentageChange >= 0 ? '+' : '';
+
+    // Gib das Ergebnis als Objekt zurück, um sowohl den Wert als auch die CSS-Klasse zu nutzen
+    return {
+        percentageChange: `${sign}${percentageChange}%`, // Prozentwert mit Vorzeichen
+        changeClass: changeClass // CSS-Klasse für positive oder negative Veränderung
+    };
+}
+
+function displayTotalPortfolioValues(totalCurrentPortfolioValue, totalBoughtPortfolioValue) {
+    console.log(totalCurrentPortfolioValue);
+    console.log(totalBoughtPortfolioValue);
+    const portfolioValueContainer = document.querySelector('.portfolio .portfolio-value');
+
+    // Berechnung der prozentualen Veränderung
+    const percentageChange = roundToTwoDecimalPlaces(((totalCurrentPortfolioValue - totalBoughtPortfolioValue) / totalBoughtPortfolioValue * 100));
+    
+    // Überprüfen, ob die Veränderung positiv oder negativ ist
+    const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
+    const sign = percentageChange >= 0 ? '+' : '';
+
+    // Rundung des aktuellen Portfolio-Werts auf zwei Dezimalstellen
+    const roundedCurrentValue = roundToTwoDecimalPlaces(totalCurrentPortfolioValue);
+
+    // Aktualisierung des HTML-Codes
+    portfolioValueContainer.innerHTML = `${roundedCurrentValue} $ <span class="percentage ${changeClass}">${sign}${percentageChange}%</span>`;
 }
