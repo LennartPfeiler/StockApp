@@ -279,6 +279,41 @@ function editUser(){
 
     $.ajax(editRegister);
 }
+
+function resetProfile(){
+    event.preventDefault();
+    const editRegister = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user/reset",
+        "method": "PUT",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "User": {
+            "firstname": getCookie("firstname"),
+            "lastname": getCookie("lastname"),
+            "email": getCookie("email"),
+            "password": getCookie("password"),
+            "budget": getCookie("budget")
+        }}),
+        "success": function(data) {
+            alert("Profile successfully resetted!.");
+            setCookie("budget", data.budget);
+        },
+        "error": function(xhr) {
+            if (xhr.status === 401 || xhr.status === 400) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else{
+                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            }
+        }
+    };
+
+    $.ajax(editRegister);
+}
 //////////////////////////////////////////// Aktienpreis //////////////////////////////////////////
 
 //Funktion, um den eingegebenen Aktiennamen innerhalb des Portfolios zu bekommen

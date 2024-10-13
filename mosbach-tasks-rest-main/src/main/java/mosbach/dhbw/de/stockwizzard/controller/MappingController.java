@@ -115,6 +115,29 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
         }
     }
+
+    @PutMapping(
+            path = "/user/reset",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> resetProfile(@RequestBody TokenUser tokenUser){
+        try{
+            String token = tokenUser.getToken();
+            User user = tokenUser.getUser();
+            User newUser;
+            Logger.getLogger("AAAAAAAAAAAAAAALOGGER").log(Level.INFO, "AAAAAAAAAAAAAA");
+            boolean isValid = sessionManager.validToken(token, user.getEmail());
+            if (isValid) {
+                newUser = userManager.resetProfile(user);
+                return ResponseEntity.ok(newUser); // Gültiger Token - gib TokenUser zurück
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+            }
+        } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during resetting."));
+            } 
+        
+    }
     
     @GetMapping("/portfolioStocks")
     public ResponseEntity<?> getAllPortfolioStocks( 
