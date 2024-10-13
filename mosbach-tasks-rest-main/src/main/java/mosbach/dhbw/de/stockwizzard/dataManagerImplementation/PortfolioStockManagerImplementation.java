@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,9 +139,47 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         }
     }
 
-    public void editPortfolioStock(Integer portfolioId, String symbol, Integer transactionType){
+    public List<PortfolioStock> getAllPortfolioStocks(String email, String sortby){
+        List<PortfolioStock> portfolioStocks = new ArrayList<>();
+        Statement stmt = null;
+        Connection connection = null;
 
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            String getPortfolioStocks = "SELECT * FROM group12portfoliostock WHERE portfolioid =" + 
+            "(SELECT portfolioid FROM group12portfolio WHERE email = '" + email + "') ORDER BY " + sortby + " ASC";
+
+
+            ResultSet rs = stmt.executeQuery(getPortfolioStocks);
+            while (rs.next()) {
+                portfolioStocks.add(
+                        new PortfolioStock(
+                                Integer.parseInt(rs.getString("portfolioid")),
+                                rs.getString("symbol"),
+                                Double.parseDouble(rs.getString("stockamount")),
+                                Double.parseDouble(rs.getString("boughtvalue")),
+                                Double.parseDouble(rs.getString("currentvalue"))
+                                )
+                );
+            }
+            rs.close();
+        } catch (Exception e) {
+            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "Can't get all portfolioStocks. Error: {0}", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("GetPortfolioStocksLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
+        return portfolioStocks;
     }
+
 
     public void deletePortfolioStock(Integer portfolioId, String symbol){
 

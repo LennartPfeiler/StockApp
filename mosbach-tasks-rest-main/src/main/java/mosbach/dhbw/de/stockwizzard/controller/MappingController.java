@@ -2,6 +2,8 @@ package mosbach.dhbw.de.stockwizzard.controller;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Connection;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +22,7 @@ import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
+import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
 import mosbach.dhbw.de.stockwizzard.model.Session;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
 import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
@@ -113,7 +116,47 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
         }
     }
     
-    
+    @GetMapping("/portfolioStocks")
+    public ResponseEntity<?> getAllPortfolioStocks( 
+        @RequestParam(value = "email", defaultValue = "") String email,
+        @RequestParam(value = "token", defaultValue = "") String token,
+        @RequestParam(value = "sortby", defaultValue = "") String sortby) {
+        
+        try {
+            boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                List<PortfolioStock> portfolioStocks = portfolioStockManager.getAllPortfolioStocks(email, sortby);
+                return ResponseEntity.ok(portfolioStocks);
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+            } 
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
+        }  
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity<?> getAllTransactions( 
+        @RequestParam(value = "email", defaultValue = "") String email,
+        @RequestParam(value = "token", defaultValue = "") String token,
+        @RequestParam(value = "sortby", defaultValue = "") String sortby) {
+        
+        try {
+            boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                List<Transaction> transactions = transactionManager.getAllTransactions(email, sortby);
+                return ResponseEntity.ok(transactions);
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+            } 
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
+        }  
+    }
+
+
 
     @GetMapping("/session")
     public Session getSession(@RequestParam(value = "email", defaultValue = "") String email) {

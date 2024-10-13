@@ -278,7 +278,8 @@ public class UserManagerImplementation implements IUserManager{
 
     public void editUser(String currentEmail, User user){
         Logger.getLogger("EditUserLogger").log(Level.WARNING, "Start editUser-method");
-
+        Statement stmt = null;
+        Connection connection = null;
         // Prüfen, ob die E-Mail geändert werden muss
         String newEmail = user.getEmail();
         boolean emailChanged = !newEmail.equals(currentEmail);
