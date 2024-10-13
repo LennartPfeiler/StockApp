@@ -1,4 +1,4 @@
-﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -285,7 +285,7 @@ public class UserManagerImplementation implements IUserManager{
         User currentUser = getUserProfile(currentEmail);
         Double oldBudget = currentUser.getBudget();
 
-        if(emailChanged == false){
+        if(!emailChanged){
             try{
                 connection = DriverManager.getConnection(dbUrl, username, password);
                 stmt = connection.createStatement();
@@ -294,7 +294,7 @@ public class UserManagerImplementation implements IUserManager{
                 String updateSQL = "UPDATE group12user SET " +
                    "firstname = '" + user.getFirstName() + "', " +
                    "lastname = '" + user.getLastName() + "', " +
-                   "budget = " + user.getBudget() + oldBudget;
+                   "budget = " + (user.getBudget() + oldBudget) +
                    " WHERE email = '" + currentEmail + "'";
 
                 stmt.executeUpdate(updateSQL);
