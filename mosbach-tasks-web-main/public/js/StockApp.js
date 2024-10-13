@@ -382,3 +382,78 @@ function checkFields() {
         sellButton.disabled = true; // Button deaktivieren
     }
 }
+
+
+////////////////////////////////// Portfolio //////////////////////////////////////////////
+function loadPortfolioDataFromDatabase(){
+    getAllTransactions();
+    getAllPortfolioStocks();
+}
+
+
+function getAllTransactions(){
+    const settingsGetAllTransactions = {
+        "async": false,
+        "url": "GET https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/transactions?email=" + getCookie("email") + "&token=" + getCookie("token") + "&sortby=date",
+        "method": "GET",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }
+    $.ajax(settingsGetAllTransactions).done(function (transactions) {
+        console.log(transactions);
+        displayTransactionHistory(transactions);
+        //localStorage.setItem("transactionArray", JSON.stringify(transactions));
+    });
+}
+
+function displayTransactionHistory(transactions) {
+    const transactionHistoryContainer = document.querySelector('.transaction-history');
+    transactionHistoryContainer.innerHTML = ''; // Vorherige Inhalte entfernen
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Transaction History';
+    transactionHistoryContainer.appendChild(heading);
+
+    transactions.forEach(transaction => {
+        const transactionDiv = document.createElement('div');
+        transactionDiv.textContent = `${transaction.type} ${transaction.symbol} at price of ${transaction.price}$ for ${transaction.amount}$`;
+        transactionHistoryContainer.appendChild(transactionDiv);
+    });
+}
+
+function getAllPortfolioStocks(){
+    const settingsGetAllPortfolioStocks = {
+        "async": false,
+        "url": "GET https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&sortby=symbol",
+        "method": "GET",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }
+    $.ajax(settingsGetAllPortfolioStocks).done(function (portfolioStocks) {
+        console.log(portfolioStocks);
+        displayPortfolioStocks(portfolioStocks)
+        //localStorage.setItem("portfolioStockArray", JSON.stringify(portfolioStocks));
+    });
+}
+
+function displayPortfolioStocks(portfolioStocks) {
+    const stockListContainer = document.querySelector('.portfolio .stock-list');
+    stockListContainer.innerHTML = ''; // Vorherige Inhalte entfernen
+
+    portfolioStocks.forEach(stock => {
+        const stockDiv = document.createElement('div');
+        const stockValue = parseFloat(stock.value).toFixed(2); // Wert auf 2 Dezimalstellen runden
+        const percentageChange = parseFloat(stock.percentageChange).toFixed(2); // Prozentuale Änderung runden
+
+        // Positiven oder negativen Wert überprüfen
+        const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
+        const sign = percentageChange >= 0 ? '+' : '';
+
+        stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${sign}${percentageChange}%</span>`;
+        stockListContainer.appendChild(stockDiv);
+    });
+}
