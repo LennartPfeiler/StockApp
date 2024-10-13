@@ -144,29 +144,29 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
         return new Transaction(null, null, null, null, null, null, null, null);   
     }
 
-    // @PutMapping(
-    //         path = "/user",
-    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
-    // ) 
-    // public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
-    //     String token = editRequest.getToken();
-    //     String currentEmail = editRequest.getCurrentmail();
-    //     User user = editRequest.getUser();
+    @PutMapping(
+            path = "/user",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
+        String token = editRequest.getToken();
+        String currentEmail = editRequest.getCurrentmail();
+        User user = editRequest.getUser();
 
-    //      if (token != null && currentEmail != null) {
-    //     // Führe Validierung oder eine weitere Aktion durch
-    //     // Beispiel: Prüfen, ob der Token gültig ist
-    //     boolean isValid = sessionManager.validToken(token, currentEmail);
-    //     if (isValid) {
-    //         userManager.editUser(currentEmail, user);
-    //         return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
-    //     } else {
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
-    //     }
-    //     } else {
-    //         return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
-    //     }
-    // }
+         if (token != null && currentEmail != null) {
+        // Führe Validierung oder eine weitere Aktion durch
+        // Beispiel: Prüfen, ob der Token gültig ist
+        boolean isValid = sessionManager.validToken(token, currentEmail);
+        if (isValid) {
+            userManager.editUser(currentEmail, user);
+            return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+        }
+        } else {
+            return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
+        }
+    }
 
     @PostMapping(
             path = "/order/buy",

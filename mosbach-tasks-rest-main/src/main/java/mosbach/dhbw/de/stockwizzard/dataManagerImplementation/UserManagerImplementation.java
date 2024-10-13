@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -283,6 +283,7 @@ public class UserManagerImplementation implements IUserManager{
         String newEmail = user.getEmail();
         boolean emailChanged = !newEmail.equals(currentEmail);
         User currentUser = getUserProfile(currentEmail);
+        Double oldBudget = currentUser.getBudget();
 
         if(emailChanged == false){
             try{
@@ -293,7 +294,7 @@ public class UserManagerImplementation implements IUserManager{
                 String updateSQL = "UPDATE group12user SET " +
                    "firstname = '" + user.getFirstName() + "', " +
                    "lastname = '" + user.getLastName() + "', " +
-                   "budget = " + user.getBudget() +
+                   "budget = " + user.getBudget() + oldBudget;
                    " WHERE email = '" + currentEmail + "'";
 
                 stmt.executeUpdate(updateSQL);
@@ -321,7 +322,7 @@ public class UserManagerImplementation implements IUserManager{
                     "'" + user.getFirstName() + "', " +
                     "'" + user.getLastName() + "', " +
                     "'" + passwordManager.hashPassword(user.getPassword()) + "', " +
-                    "'" + user.getBudget() + "')";
+                    "'" + user.getBudget() + oldBudget + "')";
                 String updateSessionsSQL = "UPDATE group12session SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
                 String updateTransactionsSQL = "UPDATE group12transaction SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
                 String updatePortfolioSQL = "UPDATE group12portfolio SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
