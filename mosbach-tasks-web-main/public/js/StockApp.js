@@ -212,6 +212,9 @@ function buyStock(){
         "success": function(data) {
             console.log(data);
             alert(data.answer);
+            console.log(getCookie("budget"));
+            setCookie("budget", getCookie("budget") - roundToTwoDecimalPlaces(price * stockAmount));
+            console.log(getCookie("budget"));
             loadPortfolioDataFromDatabase();
         },
         "error": function(xhr) {
@@ -393,7 +396,6 @@ function getAllTransactions(){
         }
     }
     $.ajax(settingsGetAllTransactions).done(function (transactions) {
-        console.log(transactions);
         displayTransactionHistory(transactions);
     });
 }
@@ -432,7 +434,6 @@ function getAllPortfolioStocks(){
         }
     }
     $.ajax(settingsGetAllPortfolioStocks).done(function (portfolioStocks) {
-        console.log(portfolioStocks);
         displayPortfolioStocks(portfolioStocks)
         //localStorage.setItem("portfolioStockArray", JSON.stringify(portfolioStocks));
     });
@@ -480,8 +481,6 @@ function calculatePercentage(boughtValue, currentValue) {
 }
 
 function displayTotalPortfolioValues(totalCurrentPortfolioValue, totalBoughtPortfolioValue) {
-    console.log(totalCurrentPortfolioValue);
-    console.log(totalBoughtPortfolioValue);
     const portfolioValueContainer = document.querySelector('.portfolio .portfolio-value');
 
     // Berechnung der prozentualen Veränderung
@@ -490,9 +489,9 @@ function displayTotalPortfolioValues(totalCurrentPortfolioValue, totalBoughtPort
     // Überprüfen, ob die Veränderung positiv oder negativ ist
     const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
     const sign = percentageChange >= 0 ? '+' : '';
-
+    console.log(getCookie("budget"));
     // Rundung des aktuellen Portfolio-Werts auf zwei Dezimalstellen
-    const roundedCurrentValue = roundToTwoDecimalPlaces(totalCurrentPortfolioValue);
+    const roundedCurrentValue = roundToTwoDecimalPlaces(totalCurrentPortfolioValue + parseFloat(getCookie("budget")));
 
     // Aktualisierung des HTML-Codes
     portfolioValueContainer.innerHTML = `${roundedCurrentValue} $ <span class="percentage ${changeClass}">${sign}${percentageChange}%</span>`;
