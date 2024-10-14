@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -169,7 +169,7 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    public void editUserBudget(String email, Double oldValue, Double bougthValue){
+    public void editUserBudget(String email, Double oldValue, Double bougthValue, Integer transactionType){
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("UpdatePortfolioValueLogger").log(Level.INFO, "Start updatePortfolioValue method");
@@ -179,9 +179,14 @@ public class UserManagerImplementation implements IUserManager{
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
-            String updateSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
+            if(transactionType == 1){
+                String updateSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
                             " WHERE email = '" + email + "'";
+            }
+            else{
+                String updateSQL = "UPDATE group12user SET budget = " + (oldValue + bougthValue) +
+                            " WHERE email = '" + email + "'";
+            }
 
             // Führe die SQL-Anweisung aus
             stmt.executeUpdate(updateSQL);

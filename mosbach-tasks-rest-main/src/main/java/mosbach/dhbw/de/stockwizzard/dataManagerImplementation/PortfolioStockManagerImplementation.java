@@ -79,53 +79,52 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
 
     public void addPortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double pricePerStock){
         Statement stmt = null;
-    Connection connection = null;
-    Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Start updatePortfolioStock-method");
+        Connection connection = null;
+        Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Start updatePortfolioStock-method");
 
-    try {
-        // Stelle die Verbindung zur Datenbank her
-        connection = DriverManager.getConnection(dbUrl, username, password);
-        stmt = connection.createStatement();
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
 
-        // SQL-Abfrage zum Überprüfen, ob der Stock bereits im Portfolio vorhanden ist
-        String checkSQL = "SELECT * FROM group12portfolioStock WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
-        ResultSet rs = stmt.executeQuery(checkSQL);
+            // SQL-Abfrage zum Überprüfen, ob der Stock bereits im Portfolio vorhanden ist
+            String checkSQL = "SELECT * FROM group12portfolioStock WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
+            ResultSet rs = stmt.executeQuery(checkSQL);
 
-        if (rs.next()) {
-            // Wenn der Stock bereits vorhanden ist, aktualisiere die Menge
-            Double existingAmount = rs.getDouble("stockAmount");
-            Double existingboughtValue = rs.getDouble("boughtValue");
-            Double existingCurrentValue = rs.getDouble("currentValue");
-            Double newAmount = existingAmount + stockAmount; // neue Menge berechnen
-            Double newBoughtValue = existingboughtValue + stockAmount * pricePerStock;
-            Double newCurrentValue = existingCurrentValue + stockAmount * pricePerStock;
+            if (rs.next()) {
+                // Wenn der Stock bereits vorhanden ist, aktualisiere die Menge
+                Double existingAmount = rs.getDouble("stockAmount");
+                Double existingboughtValue = rs.getDouble("boughtValue");
+                Double existingCurrentValue = rs.getDouble("currentValue");
+                Double newAmount = existingAmount + stockAmount; // neue Menge berechnen
+                Double newBoughtValue = existingboughtValue + stockAmount * pricePerStock;
+                Double newCurrentValue = existingCurrentValue + stockAmount * pricePerStock;
 
-            String updateSQL = "UPDATE group12portfolioStock SET " +
-                   "stockAmount = " + newAmount + ", " +
-                   "boughtValue = " + newBoughtValue + ", " +
-                   "currentValue = " + newCurrentValue + " " + // Leerzeichen vor dem WHERE
-                   "WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
-            stmt.executeUpdate(updateSQL);
-            Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
+                String updateSQL = "UPDATE group12portfolioStock SET " +
+                    "stockAmount = " + newAmount + ", " +
+                    "boughtValue = " + newBoughtValue + ", " +
+                    "currentValue = " + newCurrentValue + " " + // Leerzeichen vor dem WHERE
+                    "WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
+                stmt.executeUpdate(updateSQL);
+                Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
 
-        } else {
-            // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
-            Double value = stockAmount * pricePerStock; // Berechnung des Wertes
+            } else {
+                // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
+                Double value = stockAmount * pricePerStock; // Berechnung des Wertes
 
-            // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
-            String insertSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockAmount, boughtValue, currentValue) VALUES (" +
-                            portfolioId + ", '" + // Portfolio-ID
-                            symbol + "', " + // Symbol
-                            stockAmount + ", " + // Stock amount
-                            value + ", " + // Bought value
-                            value + ")"; // Current value
-            stmt.executeUpdate(insertSQL);
-            Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
+                // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
+                String insertSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockAmount, boughtValue, currentValue) VALUES (" +
+                                portfolioId + ", '" + // Portfolio-ID
+                                symbol + "', " + // Symbol
+                                stockAmount + ", " + // Stock amount
+                                value + ", " + // Bought value
+                                value + ")"; // Current value
+                stmt.executeUpdate(insertSQL);
+                Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
+            }
 
-        }
-
-        // Schließe ResultSet
-        rs.close();
+            // Schließe ResultSet
+            rs.close();
         } catch (SQLException e) {
             Logger.getLogger("UpdatePortfolioStockLogger").log(Level.SEVERE, "Fehler beim Aktualisieren des Portfolio-Stock.", e);
         } finally {
@@ -181,7 +180,87 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
     }
 
 
-    public void deletePortfolioStock(Integer portfolioId, String symbol){
+    public void deletePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double pricePerStock){
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("DeletePortfolioStockLogger").log(Level.INFO, "Start deletePortfolioStock-method");
 
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Abfrage zum Überprüfen, ob der Stock bereits im Portfolio vorhanden ist
+            String checkSQL = "SELECT * FROM group12portfolioStock WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
+            ResultSet rs = stmt.executeQuery(checkSQL);
+
+            if (rs.next()) {
+                // Wenn der Stock bereits vorhanden ist, aktualisiere die Menge
+               //TODO
+                Logger.getLogger("DeletePortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
+
+            } else {
+                // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
+                //TODO
+                Logger.getLogger("DeletePortfolioStockLogger").log(Level.INFO, "Stock deleted successfully.");
+            }
+
+            // Schließe ResultSet
+            rs.close();
+        } catch (SQLException e) {
+            Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Fehler beim Aktualisieren des Portfolio-Stock.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
     }
+
+    // public Boolean CheckIfPortfolioStockAmountIsSufficient(Double sellRequestAmount, String email, String symbol){   
+    //     return true;
+    //     Statement stmt = null;
+    //     Connection connection = null;
+    //     Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.INFO, "Start CheckIfPortfolioStockAmountIsSufficient-method");
+
+    //     try {
+    //         // Stelle die Verbindung zur Datenbank her
+    //         connection = DriverManager.getConnection(dbUrl, username, password);
+    //         stmt = connection.createStatement();
+
+    //         // SQL-Abfrage zum Überprüfen, ob der Stock bereits im Portfolio vorhanden ist
+    //         String checkSQL = "SELECT currentvalue FROM group12portfoliostock WHERE symbol = '"+ symbol + "' AND portfolioid = (SELECT portfolioid from group12portfolio WHERE email = '" + email + "')";
+    //         ResultSet rs = stmt.executeQuery(checkSQL);
+
+    //         if (rs.next()) {
+    //             Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.INFO, "Stock is in Portfolio.");
+    //             Double value = rs.getDouble("currentvalue");
+    //             if(value >= sellRequestAmount){
+    //                 return true;
+    //             }
+    //             else{
+    //                 return false;
+    //             }
+    //         } else {
+    //             // Wenn der Stock nicht vorhanden ist, return null
+    //             return null;
+    //             Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.INFO, "Stock deleted successfully.");
+    //         }
+    //         // Schließe ResultSet
+    //         rs.close();
+    //     } catch (SQLException e) {
+    //         Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.SEVERE, "Fehler beim Abrufen des currentValues des Portfolio-Stock.", e);
+    //     } finally {
+    //         try {
+    //             // Schließen von Statement und Connection, um Ressourcen freizugeben
+    //             if (stmt != null) stmt.close();
+    //             if (connection != null) connection.close();
+    //         } catch (SQLException e) {
+    //             Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+    //         }
+    //     }
+    // }
 }

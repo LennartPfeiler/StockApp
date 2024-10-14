@@ -257,7 +257,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             path = "/order/buy",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     ) 
-    public ResponseEntity<?> createOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+    public ResponseEntity<?> createBuyOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
         String token = tokenTransactionContent.getToken();
         TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
 
@@ -272,7 +272,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
                 portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getPricePerStock());
                 
                 //Budget ändern
-                userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice());
+                userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                 //Portfoliowert ändern
                 //portfolioManager.editPortfolioValue(userPortfolio.getPortfolioID(), userPortfolio.getValue(), transactionContent.getTotalPrice());
                 return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
@@ -285,7 +285,43 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
         }
     }
-        
+    
+    // @PostMapping(
+    //         path = "/order/sell",
+    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
+    // ) 
+    // public ResponseEntity<?> createSellOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+    //     String token = tokenTransactionContent.getToken();
+    //     TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+    //     Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+    //     if (isValid) {
+    //         User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+    //         Boolean portfolioStockAmountCheck = portfolioStockManager.CheckIfPortfolioStockAmountIsSufficient(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
+    //         if(portfolioStockAmountCheck == true){
+    //             transactionManager.addTransaction(transactionContent);
+    //             Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+    //             //PortfolioStock abändern
+    //             portfolioStockManager.deletePortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getPricePerStock());
+    //             //Budget ändern
+    //             userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice(), transactionContent.getTransactionType(), transactionContent.getTransactionType());
+    //             //Portfoliowert ändern
+    //             //portfolioManager.editPortfolioValue(userPortfolio.getPortfolioID(), userPortfolio.getValue(), transactionContent.getTotalPrice());
+    //             return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+    //         }
+    //         else{
+    //             if(portfolioStockAmountCheck == false){
+    //                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Your stock position is not that high!"));
+    //             }
+    //             else{
+    //                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("You don't own a position with the selected stock!"));
+    //             }
+                
+    //         }
+    //     }
+    //     else{
+    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+    //     }
+    // }
         
         
 
