@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -199,83 +199,6 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    // public boolean editUser(String currentEmail, User user) {
-    //     Logger.getLogger("EditUser").log(Level.WARNING, "Start editUser-method");
-
-    //     // Prüfen, ob die E-Mail geändert werden muss
-    //     String newEmail = user.getEmail();
-    //     boolean emailChanged = !newEmail.equals(currentEmail);
-
-    //     try (Connection connection = DriverManager.getConnection(dbUrl, username, password)) {
-    //         connection.setAutoCommit(false); // Beginne Transaktion
-
-    //         // 1. Aktualisiere group12user-Tabelle (ohne Email)
-    //         try (PreparedStatement stmtUpdateUser = connection.prepareStatement(
-    //                 "UPDATE group12user SET firstname = ?, lastname = ?, budget = ? WHERE email = ?")) {
-
-    //             stmtUpdateUser.setString(1, user.getFirstName());
-    //             stmtUpdateUser.setString(2, user.getLastName());
-    //             stmtUpdateUser.setDouble(3, user.getBudget());
-    //             stmtUpdateUser.setString(4, currentEmail); // Alte E-Mail als Bedingung
-
-    //             int rowsAffected = stmtUpdateUser.executeUpdate();
-    //             if (rowsAffected == 0) {
-    //                 // Kein Benutzer mit der angegebenen E-Mail gefunden, Abbruch
-    //                 connection.rollback();
-    //                 return false;
-    //             }
-    //         }
-
-    //         // 2. Aktualisiere andere Tabellen, falls die E-Mail geändert wurde
-    //         if (emailChanged) {
-    //             try (PreparedStatement stmtUpdatePortfolio = connection.prepareStatement(
-    //                     "UPDATE group12portfolio SET email = ? WHERE email = ?");
-    //                 PreparedStatement stmtUpdateSession = connection.prepareStatement(
-    //                     "UPDATE group12session SET email = ? WHERE email = ?");
-    //                 PreparedStatement stmtUpdateTransaction = connection.prepareStatement(
-    //                     "UPDATE group12transaction SET email = ? WHERE email = ?")) {
-
-    //                 // Setze Parameter für alle Fremdschlüssel-Tabellen
-    //                 stmtUpdatePortfolio.setString(1, newEmail);
-    //                 stmtUpdatePortfolio.setString(2, currentEmail);
-    //                 stmtUpdateSession.setString(1, newEmail);
-    //                 stmtUpdateSession.setString(2, currentEmail);
-    //                 stmtUpdateTransaction.setString(1, newEmail);
-    //                 stmtUpdateTransaction.setString(2, currentEmail);
-
-    //                 // Führe die Updates aus
-    //                 stmtUpdatePortfolio.executeUpdate();
-    //                 stmtUpdateSession.executeUpdate();
-    //                 stmtUpdateTransaction.executeUpdate();
-    //             }
-
-    //             // 3. Aktualisiere die Email in der group12user-Tabelle
-    //             try (PreparedStatement stmtUpdateUserEmail = connection.prepareStatement(
-    //                     "UPDATE group12user SET email = ? WHERE email = ?")) {
-
-    //                 stmtUpdateUserEmail.setString(1, newEmail);
-    //                 stmtUpdateUserEmail.setString(2, currentEmail);
-    //                 stmtUpdateUserEmail.executeUpdate();
-    //             }
-    //         }
-
-    //         // Alle Updates erfolgreich, commit
-    //         connection.commit();
-    //         return true;
-
-    //     } catch (SQLException e) {
-    //         Logger.getLogger("EditUser").log(Level.SEVERE, "Error editing user", e);
-    //         try {
-    //             if (connection != null) {
-    //                 connection.rollback(); // Rollback bei Fehler
-    //             }
-    //         } catch (SQLException rollbackEx) {
-    //             Logger.getLogger("EditUser").log(Level.SEVERE, "Error during rollback", rollbackEx);
-    //         }
-    //         return false;
-    //     }
-    // }
-
     public void editUser(String currentEmail, User user){
         Logger.getLogger("EditUserLogger").log(Level.WARNING, "Start editUser-method");
         Statement stmt = null;
@@ -318,6 +241,7 @@ public class UserManagerImplementation implements IUserManager{
                 stmt = connection.createStatement();
 
                 // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
+                if(isEmailAlreadyRegistered(newEmail) == false){
                 String newUserSQL = "INSERT into group12user (email, firstname, lastname, password, budget) VALUES (" +
                     "'" + user.getEmail() + "', " +
                     "'" + user.getFirstName() + "', " +
@@ -334,6 +258,7 @@ public class UserManagerImplementation implements IUserManager{
                 stmt.executeUpdate(updateTransactionsSQL);
                 stmt.executeUpdate(updatePortfolioSQL);
                 stmt.executeUpdate(deleteOldUserSQL);
+                }
             } catch (SQLException e) {
                 Logger.getLogger("EditUserLogger").log(Level.SEVERE, "Error editing User .", e);
             } finally {
