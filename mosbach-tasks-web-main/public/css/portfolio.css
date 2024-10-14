@@ -393,7 +393,20 @@ section {
 .buy-sell button#sell-stock:hover {
     background-color: #e53935;
 }
-
+.remaining-buget {
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+    opacity: 0;
+    background-color: #333; /* Dunkler Hintergrund */
+    border-radius: 15px; /* Abgerundete Ecken */
+    padding: 20px; /* Innenabstand, um Text vom Rand zu halten */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), /* Schlagschatten für 3D-Effekt */
+                inset 0 2px 5px rgba(255, 255, 255, 0.1); /* Innerer Schatten für 3D-Effekt */
+    animation: slideBottom 1s ease forwards;
+    animation-delay: 2.3s;
+}
 /* Portfolio-Wert */
 .portfolio-value {
     font-weight: bold;
