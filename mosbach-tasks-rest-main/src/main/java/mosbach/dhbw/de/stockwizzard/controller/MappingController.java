@@ -219,8 +219,8 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
     public Transaction getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
         userManager.createUserTable();
         sessionManager.createSessionTable();
-        portfolioManager.createPortfolioTable();
-        stockManager.createStockTable();
+        // portfolioManager.createPortfolioTable();
+        // stockManager.createStockTable();
         portfolioStockManager.createPortfolioStockTable();
         portfolioManager.createPortfolioTable();
         transactionManager.createTransactionTable();
