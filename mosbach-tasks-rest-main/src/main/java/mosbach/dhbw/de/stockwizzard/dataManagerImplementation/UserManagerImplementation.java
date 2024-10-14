@@ -1,4 +1,4 @@
-﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
