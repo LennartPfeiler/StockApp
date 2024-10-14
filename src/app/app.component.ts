@@ -1,13 +1,26 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { NavbarComponent } from './navbar/navbar.component'; // Importiere die Navbar
+import { VorHomeNavbarComponent } from './navbar-vorhome/navbar-vorhome.component'; // Importiere die VorHomeNavbar
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [
+    CommonModule,
+    RouterModule,
+    NavbarComponent, // Binde die Navbar hier ein
+    VorHomeNavbarComponent // Binde die VorHomeNavbar hier ein
+  ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'SPAWEB';
+  constructor(private router: Router) {}
+
+  isVorHomePage(): boolean {
+    return this.router.url === '/content/vor-home'; // Passe den Pfad an, falls nötig
+  }
 }

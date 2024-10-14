@@ -1,0 +1,562 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    
+}
+
+html body {
+    background-color: black; /* Hintergrundfarbe festlegen */
+}
+
+.header {
+    position:absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 8%;
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
+
+.logo img{
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    animation: slideRight 1s ease forwards;
+
+}
+
+.logintxt {
+    font-size: 25px;
+    color: #900808;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.Login {
+    display: flex;
+    justify-content: space-between;
+    width: 180px;
+    height: 60px;
+    transition: transform 0.7s ease;
+    animation: slideSci 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+}
+
+.Login:hover {
+    transform: scale(1.10);
+}
+
+/* Stil für das <a>-Element */
+.Login a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 600px;
+    height: 60px;
+    background: transparent;
+    text-decoration: none;
+    text-shadow: 0px 0px 10px grey;
+    font-size: 25px;
+    color: white;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+/* Stil für das <i>-Element */
+.Login a i {
+    font-size: 50px;
+    color: rgb(255, 255, 255);
+    transition: color 0.3s ease;
+}
+
+/* Wenn über das <a> oder <i> gehovert wird, färbe sowohl <a> als auch <i> */
+.Login:hover a, .Login:hover a i {
+    color: #900808;
+    text-shadow: 0px 0px 10px black;
+}
+.navbar a{
+    display: inline-block;
+    font-size: 18px;
+    color: #eaeaea;
+    text-decoration: none;
+    font-weight: 500;
+    margin: 0 20px;
+    transition: .5s;
+    text-shadow: 0px 5px 10px grey;
+    animation: slideTop 1s ease forwards;
+    animation-delay: calc(.2s * var(--i));
+
+}
+
+.navbar a:hover,
+.navbar a.active {
+    color: #33e39a;
+}
+
+
+.price-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-left: 10px;
+    margin-top: 0; /* Um das Label auf die gleiche Höhe wie "Stock name" zu bringen */
+}
+.price-display {
+    display: inline-block;
+    width: 100%; /* Übernimmt die Breite des Containers */
+    text-align: right;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #333;
+}
+#current-price {
+    display: none;
+}
+.form-label {
+    margin-bottom: 0; /* Sicherstellen, dass es keinen zusätzlichen Abstand gibt */
+}
+.d-flex-align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+/* Globale Einstellungen */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding-top: 100px; /* Abstand an die Navbar-Höhe anpassen */
+    background-color: black; /* Hintergrund der gesamten Seite auf schwarz setzen */
+    color: #eaeaea; /* Textfarbe auf Weiß setzen, falls benötigt */
+}
+
+
+/* Login-Button */
+.login-button {
+    background-color: orange; /* Hintergrundfarbe des Login-Buttons */
+    color: white; /* Textfarbe des Login-Buttons */
+    font-size: 14px; /* Schriftgröße */
+    padding: 8px 20px; /* Innenabstand */
+    border-radius: 50px; /* Abgerundete Ecken */
+    text-decoration: none; /* Keine Unterstreichung */
+    transition: 0.3s background-color; /* Hintergrundfarbe-Übergang */
+}
+
+.login-button:hover {
+    background-color: darkorange; /* Hintergrundfarbe bei Hover */
+}
+
+/* Navbar-Toggler */
+.navbar-toggler {
+    border: none; /* Kein Rand */
+    font-size: 1.25rem; /* Schriftgröße des Toggler-Icons */
+}
+
+.navbar-toggler:focus, .nav-link:focus {
+    box-shadow: none; /* Kein Schatten bei Fokussierung */
+    outline: none; /* Kein Umriss */
+}
+
+/* Navbar-Link */
+.nav-link {
+    color: grey; /* Textfarbe der Links */
+    font-weight: 500; /* Schriftgewicht */
+    position: relative; /* Für das Pseudo-Element ::before */
+}
+
+.nav-link:hover, .nav-link.active {
+    color: black; /* Textfarbe bei Hover oder aktivem Zustand */
+}
+
+/* Navbar-Link Hover-Effekt */
+@media (min-width: 991px) {
+    .nav-link::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 2px;
+        background-color: black; /* Unterstreichung bei Hover */
+        visibility: hidden; /* Standardmäßig unsichtbar */
+        transition: 0.2s ease-in-out; /* Übergangseffekt */
+    }
+    
+    .nav-link:hover::before, .nav-link.active::before {
+        width: 100%;
+        visibility: visible; /* Sichtbar bei Hover oder aktivem Zustand */
+    }
+}
+
+/* Offcanvas-Menü */
+.offcanvas {
+    background-color: grey; /* Hintergrundfarbe des Offcanvas-Menüs */
+    color: #fff; /* Textfarbe im Offcanvas-Menü */
+}
+
+/* Hero-Sektion */
+.hero-section {
+    background-color: black; /* Hintergrundfarbe der Hero-Sektion */
+    background-size: cover; /* Hintergrundbild deckend */
+    width: 100%; /* Breite auf 100% setzen */
+    height: 100vh; /* Höhe auf 100% der Viewport-Höhe setzen */
+}
+
+/* Hauptbereich mit Grid-Layout */
+main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 40px;
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    opacity: 0;
+    animation: slideBottom 1s ease forwards;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+
+    .portfolio, .buy-sell, .transaction-history {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .transaction-history {
+        grid-column: 1 / 2;
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 20px 10px;
+        gap: 20px;
+    }
+
+    .buy-sell, .portfolio, .transaction-history {
+        padding: 20px;
+    }
+
+    .portfolio-value {
+        font-size: 18px;
+    }
+
+    .stock-list div {
+        font-size: 14px;
+    }
+
+    .change {
+        font-size: 12px;
+    }
+}
+
+/* Allgemeine Sektion-Stile */
+section {
+    background-color: #2a2a2a;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out;
+    opacity: 0;
+    animation: zoomOut 1s ease forwards;
+    animation-delay: 1s;
+}
+
+/* Buy/Sell-Sektion */
+.buy-sell {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    background-color: #303030;
+    color: #e0e0e0;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation: slideRight 1s ease forwards;
+    animation-delay: 1.3s;
+}
+
+.buy-sell input:focus {
+    background-color: #555; /* Bleibt Grau beim Fokus */
+    color: #fff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 133, 237, 0.5); /* Optional: Schatteneffekt */
+}
+
+.buy-sell input:not(:placeholder-shown) {
+    background-color: #555; /* Bleibt Grau, wenn Text vorhanden ist */
+    color: #fff;
+}
+
+.buy-sell input:valid {
+    background-color: #555; /* Gültige Eingaben bleiben grau */
+    color: #fff;
+}
+
+/* Portfolio-Sektion */
+.portfolio {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    background-color: #303030;
+    color: #e0e0e0;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: none;
+    animation: slideLeft 1s ease forwards;
+    animation-delay: 1.6s;
+}
+
+/* Transaction History-Sektion */
+.transaction-history {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+    background-color: #303030;
+    color: #e0e0e0;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    animation: slideTop 1s ease forwards;
+    animation-delay: 2s;
+}
+
+/* Scrollbar-Styling */
+.transaction-history::-webkit-scrollbar {
+    width: 10px;
+}
+
+.transaction-history::-webkit-scrollbar-track {
+    background: #2a2a2a;
+}
+
+.transaction-history::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 6px;
+    border: 2px solid #2a2a2a;
+}
+
+.transaction-history::-webkit-scrollbar-thumb:hover {
+    background-color: #444;
+}
+
+/* Buy/Sell-Formular */
+.buy-sell input, .buy-sell button {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    display: block;
+    margin: 15px 0;
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    animation: zoomOut 1s ease forwards;
+}
+
+.buy-sell input:focus, .buy-sell button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(72, 133, 237, 0.5);
+}
+
+/* Buttons */
+.buy-sell button {
+    background-color: #4CAF50;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.buy-sell button#sell-stock {
+    background-color: #f44336;
+}
+
+.buy-sell button:hover {
+    background-color: #45a049;
+}
+
+.buy-sell button#sell-stock:hover {
+    background-color: #e53935;
+}
+
+/* Portfolio-Wert */
+.portfolio-value {
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #fff;
+    opacity: 0;
+    animation: slideBottom 1s ease forwards;
+    animation-delay: 2.3s;
+}
+
+/* Aktienliste */
+.stock-list div {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Veränderungen */
+.change {
+    color: #aaa;
+    font-size: 14px;
+}
+
+/* Transaction History */
+.transaction-history div {
+    margin: 10px 0;
+    padding: 8px 0;
+    color: #fff;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Profil- und Logo-Icons */
+.profile-icon {
+    width: 50px;
+    height: 50px;
+    margin-left: 30px;
+}
+
+.logo-icon {
+    width: 150px;
+    height: 150px;
+}
+
+/* Styles für Prozentsätze */
+.percentage.positive {
+    color: #4CAF50;
+}
+
+.percentage.negative {
+    color: #f44336;
+}
+
+/* Styles für Veränderungen */
+.change.positive {
+    color: #4CAF50;
+}
+
+.change.negative {
+    color: #f44336;
+}
+
+/* Styles für das Preis-Display-Feld */
+#price-display {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    display: block;
+    margin: 15px 0;
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Animationen */
+@keyframes slideRight {
+    0% {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideLeft {
+    0% {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideTop {
+    0% {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideBottom {
+    0% {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes zoomOut {
+    0% {
+        transform: scale(1.1);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+#toggle-label {
+    background-color: #c6a300; /* Gleiche Hintergrundfarbe wie Buy Stock */
+    color: white; /* Weißer Text */
+    border: none;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px; /* Gleiche abgerundete Ecken */
+    transition: background-color 0.3s ease-in-out; /* Weicher Übergang */
+}
+
+#show-price {
+    background-color: #c6a300; /* Gleiche Hintergrundfarbe wie Buy Stock */
+    color: white; /* Weißer Text */
+    border: none;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px; /* Gleiche abgerundete Ecken */
+    transition: background-color 0.3s ease-in-out; /* Weicher Übergang */
+}
