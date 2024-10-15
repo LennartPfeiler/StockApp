@@ -9,9 +9,11 @@
 }
 
 body {
-    overflow:hidden;
+    overflow-x: hidden;
     background: #000;
     padding-top: 100px;
+    
+ 
 }
 
 .header {
