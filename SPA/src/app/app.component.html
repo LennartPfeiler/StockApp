@@ -1,0 +1,15 @@
+<nav>
+  <a routerLink="/content/vor-home">Vor Home</a>
+  <a routerLink="/content/home">Home</a>
+  <a routerLink="/content/portfolio">Portfolio</a>
+  <a routerLink="/content/profile">Profile</a>
+  <a routerLink="/content/tracker">Tracker</a>
+</nav>
+
+<ng-container *ngIf="isVorHomePage(); else defaultNavbar">
+  <app-vorhome-navbar></app-vorhome-navbar> <!-- Stelle sicher, dass dies der korrekte Tag ist -->
+</ng-container>
+<ng-template #defaultNavbar>
+  <app-navbar></app-navbar>
+</ng-template>
+<router-outlet></router-outlet>

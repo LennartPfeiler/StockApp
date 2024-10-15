@@ -1,0 +1,214 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #000000;
+    opacity: 0;
+    animation: slideRight 1s ease forwards;
+}
+
+.header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 8%;
+    background: transparent;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
+
+.Login {
+    position: absolute;
+    top: 30px;
+    right: 40px; /* Positioniere den Link oben rechts */
+    z-index: 10; /* Stelle sicher, dass es über anderen Elementen steht */
+}
+
+.logintxt {
+    font-size: 20px;
+    color: white; 
+   
+    padding: 10px 20px; 
+    font-weight: bold;
+    text-shadow: 0px 4px 6px rgba(255, 255, 255, 0.2); 
+    transition: transform 0.3s ease; 
+}
+
+.Login .logintxt:hover {
+    transform: scale(1.3); 
+    color: #900808; 
+    text-shadow: 0px 6px 12px black;
+}
+
+.login-box {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 440px;
+    height: 480px;
+    padding: 30px;
+    opacity: 0;
+    animation: slideBottom 1s ease forwards;
+    animation-delay: 0.5s;
+}
+
+.login-header {
+    text-align: center;
+    margin: 20px 0 40px 0;
+}
+
+.login-header header {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 600;
+}
+
+.input-box .input-field {
+    width: 100%;
+    height: 60px;
+    font-size: 17px;
+    padding: 0 25px;
+    margin-bottom: 15px;
+    border-radius: 30px;
+    border: none;
+    box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
+    outline: none;
+    transition: .3s;
+    opacity: 0;
+    animation: slideBottom 1s ease forwards;
+    animation-delay: 0.5s;
+}
+
+::placeholder {
+    font-weight: 500;
+    color: #222;
+}
+
+.input-field:focus {
+    width: 105%;
+}
+
+.forgot {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+
+section {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+}
+
+#check {
+    margin-right: 10px;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+section a {
+    color: #555;
+}
+
+.input-submit {
+    position: relative;
+}
+
+.submit-btn {
+    width: 100%;
+    height: 60px;
+    background: #222;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.input-submit label {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    color: #fff;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: #094d00;
+    transform: scale(1.05, 1);
+}
+
+.sign-up-link {
+    color: #ffffff;
+    text-align: center;
+    font-size: 15px;
+    margin-top: 20px;
+}
+
+.sign-up-link a {
+    text-align: center;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.Logo-Bild {
+    width: 50%;
+    height: auto;
+}
+
+@keyframes slideRight {
+    0% {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideBottom {
+    0% {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 862px) {
+    .Logo-Bild {
+        position: absolute;
+        top: 50px;
+        align-items: center;
+        z-index: 2;
+    }
+    
+    .login-box {
+        margin-top: 400px;
+    }
+}
