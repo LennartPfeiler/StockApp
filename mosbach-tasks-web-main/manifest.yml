@@ -1,8 +1,8 @@
 ---
 applications:
-- name: TasksFrontend
+- name: StockWizzardFrontend
   instances: 1
-  host: TasksFrontend{random-word}
+  host: StockWizzardFrontend{random-word}
   path: .
   buildpacks:
     - php_buildpack

@@ -63,7 +63,7 @@ function login(profileSchema){
             setCookie("firstname", data.user.firstname);
             setCookie("lastname", data.user.lastname);
             setCookie("email", data.user.email);
-            setCookie("budget", data.user.budget);
+            setCookie("budget", roundToTwoDecimalPlaces(data.user.budget));
             setCookie("password", data.user.password);
             // localStorage.setItem("token", data.token);
             // localStorage.setItem("firstname", data.User.firstname);
