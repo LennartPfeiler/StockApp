@@ -13,15 +13,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PortfolioStock {
 
-    @JsonProperty("portfolioID")
+    @JsonProperty("portfolioid")
     private Integer portfolioID;
     @JsonProperty("symbol")
     private String symbol;
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     private Double stockAmount;
-    @JsonProperty("boughtValue")
+    @JsonProperty("boughtvalue")
     private Double boughtValue;
-    @JsonProperty("currentValue")
+    @JsonProperty("currentvalue")
     private Double currentValue;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
@@ -50,12 +50,12 @@ public class PortfolioStock {
         this.currentValue = currentValue;
     }
 
-    @JsonProperty("portfolioID")
+    @JsonProperty("portfolioid")
     public Integer getPortfolioID() {
         return portfolioID;
     }
 
-    @JsonProperty("portfolioID")
+    @JsonProperty("portfolioid")
     public void setPortfolioID(Integer portfolioID) {
         this.portfolioID = portfolioID;
     }
@@ -70,33 +70,33 @@ public class PortfolioStock {
         this.symbol = symbol;
     }
 
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     public Double getStockAmount() {
         return stockAmount;
     }
 
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     public void setStockAmount(Double stockAmount) {
         this.stockAmount = stockAmount;
     }
 
-    @JsonProperty("boughtValue")
+    @JsonProperty("boughtvalue")
     public Double getBoughtValue() {
         return boughtValue;
     }
 
-    @JsonProperty("boughtValue")
-    public void setBoughtValue() {
+    @JsonProperty("boughtvalue")
+    public void setBoughtValue(Double boughtValue) {
         this.boughtValue = boughtValue;
     }
 
-    @JsonProperty("currentValue")
+    @JsonProperty("currentvalue")
     public Double getCurrentValue() {
         return currentValue;
     }
 
-    @JsonProperty("currentValue")
-    public void setCurrentValue() {
+    @JsonProperty("currentvalue")
+    public void setCurrentValue(Double currentValue) {
         this.currentValue = currentValue;
     }
 

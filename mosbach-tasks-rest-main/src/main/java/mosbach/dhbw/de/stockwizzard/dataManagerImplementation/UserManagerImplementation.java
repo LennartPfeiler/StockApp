@@ -1,4 +1,4 @@
-﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -147,14 +147,14 @@ public class UserManagerImplementation implements IUserManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String udapteSQL = "INSERT into group12user (email, firstname, lastname, password, budget) VALUES (" +
+            String insertSQL = "INSERT into group12user (email, firstname, lastname, password, budget) VALUES (" +
                     "'" + user.getEmail() + "', " +
                     "'" + user.getFirstName() + "', " +
                     "'" + user.getLastName() + "', " +
                     "'" + passwordManager.hashPassword(user.getPassword()) + "', " +
-                    "'" + user.getBudget() + "')";
+                    + user.getBudget() + ")";
 
-            stmt.executeUpdate(udapteSQL);     
+            stmt.executeUpdate(insertSQL);     
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -172,6 +172,7 @@ public class UserManagerImplementation implements IUserManager{
     public void editUserBudget(String email, Double oldValue, Double bougthValue, Integer transactionType){
         Statement stmt = null;
         Connection connection = null;
+        String updateSQL = "";
         Logger.getLogger("UpdatePortfolioValueLogger").log(Level.INFO, "Start updatePortfolioValue method");
 
         try {
@@ -180,11 +181,10 @@ public class UserManagerImplementation implements IUserManager{
             stmt = connection.createStatement();
 
             if(transactionType == 1){
-                String updateSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
+                updateSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
                             " WHERE email = '" + email + "'";
-            }
-            else{
-                String updateSQL = "UPDATE group12user SET budget = " + (oldValue + bougthValue) +
+            } else{
+                updateSQL = "UPDATE group12user SET budget = " + (oldValue + bougthValue) +
                             " WHERE email = '" + email + "'";
             }
 
@@ -210,11 +210,11 @@ public class UserManagerImplementation implements IUserManager{
         Connection connection = null;
         // Prüfen, ob die E-Mail geändert werden muss
         String newEmail = user.getEmail();
-        boolean emailChanged = !newEmail.equals(currentEmail);
+        Boolean emailChanged = !newEmail.equals(currentEmail);
         User currentUser = getUserProfile(currentEmail);
         Double oldBudget = currentUser.getBudget();
 
-        if(emailChanged == false){
+        if(emailChanged){
             try{
                 connection = DriverManager.getConnection(dbUrl, username, password);
                 stmt = connection.createStatement();

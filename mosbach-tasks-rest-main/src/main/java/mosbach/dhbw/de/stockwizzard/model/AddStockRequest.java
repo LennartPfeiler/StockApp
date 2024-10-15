@@ -1,4 +1,5 @@
-package mosbach.dhbw.de.stockwizzard.model;
+
+package mosbach.dhbw.de.stockwizzard.model ;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,12 +11,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TokenUser {
+public class AddStockRequest {
 
-    @JsonProperty("token")
-    private String token;
-    @JsonProperty("user")
-    private User user;
+    @JsonProperty("tokenemail")
+    private TokenEmail tokenEmail;
+    @JsonProperty("stock")
+    private Stock stock;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -23,38 +24,38 @@ public class TokenUser {
      * No args constructor for use in serialization
      * 
      */
-    public TokenUser() {
+    public AddStockRequest() {
     }
 
     /**
      * 
-     * @param user
-     * @param token
+     * @param tokenEmail
+     * @param stock
      */
-    public TokenUser(String token, User user) {
+    public AddStockRequest(TokenEmail tokenEmail, Stock stock) {
         super();
-        this.token = token;
-        this.user = user;
+        this.tokenEmail = tokenEmail;
+        this.stock = stock;
     }
 
-    @JsonProperty("token")
-    public String getToken() {
-        return token;
+    @JsonProperty("tokenemail")
+    public TokenEmail getTokenEmail() {
+        return tokenEmail;
     }
 
-    @JsonProperty("token")
-    public void setToken(String token) {
-        this.token = token;
+    @JsonProperty("tokenemail")
+    public void setTokenEmail(TokenEmail tokenEmail) {
+        this.tokenEmail = tokenEmail;
     }
 
-    @JsonProperty("user")
-    public User getUser() {
-        return user;
+    @JsonProperty("stock")
+    public Stock getStock() {
+        return stock;
     }
 
-    @JsonProperty("user")
-    public void setUser(User user) {
-        this.user = user;
+    @JsonProperty("stock")
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 
     @JsonAnyGetter

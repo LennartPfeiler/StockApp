@@ -141,7 +141,7 @@ body {
 }
 
 /* Input Felder Styling */
-.profile input {
+input {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
@@ -151,12 +151,12 @@ body {
     color: #eaeaea;
 }
 
-.profile input::placeholder {
+input::placeholder {
     color: #b0b0b0; /* Platzhalterfarbe etwas heller */
 }
 
 /* Button Styling */
-.profile button {
+button {
     width: 48%; /* Beide Buttons nehmen jeweils 48% des verfügbaren Platzes ein */
     padding: 10px;
     background-color: #33e39a; /* Grüne Farbe für den Apply-Button */
@@ -168,19 +168,19 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.profile button:hover {
+button:hover {
     background-color: #28c883; /* Dunklere Farbe beim Hover */
 }
 
 /* Spezifisch für den "Delete Profile"-Button */
-.profile .delete-btn {
+#delete-btn {
     background-color: #d9534f; /* Rote Farbe für Löschen */
 }
 
-.profile .delete-btn:hover {
+#delete-btn:hover {
     background-color: #c9302c; /* Dunkleres Rot beim Hover */
 }
-.profile .reset-btn{
+#reset-btn{
     width: 98%; /* Beide Buttons nehmen jeweils 48% des verfügbaren Platzes ein */
     margin-top: 10px;
     padding: 10px;
@@ -194,12 +194,12 @@ body {
 
 }
 
-.profile .reset-btn:hover{
+#reset-btn:hover{
     background-color: #fbcf04 ;
 }
 
 /* Section Title Styling */
-.profile h2 {
+h2 {
     text-align: center;
     margin-bottom: 20px;
     font-weight: 700;

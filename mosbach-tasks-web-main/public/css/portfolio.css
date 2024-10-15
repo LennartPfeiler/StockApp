@@ -393,7 +393,7 @@ section {
 .buy-sell button#sell-stock:hover {
     background-color: #e53935;
 }
-.remaining-buget {
+.remaining-budget {
     font-weight: bold;
     font-size: 20px;
     margin-bottom: 20px;

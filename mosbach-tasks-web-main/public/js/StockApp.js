@@ -39,7 +39,6 @@ function testCookie(){
     }
 }
 
-// GET USER ID FROM COOKIE --------------------------------------------------------------------------------------------------------------------------------------------------------
 //getting Profile for user of the Website
 function login(profileSchema){
     event.preventDefault();
@@ -61,11 +60,11 @@ function login(profileSchema){
             // Erfolgreicher Aufruf
             console.log(data)
             setCookie("token", data.token);
-            setCookie("firstname", data.User.firstname);
-            setCookie("lastname", data.User.lastname);
-            setCookie("email", data.User.email);
-            setCookie("budget", data.User.budget);
-            setCookie("password", data.User.password);
+            setCookie("firstname", data.user.firstname);
+            setCookie("lastname", data.user.lastname);
+            setCookie("email", data.user.email);
+            setCookie("budget", data.user.budget);
+            setCookie("password", data.user.password);
             // localStorage.setItem("token", data.token);
             // localStorage.setItem("firstname", data.User.firstname);
             // localStorage.setItem("lastname", data.User.lastname);
@@ -142,13 +141,12 @@ function getCurrentDateTime() {
 
     // Formatieren der einzelnen Teile
     const year = now.getFullYear(); // Jahr
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Monat (0-basiert, also +1 und 2-stellig)
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Monat 
     const day = String(now.getDate()).padStart(2, '0'); // Tag
     const hours = String(now.getHours()).padStart(2, '0'); // Stunden
     const minutes = String(now.getMinutes()).padStart(2, '0'); // Minuten
     const seconds = String(now.getSeconds()).padStart(2, '0'); // Sekunden
 
-    // Zusammensetzen im gewünschten Format
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
@@ -198,12 +196,12 @@ function buyStock(){
         },
         "data": JSON.stringify({
             "token": getCookie("token"),
-            "transactionContent": {
-                "transactionType": 1,
-                "stockAmount": stockAmount,
+            "transactioncontent": {
+                "transactiontype": 1,
+                "stockamount": stockAmount,
                 "date": getCurrentDateTime(),
-                "pricePerStock": price,
-                "totalPrice": roundToTwoDecimalPlaces(price * stockAmount),
+                "priceperstock": price,
+                "totalprice": roundToTwoDecimalPlaces(price * stockAmount),
                 "email": getCookie("email"),
                 "symbol": $('#stock-name').val()
             }
@@ -213,9 +211,10 @@ function buyStock(){
             console.log(data);
             alert(data.answer);
             console.log(getCookie("budget"));
-            setCookie("budget", getCookie("budget") - roundToTwoDecimalPlaces(price * stockAmount));
+            setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") - roundToTwoDecimalPlaces(price * stockAmount)));
             console.log(getCookie("budget"));
             loadPortfolioDataFromDatabase();
+            displayBudget();
         },
         "error": function(xhr) {
             if (xhr.status === 401 || xhr.status === 400) {
@@ -345,7 +344,74 @@ function deleteProfile(){
 
     $.ajax(deleteRegister);
 }
+
+function displayBudget() {
+    $(".remaining-budget").text(getCookie("budget") + " $");
+}
+
 //////////////////////////////////////////// Aktienpreis //////////////////////////////////////////
+
+function displayStockPrice(value){
+    $('#price-display').text(value);
+}
+
+function fetchStockPrice(){
+    let stockName = getStockName();
+    getStockPriceFromDB(stockName)
+        .done(function(data) {
+            displayStockPrice(data.stockprice);
+            // Erfolgreicher Abruf aus der Datenbank
+            console.log('Preis aus der DB:', data);
+            // Weiterverarbeitung des Preises
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 500) {
+                displayStockPrice('Error retrieving data. Please try again later.');
+            } else {
+                getStockPriceFromAPI(stockName)
+                    .done(function(data) {
+                        if (data.status === 'OK' && data.results && data.results.length > 0) {
+                            const closeValue = parseFloat(data.results[0].c); // The closing price
+                            const roundedCloseValue = closeValue.toFixed(2);
+                            insertNewStock(stockName, roundedCloseValue);
+                            displayStockPrice(roundedCloseValue);
+                        } else if (!data.results) {
+                            displayStockPrice('Stock not found or no data available.');
+                        } else if (data.results.length === 0) {
+                            displayStockPrice('No closing price data available.');
+                        } else {
+                            displayStockPrice('Unknown error retrieving data.');
+                        }
+                        // Erfolgreicher Abruf aus der Datenbank
+                        console.log('Preis von der API:', data);
+                        // Weiterverarbeitung des Preises
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.status === 429) {
+                            displayStockPrice('Too many requests. Please try again later.');
+                        } else {
+                            console.error('Error:', textStatus, errorThrown);
+                            displayStockPrice('Error retrieving data. Please try again later.');
+                        }
+                    });            
+                    }
+        });
+}
+
+function getStockPriceFromDB(stockName){
+    const getStockPriceDBRegister = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + stockName,
+
+        "method": "GET",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    };
+
+    return $.ajax(getStockPriceDBRegister);
+}
 
 //Funktion, um den eingegebenen Aktiennamen innerhalb des Portfolios zu bekommen
 function getStockName() {
@@ -356,54 +422,56 @@ function getStockName() {
 }
 
 //Funktion, um den aktuellen Preis der eingegebenen Aktie zu bekommen 
-function getStockPrice() {
-    let stockName = getStockName(); // Replace this with the input field name for the stock symbol
-    let url = `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`;
+function getStockPriceFromAPI(stockName) {
+    const getStockPriceAPIRegister = {
+        "async": true, // Asynchrone Anfrage
+        "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
+        "method": "GET",
+        "dataType": 'json',
+        };
+    return $.ajax(getStockPriceAPIRegister);
+}
 
-    $.ajax({
-        url: url,
-        method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            console.log(data); // Debugging: Check the data structure
-
-            if (data.status === 'OK' && data.results && data.results.length > 0) {
-                const closeValue = parseFloat(data.results[0].c); // The closing price
-                const roundedCloseValue = closeValue.toFixed(2);
-                $('#price-display').text(`${roundedCloseValue}$`);
-            } else if (!data.results) {
-                $('#price-display').text('Stock not found or no data available.');
-            } else if (data.results.length === 0) {
-                $('#price-display').text('No closing price data available.');
-            } else {
-                $('#price-display').text('Unknown error retrieving data.');
-            }
+function insertNewStock(stockName, stockPrice){
+    const settingsInsertStock = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock",
+        "method": "POST",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 429) {
-                $('#price-display').text('Too many requests. Please try again later.');
-            } else {
-                console.error('Error:', textStatus, errorThrown);
-                $('#price-display').text('Error retrieving data.');
+        "data": JSON.stringify({
+            "tokenemail": {
+                "token": getCookie("token"),
+                "email": getCookie("email")
+            },
+            "stock": {
+                "symbol": stockName,
+                "stockprice": stockPrice,
+                "name": "-"
             }
-        }
-    });
+        })
+    };
+
+    $.ajax(settingsInsertStock);
 }
 
 //Funktion, um die Events zur Preisanzeige zu implementieren
 function showStockPriceViaEvent() {
     const inputField = document.getElementById('stock-name');
     inputField.addEventListener('keypress', handleInputKeypress);
-    inputField.addEventListener('blur', getStockPrice);
+    inputField.addEventListener('blur', fetchStockPrice);
 }
 
 //Funktion, um eine Enter-Taste Eingabe zu empfangen
 function handleInputKeypress(e) {
     if (e.key === 'Enter') { 
-        getStockPrice();
+        fetchStockPrice();
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
 function setProfileValues(){
     // console.log("Vor dem Abrufen der Werte:");
     // console.log("Firstname:", localStorage.getItem("firstname"));
@@ -477,13 +545,13 @@ function displayTransactionHistory(transactions) {
     transactions.forEach(transaction => {
         console.log(transaction);
         const transactionDiv = document.createElement('div');
-        if(transaction.transactionType === 1){
+        if(transaction.transactiontype === 1){
             type = "Bought"
         }
         else{
             type = "Sold"
         }
-        transactionDiv.textContent = `${type} ${transaction.stockAmount} ${transaction.symbol} at price of ${transaction.pricePerStock}$ for ${transaction.totalPrice}$`;
+        transactionDiv.textContent = `${type} ${transaction.stockamount} ${transaction.symbol} at price of ${transaction.priceperstock}$ for ${transaction.totalprice}$`;
         transactionHistoryContainer.appendChild(transactionDiv);
     });
 }
@@ -512,13 +580,13 @@ function displayPortfolioStocks(portfolioStocks) {
     let totalBoughtPortfolioValue = 0; // Initialisierung auf 0
 
     portfolioStocks.forEach(stock => {
-        totalCurrentPortfolioValue += stock.currentValue;
-        totalBoughtPortfolioValue += stock.boughtValue;
+        totalCurrentPortfolioValue += stock.currentvalue;
+        totalBoughtPortfolioValue += stock.boughtvalue;
         const stockDiv = document.createElement('div');
-        const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentValue));
+        const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentvalue));
 
         // Berechne die prozentuale Änderung mit der neuen Methode
-        const { percentageChange, changeClass } = calculatePercentage(stock.boughtValue, stock.currentValue);
+        const { percentageChange, changeClass } = calculatePercentage(stock.boughtvalue, stock.currentvalue);
 
         // Füge die Daten in das Div-Element ein
         stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
@@ -531,9 +599,9 @@ function displayPortfolioStocks(portfolioStocks) {
 
 
 
-function calculatePercentage(boughtValue, currentValue) {
+function calculatePercentage(boughtvalue, currentvalue) {
     // Berechne die prozentuale Änderung
-    const percentageChange = ((currentValue - boughtValue) / boughtValue * 100).toFixed(2);
+    const percentageChange = ((currentvalue - boughtvalue) / boughtvalue * 100).toFixed(2);
 
     // Überprüfe, ob der Wert positiv oder negativ ist, und lege die CSS-Klasse fest
     const changeClass = percentageChange >= 0 ? 'positive' : 'negative';

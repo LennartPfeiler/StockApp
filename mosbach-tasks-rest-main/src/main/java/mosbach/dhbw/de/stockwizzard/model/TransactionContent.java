@@ -13,15 +13,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransactionContent {
 
-    @JsonProperty("transactionType")
+    @JsonProperty("transactiontype")
     private Integer transactionType;
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     private Double stockAmount;
     @JsonProperty("date")
     private String date;
-    @JsonProperty("pricePerStock")
+    @JsonProperty("priceperstock")
     private Double pricePerStock;
-    @JsonProperty("totalPrice")
+    @JsonProperty("totalprice")
     private Double totalPrice;
     @JsonProperty("email")
     private String email;
@@ -58,22 +58,22 @@ public class TransactionContent {
         this.symbol = symbol;
     }
 
-    @JsonProperty("transactionType")
+    @JsonProperty("transactiontype")
     public Integer getTransactionType() {
         return transactionType;
     }
 
-    @JsonProperty("transactionType")
+    @JsonProperty("transactiontype")
     public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
     }
 
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     public Double getStockAmount() {
         return stockAmount;
     }
 
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     public void setStockAmount(Double stockAmount) {
         this.stockAmount = stockAmount;
     }
@@ -88,22 +88,22 @@ public class TransactionContent {
         this.date = date;
     }
 
-    @JsonProperty("pricePerStock")
+    @JsonProperty("priceperstock")
     public Double getPricePerStock() {
         return pricePerStock;
     }
 
-    @JsonProperty("pricePerStock")
+    @JsonProperty("priceperstock")
     public void setPricePerStock(Double pricePerStock) {
         this.pricePerStock = pricePerStock;
     }
 
-    @JsonProperty("totalPrice")
+    @JsonProperty("totalprice")
     public Double getTotalPrice() {
         return totalPrice;
     }
 
-    @JsonProperty("totalPrice")
+    @JsonProperty("totalprice")
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }

@@ -17,7 +17,7 @@ public class EditRequest {
     private String token;
     @JsonProperty("currentmail")
     private String currentmail;
-    @JsonProperty("User")
+    @JsonProperty("user")
     private User user;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
@@ -62,12 +62,12 @@ public class EditRequest {
         this.currentmail = currentmail;
     }
 
-    @JsonProperty("User")
+    @JsonProperty("user")
     public User getUser() {
         return user;
     }
 
-    @JsonProperty("User")
+    @JsonProperty("user")
     public void setUser(User user) {
         this.user = user;
     }

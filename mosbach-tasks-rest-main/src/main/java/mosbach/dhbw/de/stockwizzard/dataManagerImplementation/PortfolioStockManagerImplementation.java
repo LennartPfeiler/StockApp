@@ -80,7 +80,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
     public void addPortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double pricePerStock){
         Statement stmt = null;
         Connection connection = null;
-        Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Start updatePortfolioStock-method");
+        Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Start addPortfolioStock-method");
 
         try {
             // Stelle die Verbindung zur Datenbank her
@@ -93,47 +93,47 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
 
             if (rs.next()) {
                 // Wenn der Stock bereits vorhanden ist, aktualisiere die Menge
-                Double existingAmount = rs.getDouble("stockAmount");
-                Double existingboughtValue = rs.getDouble("boughtValue");
-                Double existingCurrentValue = rs.getDouble("currentValue");
+                Double existingAmount = rs.getDouble("stockamount");
+                Double existingboughtValue = rs.getDouble("boughtvalue");
+                Double existingCurrentValue = rs.getDouble("currentvalue");
                 Double newAmount = existingAmount + stockAmount; // neue Menge berechnen
                 Double newBoughtValue = existingboughtValue + stockAmount * pricePerStock;
                 Double newCurrentValue = existingCurrentValue + stockAmount * pricePerStock;
 
                 String updateSQL = "UPDATE group12portfolioStock SET " +
-                    "stockAmount = " + newAmount + ", " +
-                    "boughtValue = " + newBoughtValue + ", " +
-                    "currentValue = " + newCurrentValue + " " + // Leerzeichen vor dem WHERE
+                    "stockamount = " + newAmount + ", " +
+                    "boughtvalue = " + newBoughtValue + ", " +
+                    "currentvalue = " + newCurrentValue + " " + // Leerzeichen vor dem WHERE
                     "WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
                 stmt.executeUpdate(updateSQL);
-                Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
+                Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
 
             } else {
                 // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
                 Double value = stockAmount * pricePerStock; // Berechnung des Wertes
 
                 // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
-                String insertSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockAmount, boughtValue, currentValue) VALUES (" +
+                String insertSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockamount, boughtvalue, currentvalue) VALUES (" +
                                 portfolioId + ", '" + // Portfolio-ID
                                 symbol + "', " + // Symbol
                                 stockAmount + ", " + // Stock amount
                                 value + ", " + // Bought value
                                 value + ")"; // Current value
                 stmt.executeUpdate(insertSQL);
-                Logger.getLogger("UpdatePortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
+                Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
             }
 
             // Schließe ResultSet
             rs.close();
         } catch (SQLException e) {
-            Logger.getLogger("UpdatePortfolioStockLogger").log(Level.SEVERE, "Fehler beim Aktualisieren des Portfolio-Stock.", e);
+            Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE, "Fehler beim Aktualisieren des Portfolio-Stock.", e);
         } finally {
             try {
                 // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                Logger.getLogger("UpdatePortfolioStockLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
             }
         }
     }

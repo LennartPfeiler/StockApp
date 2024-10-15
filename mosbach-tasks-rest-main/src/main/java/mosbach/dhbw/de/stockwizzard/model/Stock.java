@@ -14,9 +14,9 @@ public class Stock {
 
     @JsonProperty("symbol")
     private String symbol;
-    @JsonProperty("stockPrice")
+    @JsonProperty("stockprice")
     private Double stockPrice;
-    @JsonProperty("Name")
+    @JsonProperty("name")
     private String name;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
@@ -45,22 +45,22 @@ public class Stock {
         this.symbol = symbol;
     }
 
-    @JsonProperty("stockPrice")
+    @JsonProperty("stockprice")
     public Double getStockPrice() {
         return stockPrice;
     }
 
-    @JsonProperty("stockPrice")
+    @JsonProperty("stockprice")
     public void setStockPrice(Double stockPrice) {
         this.stockPrice = stockPrice;
     }
 
-    @JsonProperty("Name")
+    @JsonProperty("name")
     public String getName() {
         return name;
     }
 
-    @JsonProperty("Name")
+    @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
     }

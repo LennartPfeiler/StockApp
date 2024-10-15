@@ -52,7 +52,7 @@ public class Session {
         return token;
     }
 
-    @JsonProperty("password")
+    @JsonProperty("token")
     public void setToken(String token) {
         this.token = token;
     }

@@ -14,17 +14,17 @@ import java.sql.Timestamp;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Transaction {
 
-    @JsonProperty("transactionID")
+    @JsonProperty("transactionid")
     private Integer transactionID;
-    @JsonProperty("transactionType")
+    @JsonProperty("transactiontype")
     private Integer transactionType;
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     private Double stockAmount;
     @JsonProperty("date")
     private Timestamp date;
-    @JsonProperty("pricePerStock")
+    @JsonProperty("priceperstock")
     private Double pricePerStock;
-    @JsonProperty("totalPrice")
+    @JsonProperty("totalprice")
     private Double totalPrice;
     @JsonProperty("email")
     private String email;
@@ -63,32 +63,32 @@ public class Transaction {
         this.symbol = symbol;
     }
 
-    @JsonProperty("transactionID")
+    @JsonProperty("transactionid")
     public Integer getTransactionID() {
         return transactionID;
     }
 
-    @JsonProperty("transactionID")
+    @JsonProperty("transactionid")
     public void setTransactionID(Integer transactionID) {
         this.transactionID = transactionID;
     }
 
-    @JsonProperty("transactionType")
+    @JsonProperty("transactiontype")
     public Integer getTransactionType() {
         return transactionType;
     }
 
-    @JsonProperty("transactionType")
+    @JsonProperty("transactiontype")
     public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
     }
 
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     public Double getStockAmount() {
         return stockAmount;
     }
 
-    @JsonProperty("stockAmount")
+    @JsonProperty("stockamount")
     public void setStockAmount(Double stockAmount) {
         this.stockAmount = stockAmount;
     }
@@ -103,22 +103,22 @@ public class Transaction {
         this.date = date;
     }
 
-    @JsonProperty("pricePerStock")
+    @JsonProperty("priceperstock")
     public Double getPricePerStock() {
         return pricePerStock;
     }
 
-    @JsonProperty("pricePerStock")
+    @JsonProperty("priceperstock")
     public void setPricePerStock(Double pricePerStock) {
         this.pricePerStock = pricePerStock;
     }
 
-    @JsonProperty("totalPrice")
+    @JsonProperty("totalprice")
     public Double getTotalPrice() {
         return totalPrice;
     }
 
-    @JsonProperty("totalPrice")
+    @JsonProperty("totalprice")
     public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }

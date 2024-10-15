@@ -24,7 +24,9 @@ import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
+import mosbach.dhbw.de.stockwizzard.model.Stock;
 import mosbach.dhbw.de.stockwizzard.model.Session;
+import mosbach.dhbw.de.stockwizzard.model.AddStockRequest;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
 import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
@@ -149,7 +151,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 userManager.deleteUser(email);
-                return ResponseEntity.ok(new StringAnswer("Profile successfully deleted")); // Gültiger Token - gib TokenUser zurück
+                return ResponseEntity.ok(new StringAnswer("Profile successfully deleted"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!")); // Ungültiger Token - gib Fehlerstatus zurück
             }
@@ -158,6 +160,51 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             } 
     }
     
+    @GetMapping("/stock")
+    public ResponseEntity<?> getStock(
+        @RequestParam(value = "email", defaultValue = "") String email,
+        @RequestParam(value = "token", defaultValue = "") String token,
+        @RequestParam(value = "symbol", defaultValue = "") String symbol) {
+        
+        try {
+            Boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                Stock stock = stockManager.getStock(symbol);
+                if (stock != null) {
+                    return ResponseEntity.ok(stock);
+                } else {
+                    // Aktie nicht gefunden
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("Stock is not in the database."));
+                }
+            } else {
+                // Ungültige Authentifizierung
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+            }
+        } catch (Exception e) {
+            // Unerwarteter Fehler
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringAnswer("An unexpected error occurred during getting stock data."));
+        }
+    }
+
+    @PostMapping(
+            path = "/stock",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    )
+    public ResponseEntity<?> createStock(@RequestBody AddStockRequest addStockRequest) {
+        try {
+            Boolean isValid = sessionManager.validToken(addStockRequest.getTokenEmail().getToken(), addStockRequest.getTokenEmail().getEmail());
+            if (isValid) {
+                stockManager.addStock(addStockRequest.getStock());
+                return ResponseEntity.ok(new StringAnswer("Stock got added to Database"));
+            } else {
+                // Ungültige Authentifizierung
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringAnswer("An unexpected error occurred during adding Stock to Database."));
+        }
+    }
+
     @GetMapping("/portfolioStocks")
     public ResponseEntity<?> getAllPortfolioStocks( 
         @RequestParam(value = "email", defaultValue = "") String email,
@@ -165,7 +212,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
         @RequestParam(value = "sortby", defaultValue = "") String sortby) {
         
         try {
-            boolean isValid = sessionManager.validToken(token, email);
+            Boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 List<PortfolioStock> portfolioStocks = portfolioStockManager.getAllPortfolioStocks(email, sortby);
                 return ResponseEntity.ok(portfolioStocks);
@@ -174,7 +221,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
             } 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during getting portfolioStocks."));
         }  
     }
 
@@ -185,7 +232,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
         @RequestParam(value = "sortby", defaultValue = "") String sortby) {
         
         try {
-            boolean isValid = sessionManager.validToken(token, email);
+            Boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 List<Transaction> transactions = transactionManager.getAllTransactions(email, sortby);
                 return ResponseEntity.ok(transactions);
@@ -194,7 +241,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
             } 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during getting transactions."));
         }  
     }
 
@@ -239,15 +286,13 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
         User user = editRequest.getUser();
 
          if (token != null && currentEmail != null) {
-        // Führe Validierung oder eine weitere Aktion durch
-        // Beispiel: Prüfen, ob der Token gültig ist
-        boolean isValid = sessionManager.validToken(token, currentEmail);
-        if (isValid) {
-            userManager.editUser(currentEmail, user);
-            return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
-        }
+            Boolean isValid = sessionManager.validToken(token, currentEmail);
+            if (isValid) {
+                userManager.editUser(currentEmail, user);
+                return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+            }
         } else {
             return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
         }
@@ -323,40 +368,4 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
     //     }
     // }
         
-        
-
-
-
-
-//     @PostMapping(                                                                               
-//             path = "/user",
-//             consumes = {MediaType.APPLICATION_JSON_VALUE}
-//     )
-//     @ResponseStatus(HttpStatus.OK)
-//     public User createUser(@RequestBody User user) {
-//         DatabaseUserImplementation db_user = DatabaseUserImplementation.getDatabaseUser();
-//         User newUser = new User();
-//         newUser.setUserID(db_user.addUser(user));
-//         return newUser;
-//     }
-
-//     @PutMapping(                                                                                
-//             path = "/user",
-//             consumes = {MediaType.APPLICATION_JSON_VALUE}
-//     )
-//     @ResponseStatus(HttpStatus.OK)
-//     public StringAnswer editUser(@RequestBody User user) {
-//         DatabaseUserImplementation db_user = DatabaseUserImplementation.getDatabaseUser();
-//         boolean success = db_user.editUser(user);
-//         if (success) return new StringAnswer("success");
-//         else return new StringAnswer("failure");
-//     }
-
-//     @DeleteMapping(path = "/user")                                                              
-//     public StringAnswer deleteUser(@RequestParam (value = "userID", defaultValue = "0") int userID) {
-//         DatabaseUserImplementation db_user = DatabaseUserImplementation.getDatabaseUser();
-//         boolean success = db_user.deleteUser(userID);
-//         if (success) return new StringAnswer("success");
-//         else return new StringAnswer("failure");
-//     }
 }

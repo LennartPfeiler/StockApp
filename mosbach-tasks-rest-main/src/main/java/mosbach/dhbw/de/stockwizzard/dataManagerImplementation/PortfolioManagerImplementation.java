@@ -128,7 +128,7 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
                 // Extrahiere die Werte aus dem ResultSet
                 int portfolioID = rs.getInt("portfolioid");
                 double value = rs.getDouble("value");
-                double startValue = rs.getDouble("startValue");
+                double startValue = rs.getDouble("startvalue");
                 String userEmail = rs.getString("email");
 
                 // Erstelle ein neues Portfolio-Objekt

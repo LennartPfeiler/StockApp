@@ -13,11 +13,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Portfolio {
 
-    @JsonProperty("portfolioID")
+    @JsonProperty("portfolioid")
     private Integer portfolioID;
     @JsonProperty("value")
     private Double value;
-    @JsonProperty("startValue")
+    @JsonProperty("startvalue")
     private Double startValue;
     @JsonProperty("email")
     private String email;
@@ -45,12 +45,12 @@ public class Portfolio {
         this.email = email;
     }
 
-    @JsonProperty("portfolioID")
+    @JsonProperty("portfolioid")
     public Integer getPortfolioID() {
         return portfolioID;
     }
 
-    @JsonProperty("portfolioID")
+    @JsonProperty("portfolioid")
     public void setPortfolioID(Integer portfolioID) {
         this.portfolioID = portfolioID;
     }
@@ -65,12 +65,12 @@ public class Portfolio {
         this.value = value;
     }
 
-    @JsonProperty("startValue")
+    @JsonProperty("startvalue")
     public Double getStartValue() {
         return startValue;
     }
 
-    @JsonProperty("startValue")
+    @JsonProperty("startvalue")
     public void setStartValue(Double startValue) {
         this.startValue = startValue;
     }

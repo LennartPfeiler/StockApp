@@ -15,7 +15,7 @@ public class TokenTransactionContent {
 
     @JsonProperty("token")
     private String token;
-    @JsonProperty("transactionContent")
+    @JsonProperty("transactioncontent")
     private TransactionContent transactionContent;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
@@ -48,12 +48,12 @@ public class TokenTransactionContent {
         this.token = token;
     }
 
-    @JsonProperty("transactionContent")
+    @JsonProperty("transactioncontent")
     public TransactionContent getTransactionContent() {
         return transactionContent;
     }
 
-    @JsonProperty("transactionContent")
+    @JsonProperty("transactioncontent")
     public void setTransactionContent(TransactionContent transactionContent) {
         this.transactionContent = transactionContent;
     }
