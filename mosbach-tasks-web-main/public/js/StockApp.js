@@ -256,9 +256,9 @@ function editUser(){
             "token": getCookie("token"),
             "currentmail": getCookie("email"),
             "user": {
-            "firstname": $('#first-name').value,
-            "lastname": $('#last-name').value,
-            "email": $('#email').value,
+            "firstname": $('#first-name').val(),
+            "lastname": $('#last-name').val(),
+            "email": $('#email').val(),
             "password": getCookie("password"),
             "budget": getCookie("budget")
         }}),
