@@ -214,7 +214,7 @@ public class UserManagerImplementation implements IUserManager{
         User currentUser = getUserProfile(currentEmail);
         Double oldBudget = currentUser.getBudget();
 
-        if(emailChanged){
+        if(emailChanged == false){
             try{
                 connection = DriverManager.getConnection(dbUrl, username, password);
                 stmt = connection.createStatement();
