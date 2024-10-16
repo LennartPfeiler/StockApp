@@ -12,8 +12,12 @@ import java.util.logging.Logger;
 import mosbach.dhbw.de.stockwizzard.dataManager.IPortfolioStockManager;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
+import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
+import mosbach.dhbw.de.stockwizzard.model.Transaction;
 
 public class PortfolioStockManagerImplementation implements IPortfolioStockManager{
+
+    TransactionManagerImplementation transactionManager = TransactionManagerImplementation.getTransactionManager();
 
     String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
     URI dbUri;
@@ -77,7 +81,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         }
     }
 
-    public void addPortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double pricePerStock){
+    public void addPortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice){
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Start addPortfolioStock-method");
@@ -97,8 +101,8 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
                 Double existingboughtValue = rs.getDouble("boughtvalue");
                 Double existingCurrentValue = rs.getDouble("currentvalue");
                 Double newAmount = existingAmount + stockAmount; // neue Menge berechnen
-                Double newBoughtValue = existingboughtValue + stockAmount * pricePerStock;
-                Double newCurrentValue = existingCurrentValue + stockAmount * pricePerStock;
+                Double newBoughtValue = existingboughtValue + totalPrice;
+                Double newCurrentValue = existingCurrentValue + totalPrice;
 
                 String updateSQL = "UPDATE group12portfolioStock SET " +
                     "stockamount = " + newAmount + ", " +
@@ -110,15 +114,12 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
 
             } else {
                 // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
-                Double value = stockAmount * pricePerStock; // Berechnung des Wertes
-
-                // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
                 String insertSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockamount, boughtvalue, currentvalue) VALUES (" +
                                 portfolioId + ", '" + // Portfolio-ID
                                 symbol + "', " + // Symbol
                                 stockAmount + ", " + // Stock amount
-                                value + ", " + // Bought value
-                                value + ")"; // Current value
+                                totalPrice + ", " + // Bought value
+                                totalPrice + ")"; // Current value
                 stmt.executeUpdate(insertSQL);
                 Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
             }
@@ -180,87 +181,138 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
     }
 
 
-    public void deletePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double pricePerStock){
+    public void deletePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice, PortfolioStockValue portfolioStockValues, List<Transaction> transactionsInPortfolio){
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("DeletePortfolioStockLogger").log(Level.INFO, "Start deletePortfolioStock-method");
+        if(totalPrice == portfolioStockValues.getCurrentValue()){
+            try {
+                connection = DriverManager.getConnection(dbUrl, username, password);
+                stmt = connection.createStatement();
+                //does not work
+                String deletePortfolioStock = "DELETE FROM group12portfoliostock WHERE symbol = '" + symbol + "' AND portfolioid=" + portfolioId;
+                stmt.executeUpdate(deletePortfolioStock);
+                //does not work
+                for (Transaction transaction : transactionsInPortfolio) {
+                    transactionManager.updateLeftinPortfolio(transaction.getTransactionID(), 0.0);
+                }
+    
+            } catch (SQLException e) {
+                Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Fehler beim Löschen des Portfolio-Stock.", e);
+            } finally {
+                try {
+                    if (stmt != null) stmt.close();
+                    if (connection != null) connection.close();
+                } catch (SQLException e) {
+                    Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                }
+            }
+        }
+        else {
+            try {
+                connection = DriverManager.getConnection(dbUrl, username, password);
+                stmt = connection.createStatement();
+            
+                Double remainingAmount = totalPrice;
+                Double totalBoughtValueReduction = 0.0;
+            
+                // Gehe die Transaktionen durch, bis die zu verkaufende Menge vollständig abgedeckt ist
+                for (Transaction transaction : transactionsInPortfolio) {
+                    if (remainingAmount <= 0) {
+                        break;
+                    }
+            
+                    Double leftInTransaction = transaction.getLeftInPortfolio();
+                    Double transactionBoughtValue = transaction.getTotalPrice(); // Gesamtwert der Transaktion
+                    Integer transactionId = transaction.getTransactionID();
+            
+                    if (remainingAmount >= leftInTransaction) {
+                        // Verkaufe den gesamten verbleibenden Betrag dieser Transaktion
+                        remainingAmount -= leftInTransaction;
+                        totalBoughtValueReduction += transactionBoughtValue;
+                        transactionManager.updateLeftinPortfolio(transactionId, 0.0);
+                    } else {
+                        // Verkaufe einen Teil des verbleibenden Betrags dieser Transaktion
+                        Double proportion = remainingAmount / leftInTransaction;
+                        Double reductionInBoughtValue = transactionBoughtValue * proportion;
+                        totalBoughtValueReduction += reductionInBoughtValue;
+            
+                        Double newLeftInTransaction = leftInTransaction - remainingAmount;
+                        remainingAmount = 0.0;
+                        transactionManager.updateLeftinPortfolio(transactionId, newLeftInTransaction);
+                    }
+                }
+            
+                // Aktualisiere den PortfolioStock-Eintrag
+                Double newCurrentValue = portfolioStockValues.getCurrentValue() - totalPrice;
+                Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
+            
+                String updatePortfolioStockSQL = "UPDATE group12portfoliostock SET currentvalue = " + newCurrentValue + 
+                                                 ", boughtvalue = " + newBoughtValue + 
+                                                 ", stockamount = stockamount - " + stockAmount + 
+                                                 " WHERE portfolioid = " + portfolioId + 
+                                                 " AND symbol = '" + symbol + "'";
+                stmt.executeUpdate(updatePortfolioStockSQL);
+            
+            } catch (SQLException e) {
+                Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Fehler beim Aktualisieren des Portfolio-Stock.", e);
+            } finally {
+                try {
+                    if (stmt != null) stmt.close();
+                    if (connection != null) connection.close();
+                } catch (SQLException e) {
+                    Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                }
+            }
+            
+        }
+        
+    }
 
+    public PortfolioStockValue checkPortfolioStockValue(Double sellRequestAmount, String email, String symbol) {   
+        Connection connection = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+        Logger logger = Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger");
+        logger.log(Level.INFO, "Start CheckIfPortfolioStockAmountIsSufficient-method");
+    
         try {
-            // Stelle die Verbindung zur Datenbank her
+            // Verbindung zur Datenbank herstellen
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-
+    
             // SQL-Abfrage zum Überprüfen, ob der Stock bereits im Portfolio vorhanden ist
-            String checkSQL = "SELECT * FROM group12portfolioStock WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
-            ResultSet rs = stmt.executeQuery(checkSQL);
-
+            String checkSQL = "SELECT boughtvalue, currentvalue FROM group12portfoliostock WHERE symbol = '" + symbol + 
+                              "' AND portfolioid = (SELECT portfolioid FROM group12portfolio WHERE email = '" + email + "')";
+            rs = stmt.executeQuery(checkSQL);
+    
             if (rs.next()) {
-                // Wenn der Stock bereits vorhanden ist, aktualisiere die Menge
-               //TODO
-                Logger.getLogger("DeletePortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
-
+                logger.log(Level.INFO, "Stock is in Portfolio.");
+                Double boughtValue = rs.getDouble("boughtvalue");
+                Double currentValue = rs.getDouble("currentvalue");
+                if (currentValue >= sellRequestAmount) {
+                    return new PortfolioStockValue(currentValue, boughtValue);
+                } else {
+                    return new PortfolioStockValue(-1.0, -1.0); // Nicht genug Wert im Portfolio
+                }
             } else {
-                // Wenn der Stock nicht vorhanden ist, füge ihn hinzu
-                //TODO
-                Logger.getLogger("DeletePortfolioStockLogger").log(Level.INFO, "Stock deleted successfully.");
+                // Wenn der Stock nicht vorhanden ist, return null
+                logger.log(Level.INFO, "Stock is not in Portfolio.");
+                return null;
             }
-
-            // Schließe ResultSet
-            rs.close();
         } catch (SQLException e) {
-            Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Fehler beim Aktualisieren des Portfolio-Stock.", e);
+            logger.log(Level.SEVERE, "Fehler beim Abrufen des currentValues des Portfolio-Stock.", e);
+            return null; // Fehlerfall: null zurückgeben
         } finally {
+            // Ressourcen freigeben
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                logger.log(Level.SEVERE, "Fehler beim Schließen der Ressourcen.", e);
             }
         }
     }
-
-    // public Boolean CheckIfPortfolioStockAmountIsSufficient(Double sellRequestAmount, String email, String symbol){   
-    //     return true;
-    //     Statement stmt = null;
-    //     Connection connection = null;
-    //     Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.INFO, "Start CheckIfPortfolioStockAmountIsSufficient-method");
-
-    //     try {
-    //         // Stelle die Verbindung zur Datenbank her
-    //         connection = DriverManager.getConnection(dbUrl, username, password);
-    //         stmt = connection.createStatement();
-
-    //         // SQL-Abfrage zum Überprüfen, ob der Stock bereits im Portfolio vorhanden ist
-    //         String checkSQL = "SELECT currentvalue FROM group12portfoliostock WHERE symbol = '"+ symbol + "' AND portfolioid = (SELECT portfolioid from group12portfolio WHERE email = '" + email + "')";
-    //         ResultSet rs = stmt.executeQuery(checkSQL);
-
-    //         if (rs.next()) {
-    //             Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.INFO, "Stock is in Portfolio.");
-    //             Double value = rs.getDouble("currentvalue");
-    //             if(value >= sellRequestAmount){
-    //                 return true;
-    //             }
-    //             else{
-    //                 return false;
-    //             }
-    //         } else {
-    //             // Wenn der Stock nicht vorhanden ist, return null
-    //             return null;
-    //             Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.INFO, "Stock deleted successfully.");
-    //         }
-    //         // Schließe ResultSet
-    //         rs.close();
-    //     } catch (SQLException e) {
-    //         Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.SEVERE, "Fehler beim Abrufen des currentValues des Portfolio-Stock.", e);
-    //     } finally {
-    //         try {
-    //             // Schließen von Statement und Connection, um Ressourcen freizugeben
-    //             if (stmt != null) stmt.close();
-    //             if (connection != null) connection.close();
-    //         } catch (SQLException e) {
-    //             Logger.getLogger("CheckIfPortfolioStockAmountIsSufficientLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
-    //         }
-    //     }
-    // }
+    
 }

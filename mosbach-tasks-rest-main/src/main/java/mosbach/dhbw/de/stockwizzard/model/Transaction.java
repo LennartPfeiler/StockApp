@@ -30,6 +30,8 @@ public class Transaction {
     private String email;
     @JsonProperty("symbol")
     private String symbol;
+    @JsonProperty("leftinportfolio")
+    private Double leftInPortfolio;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -50,8 +52,9 @@ public class Transaction {
      * @param totalPrice
      * @param transactionID
      * @param email
+     * @param leftInPortfolio
      */
-    public Transaction(Integer transactionID, Integer transactionType, Double stockAmount, Timestamp date, Double pricePerStock, Double totalPrice, String email, String symbol) {
+    public Transaction(Integer transactionID, Integer transactionType, Double stockAmount, Timestamp date, Double pricePerStock, Double totalPrice, String email, String symbol, Double leftInPortfolio) {
         super();
         this.transactionID = transactionID;
         this.transactionType = transactionType;
@@ -61,6 +64,7 @@ public class Transaction {
         this.totalPrice = totalPrice;
         this.email = email;
         this.symbol = symbol;
+        this.leftInPortfolio = leftInPortfolio;
     }
 
     @JsonProperty("transactionid")
@@ -141,6 +145,16 @@ public class Transaction {
     @JsonProperty("symbol")
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+
+    @JsonProperty("leftinportfolio")
+    public Double getLeftInPortfolio() {
+        return leftInPortfolio;
+    }
+
+    @JsonProperty("leftinportfolio")
+    public void setLeftInPortfolio(Double leftInPortfolio) {
+        this.leftInPortfolio = leftInPortfolio;
     }
 
     @JsonAnyGetter

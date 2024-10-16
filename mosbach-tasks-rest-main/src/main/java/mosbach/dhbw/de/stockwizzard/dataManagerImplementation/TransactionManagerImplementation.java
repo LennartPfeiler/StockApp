@@ -64,6 +64,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
                      "pricePerStock DOUBLE PRECISION NOT NULL, " +
                      "totalPrice DOUBLE PRECISION NOT NULL, " +
                      "email VARCHAR(100) NOT NULL, " +
+                     "leftinportfolio DOUBLE PRECISION, " +
                      "FOREIGN KEY (email) REFERENCES group12user(email) ON DELETE CASCADE," +
                      "FOREIGN KEY (symbol) REFERENCES group12stock(symbol) ON DELETE CASCADE)";
 
@@ -93,14 +94,15 @@ public class TransactionManagerImplementation implements ITransactionManager{
             stmt = connection.createStatement();
     
             // SQL-Anweisung für das Einfügen eines neuen Portfolios
-            String insertSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email) VALUES (" +
+            String insertSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
                     transactionContent.getTransactionType() + ", " +
                     transactionContent.getStockAmount() + ", " +
                     "'" + transactionContent.getDate() + "', " +
                     "'" + transactionContent.getSymbol() + "', " +
                     transactionContent.getPricePerStock() + ", " +
                     transactionContent.getTotalPrice() + ", " +
-                    "'" + transactionContent.getEmail() + "')";
+                    "'" + transactionContent.getEmail() + "', " + 
+                    transactionContent.getTotalPrice() + ")";
     
             // Führe die SQL-Anweisung aus
             stmt.executeUpdate(insertSQL);
@@ -142,7 +144,8 @@ public class TransactionManagerImplementation implements ITransactionManager{
                                 Double.parseDouble(rs.getString("priceperstock")),
                                 Double.parseDouble(rs.getString("totalprice")),
                                 rs.getString("email"),
-                                rs.getString("symbol")
+                                rs.getString("symbol"),
+                                Double.parseDouble(rs.getString("leftinportfolio"))
                                 )
                 );
             }
@@ -160,5 +163,73 @@ public class TransactionManagerImplementation implements ITransactionManager{
             }
         }
         return transactions;
+    }
+
+    public List<Transaction> getAllTransactionsInPortfolioStock(String email){
+        List<Transaction> transactions = new ArrayList<>();
+        Statement stmt = null;
+        Connection connection = null;
+
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            String getTransactions = "SELECT * FROM group12transaction WHERE email = '" + email + "' AND leftinportfolio > 0 ORDER BY date DESC";
+
+            ResultSet rs = stmt.executeQuery(getTransactions);
+            while (rs.next()) {
+                transactions.add(
+                        new Transaction(
+                                Integer.parseInt(rs.getString("transactionid")),
+                                Integer.parseInt(rs.getString("transactiontype")),
+                                Double.parseDouble(rs.getString("stockamount")),
+                                Timestamp.valueOf(rs.getString("date")),
+                                Double.parseDouble(rs.getString("priceperstock")),
+                                Double.parseDouble(rs.getString("totalprice")),
+                                rs.getString("email"),
+                                rs.getString("symbol"),
+                                Double.parseDouble(rs.getString("leftinportfolio"))
+                                )
+                );
+            }
+            rs.close();
+        } catch (Exception e) {
+            Logger.getLogger("GetTransactionsLoger").log(Level.INFO, "Can't get all transactions. Error: {0}", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("GetTransactionsLoger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
+        return transactions;
+    }
+
+    public void updateLeftinPortfolio(Integer transactionId, Double NewleftInPortfolio){
+        Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Start der updateLeftinPortfolio Methode");
+        Statement stmt = null;
+        Connection connection = null;
+
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            String updateTransactionSQL = "UPDATE group12transaction SET leftinportfolio = " + NewleftInPortfolio + "WHERE transactionId = " + transactionId;
+            stmt.executeUpdate(updateTransactionSQL);
+        } catch (Exception e) {
+            Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.INFO, "Can't update LeftinPortfolio. Error: {0}", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
     }
 }

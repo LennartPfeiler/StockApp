@@ -24,6 +24,7 @@ import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
+import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
 import mosbach.dhbw.de.stockwizzard.model.Stock;
 import mosbach.dhbw.de.stockwizzard.model.Session;
 import mosbach.dhbw.de.stockwizzard.model.AddStockRequest;
@@ -263,17 +264,17 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
     }
 
     @GetMapping("/transaction")
-    public Transaction getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
-        userManager.createUserTable();
-        sessionManager.createSessionTable();
+    public void getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
+        // userManager.createUserTable();
+        // sessionManager.createSessionTable();
         // portfolioManager.createPortfolioTable();
         // stockManager.createStockTable();
-        portfolioStockManager.createPortfolioStockTable();
-        portfolioManager.createPortfolioTable();
+        // portfolioStockManager.createPortfolioStockTable();
+        // portfolioManager.createPortfolioTable();
         transactionManager.createTransactionTable();
-        stockManager.createStockTable();
+        // stockManager.createStockTable();
         //return transactionManager.getTransaction(transactionID);
-        return new Transaction(null, null, null, null, null, null, null, null);   
+        // return new Transaction(null, null, null, null, null, null, null, null, null);   
     }
 
     @PutMapping(
@@ -314,7 +315,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
                 transactionManager.addTransaction(transactionContent);
                 Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
                 //PortfolioStock hinzufügen
-                portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getPricePerStock());
+                portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getTotalPrice());
                 
                 //Budget ändern
                 userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice(), transactionContent.getTransactionType());
@@ -331,41 +332,42 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
         }
     }
     
-    // @PostMapping(
-    //         path = "/order/sell",
-    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
-    // ) 
-    // public ResponseEntity<?> createSellOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
-    //     String token = tokenTransactionContent.getToken();
-    //     TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
-    //     Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
-    //     if (isValid) {
-    //         User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-    //         Boolean portfolioStockAmountCheck = portfolioStockManager.CheckIfPortfolioStockAmountIsSufficient(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
-    //         if(portfolioStockAmountCheck == true){
-    //             transactionManager.addTransaction(transactionContent);
-    //             Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-    //             //PortfolioStock abändern
-    //             portfolioStockManager.deletePortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getPricePerStock());
-    //             //Budget ändern
-    //             userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice(), transactionContent.getTransactionType(), transactionContent.getTransactionType());
-    //             //Portfoliowert ändern
-    //             //portfolioManager.editPortfolioValue(userPortfolio.getPortfolioID(), userPortfolio.getValue(), transactionContent.getTotalPrice());
-    //             return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
-    //         }
-    //         else{
-    //             if(portfolioStockAmountCheck == false){
-    //                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Your stock position is not that high!"));
-    //             }
-    //             else{
-    //                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("You don't own a position with the selected stock!"));
-    //             }
+    @PostMapping(
+            path = "/order/sell",
+            consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> createSellOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+        String token = tokenTransactionContent.getToken();
+        TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+        Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+        if (isValid) {
+            User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+            PortfolioStockValue portfolioStockValues = portfolioStockManager.checkPortfolioStockValue(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
+            if(portfolioStockValues == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("You don't own a position with the selected stock!"));
+            }
+            else{
+                if(portfolioStockValues.getCurrentValue() == -1){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Your stock position is not that high!"));
+                }
+                else{
+                    transactionManager.addTransaction(transactionContent);
+                    Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+                    List<Transaction> transactionsInPortfolio = transactionManager.getAllTransactionsInPortfolioStock(transactionContent.getEmail());
+                    //PortfolioStock abändern
+                    portfolioStockManager.deletePortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getTotalPrice(), portfolioStockValues, transactionsInPortfolio);
+                    //Budget ändern works
+                    userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                    //Portfoliowert ändern
+                    //portfolioManager.editPortfolioValue(userPortfolio.getPortfolioID(), userPortfolio.getValue(), transactionContent.getTotalPrice());
+                    return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                }
                 
-    //         }
-    //     }
-    //     else{
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
-    //     }
-    // }
+            }
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+        }
+    }
         
 }

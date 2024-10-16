@@ -58,7 +58,6 @@ function login(profileSchema){
         }),
         "success": function(data) {
             // Erfolgreicher Aufruf
-            console.log(data)
             setCookie("token", data.token);
             setCookie("firstname", data.user.firstname);
             setCookie("lastname", data.user.lastname);
@@ -178,7 +177,7 @@ function buyStock(){
             alert("Enter a valid quantity in $!");
             return;
         }
-        stockAmount = roundDownToTwoDecimalPlaces(quantity / price); // Berechnung für die Menge
+        stockAmount = quantity / price; // Berechnung für die Menge
     } else {
         stockAmount = parseFloat($('#quantity').val());
         if (isNaN(stockAmount) || stockAmount <= 0) {
@@ -226,7 +225,76 @@ function buyStock(){
     };
     $.ajax(settingsBuyStock);
 }
-    
+
+function sellStock(){
+    event.preventDefault();
+    let stockAmount;
+    const priceDisplay = document.getElementById("price-display").textContent.trim();
+    // Entferne das Dollarzeichen und parse den Preis
+    const price = parseFloat(priceDisplay.replace('$', '').trim());
+    console.log(price);
+
+    if (isNaN(price)) {
+        alert("Enter a valid stock!");
+        return;
+    }
+    if ($("#quantity-label").text() === "Quantity in $:") {
+        // Hier ist die Division
+        const quantity = parseFloat($('#quantity').val());
+        console.log(quantity);
+        if (isNaN(quantity) || quantity <= 0) {
+            alert("Enter a valid quantity in $!");
+            return;
+        }
+        stockAmount = quantity / price; // Berechnung für die Menge
+    } else {
+        stockAmount = parseFloat($('#quantity').val());
+        if (isNaN(stockAmount) || stockAmount <= 0) {
+            alert("Enter a valid stock amount!");
+            return;
+        }
+    }
+    const settingsSellStock = {
+        "async": true, // Asynchrone Anfrage
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell",
+        "method": "POST",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "transactioncontent": {
+                "transactiontype": 0,
+                "stockamount": stockAmount,
+                "date": getCurrentDateTime(),
+                "priceperstock": price,
+                "totalprice": roundToTwoDecimalPlaces(price * stockAmount),
+                "email": getCookie("email"),
+                "symbol": $('#stock-name').val()
+            }
+        })
+        ,
+        "success": function(data) {
+            console.log(data);
+            alert(data.answer);
+            console.log(getCookie("budget"));
+            setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") + roundToTwoDecimalPlaces(price * stockAmount)));
+            console.log(getCookie("budget"));
+            loadPortfolioDataFromDatabase();
+            displayBudget();
+        },
+        "error": function(xhr) {
+            if (xhr.status === 401 || xhr.status === 500 || xhr.status === 404 || xhr.status === 400) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else{
+                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+            }
+        }
+    };
+    $.ajax(settingsSellStock);
+}
+
 // Funktion, um das Label und den Button zu toggeln (Portfolio-Seite)
 function toggleLabel() {
     var label = document.getElementById('quantity-label');

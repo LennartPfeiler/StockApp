@@ -4,12 +4,12 @@ mosbach\dhbw\de\stockwizzard\model\TransactionContent.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PortfolioStockManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\model\PortfolioStock.class
 mosbach\dhbw\de\stockwizzard\dataManager\ISessionManager.class
-mosbach\dhbw\de\stockwizzard\controller\PersonController.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\SessionManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\dataManager\IStockManager.class
 mosbach\dhbw\de\stockwizzard\model\LogoutRequest.class
 mosbach\dhbw\de\stockwizzard\model\User.class
+mosbach\dhbw\de\stockwizzard\model\PortfolioStockValue.class
 mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.class
 mosbach\dhbw\de\stockwizzard\model\Portfolio.class
 mosbach\dhbw\de\stockwizzard\model\TokenTransactionContent.class
