@@ -338,14 +338,14 @@ function editUser(){
             }
         }),
         "success": function(data) {
-    console.log("Antwort vom Server:", data); // Antwortdaten im Logger ausgeben
-    alert("Erfolgreich geändert! Antwort: " + JSON.stringify(data));
+            console.log("Antwort vom Server:", data); // Antwortdaten im Logger ausgeben
+            alert(data.answer);
 }
 ,
         "error": function(xhr) {
             console.log(xhr);
             if (xhr.status === 401) {
-                alert("Sie sind nicht berechtigt, das Profil zu ändern!");
+                alert(JSON.parse(xhr.responseText).answer);
             } else {
                 alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
             }
