@@ -14,7 +14,6 @@ function displayAllDatabaseData(){
 
 //Getting cookie
 function getCookie(cookieName){
-    // source W3Schools
     let name = cookieName + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
@@ -50,7 +49,7 @@ function login(profileSchema){
     let email = profileSchema.email.value;
     let password = profileSchema.password.value;
     const settingsLogin = {
-        "async": true, // Asynchrone Anfrage
+        "async": true, 
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
         "method": "POST",
         "headers": {
@@ -62,25 +61,16 @@ function login(profileSchema){
             "password": password
         }),
         "success": function(data) {
-            // Erfolgreicher Aufruf
             setCookie("token", data.token);
             setCookie("firstname", data.user.firstname);
             setCookie("lastname", data.user.lastname);
             setCookie("email", data.user.email);
             setCookie("budget", roundToTwoDecimalPlaces(data.user.budget));
             setCookie("password", data.user.password);
-            // localStorage.setItem("token", data.token);
-            // localStorage.setItem("firstname", data.User.firstname);
-            // localStorage.setItem("lastname", data.User.lastname);
-            // localStorage.setItem("email", data.User.email);
-            // console.log("Werte gespeichert:", localStorage.getItem("firstname"), localStorage.getItem("lastname"), localStorage.getItem("email"));
-            // //setCookie("password", data.User.password); // Passwort nicht speichern
             document.location="home.html";
-            // console.log("Werte gespeichert:", localStorage.getItem("firstname"), localStorage.getItem("lastname"), localStorage.getItem("email"));
             
         },
         "error": function(xhr) {
-            // Fehlerbehandlung je nach Statuscode
             if (xhr.status === 401 || xhr.status === 404) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else{
@@ -95,7 +85,7 @@ function login(profileSchema){
 function register(profileSchema){
     event.preventDefault();
     const settingsRegister = {
-        "async": true, // Asynchrone Anfrage
+        "async": true, 
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
         "method": "POST",
         "headers": {
@@ -175,7 +165,6 @@ function buyStock(){
         return;
     }
     if ($("#quantity-label").text() === "Quantity in $:") {
-        // Hier ist die Division
         const quantity = parseFloat($('#quantity').val());
         console.log(quantity);
         if (isNaN(quantity) || quantity <= 0) {
@@ -243,7 +232,6 @@ function sellStock(){
         return;
     }
     if ($("#quantity-label").text() === "Quantity in $:") {
-        // Hier ist die Division
         const quantity = parseFloat($('#quantity').val());
         console.log(quantity);
         if (isNaN(quantity) || quantity <= 0) {
@@ -313,8 +301,6 @@ function toggleLabel() {
 
 function editUser(){
     event.preventDefault();
-    
-    // Budget aus der Dropdown-Liste abrufen
     let budgetValue = $('#budget').val();
     
     // Überprüfen, ob der Wert numerisch ist, sonst auf 0 setzen
@@ -335,14 +321,14 @@ function editUser(){
                 "firstname": $('#first-name').val(),
                 "lastname": $('#last-name').val(),
                 "email": $('#email').val(),
-                "budget": budget // Verwendet den verarbeiteten Budget-Wert
+                "budget": budget
             }
         }),
         "success": function(data) {
-            console.log("Antwort vom Server:", data); // Antwortdaten im Logger ausgeben
+            console.log("Antwort vom Server:", data);
             alert(data.answer);
-}
-,
+        }
+        ,
         "error": function(xhr) {
             console.log(xhr);
             if (xhr.status === 401) {
@@ -360,7 +346,7 @@ function editUser(){
 function resetProfile(){
     event.preventDefault();
     const resetRegister = {
-        "async": true, // Asynchrone Anfrage
+        "async": true, 
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user/reset",
         "method": "PUT",
         "headers": {
@@ -393,7 +379,7 @@ function resetProfile(){
 function deleteProfile(){
     event.preventDefault();
     const deleteRegister = {
-        "async": true, // Asynchrone Anfrage
+        "async": true, 
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
         "method": "DELETE",
         "headers": {
@@ -434,9 +420,6 @@ function fetchStockPrice(){
     getStockPriceFromDB(stockName)
         .done(function(data) {
             displayStockPrice(data.stockprice);
-            // Erfolgreicher Abruf aus der Datenbank
-            console.log('Preis aus der DB:', data);
-            // Weiterverarbeitung des Preises
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 500) {
@@ -445,7 +428,7 @@ function fetchStockPrice(){
                 getStockPriceFromAPI(stockName)
                     .done(function(data) {
                         if (data.status === 'OK' && data.results && data.results.length > 0) {
-                            const closeValue = parseFloat(data.results[0].c); // The closing price
+                            const closeValue = parseFloat(data.results[0].c); 
                             const roundedCloseValue = closeValue.toFixed(2);
                             insertNewStock(stockName, roundedCloseValue);
                             displayStockPrice(roundedCloseValue);
@@ -456,9 +439,6 @@ function fetchStockPrice(){
                         } else {
                             displayStockPrice('Unknown error retrieving data.');
                         }
-                        // Erfolgreicher Abruf aus der Datenbank
-                        console.log('Preis von der API:', data);
-                        // Weiterverarbeitung des Preises
                     })
                     .fail(function(jqXHR, textStatus, errorThrown) {
                         if (jqXHR.status === 429) {
@@ -474,7 +454,7 @@ function fetchStockPrice(){
 
 function getStockPriceFromDB(stockName){
     const getStockPriceDBRegister = {
-        "async": true, // Asynchrone Anfrage
+        "async": true,
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + stockName,
 
         "method": "GET",
@@ -490,7 +470,6 @@ function getStockPriceFromDB(stockName){
 //Funktion, um den eingegebenen Aktiennamen innerhalb des Portfolios zu bekommen
 function getStockName() {
     let stockNameLabel = document.getElementById("stock-name");
-    //console.log(stockNameLabel.value);
     return stockNameLabel.value;
 
 }
@@ -498,7 +477,7 @@ function getStockName() {
 //Funktion, um den aktuellen Preis der eingegebenen Aktie zu bekommen 
 function getStockPriceFromAPI(stockName) {
     const getStockPriceAPIRegister = {
-        "async": true, // Asynchrone Anfrage
+        "async": true, 
         "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
         "method": "GET",
         "dataType": 'json',
@@ -508,7 +487,7 @@ function getStockPriceFromAPI(stockName) {
 
 function insertNewStock(stockName, stockPrice){
     const settingsInsertStock = {
-        "async": true, // Asynchrone Anfrage
+        "async": true, 
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock",
         "method": "POST",
         "headers": {
@@ -547,24 +526,9 @@ function handleInputKeypress(e) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 function setProfileValues(){
-    // console.log("Vor dem Abrufen der Werte:");
-    // console.log("Firstname:", localStorage.getItem("firstname"));
-    // console.log("Lastname:", localStorage.getItem("lastname"));
-    // console.log("Email:", localStorage.getItem("email"));
-
-    // console.log(getCookie("firstName"));
-    // console.log(document.cookie)
-    // Setze den Wert des Vorname-Feldes
     document.getElementById("first-name").value = getCookie("firstname");
-    // Setze den Wert des Nachname-Feldes
     document.getElementById("last-name").value = getCookie("lastname");
-    // Setze den Wert des E-Mail-Feldes
     document.getElementById("email").value = getCookie("email");
-    // document.getElementById("first-name").value = localStorage.getItem("firstname");
-    // // Setze den Wert des Nachname-Feldes
-    // document.getElementById("last-name").value = localStorage.getItem("lastname");
-    // // Setze den Wert des E-Mail-Feldes
-    // document.getElementById("email").value = localStorage.getItem("email");
 }
 
 function checkFields() {
@@ -576,11 +540,11 @@ function checkFields() {
 
     // Überprüfen, ob beide Felder ausgefüllt sind
     if (stockName !== "" && quantity !== "") {
-        buyButton.disabled = false; // Button aktivieren
-        sellButton.disabled = false; // Button aktivieren
+        buyButton.disabled = false; 
+        sellButton.disabled = false; 
     } else {
-        buyButton.disabled = true; // Button deaktivieren
-        sellButton.disabled = true; // Button deaktivieren
+        buyButton.disabled = true;
+        sellButton.disabled = true;
     }
 }
 
@@ -605,7 +569,7 @@ function getAllTransactions(){
 
 function displayTransactionHistory(transactions) {
     const transactionHistoryContainer = document.querySelector('.transaction-history');
-    transactionHistoryContainer.innerHTML = ''; // Vorherige Inhalte entfernen
+    transactionHistoryContainer.innerHTML = ''; 
     let type;
     const heading = document.createElement('h2');
     heading.textContent = 'Transaction History';
@@ -638,15 +602,14 @@ function getAllPortfolioStocks(){
     }
     $.ajax(settingsGetAllPortfolioStocks).done(function (portfolioStocks) {
         displayPortfolioStocks(portfolioStocks)
-        //localStorage.setItem("portfolioStockArray", JSON.stringify(portfolioStocks));
     });
 }
 
 function displayPortfolioStocks(portfolioStocks) {
     const stockListContainer = document.querySelector('.portfolio .stock-list');
-    stockListContainer.innerHTML = ''; // Vorherige Inhalte entfernen
-    let totalCurrentPortfolioValue = 0; // Initialisierung auf 0
-    let totalBoughtPortfolioValue = 0; // Initialisierung auf 0
+    stockListContainer.innerHTML = ''; 
+    let totalCurrentPortfolioValue = 0; 
+    let totalBoughtPortfolioValue = 0; 
 
     portfolioStocks.forEach(stock => {
         totalCurrentPortfolioValue += stock.currentvalue;
@@ -666,14 +629,12 @@ function displayPortfolioStocks(portfolioStocks) {
 
 
 function calculatePercentage(boughtvalue, currentvalue) {
-    // Berechne die prozentuale Änderung
     const percentageChange = ((currentvalue - boughtvalue) / boughtvalue * 100).toFixed(2);
 
     // Überprüfe, ob der Wert positiv oder negativ ist, und lege die CSS-Klasse fest
     const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
     const sign = percentageChange >= 0 ? '+' : '';
 
-    // Gib das Ergebnis als Objekt zurück, um sowohl den Wert als auch die CSS-Klasse zu nutzen
     return {
         percentageChange: `${sign}${percentageChange}%`, // Prozentwert mit Vorzeichen
         changeClass: changeClass // CSS-Klasse für positive oder negative Veränderung
