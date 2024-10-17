@@ -147,6 +147,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
 
             ResultSet rs = stmt.executeQuery(getTransactions);
             while (rs.next()) {
+                Double leftInPortfolio = rs.getString("leftinportfolio") != null ? Double.parseDouble(rs.getString("leftinportfolio")) : null;
                 transactions.add(
                         new Transaction(
                                 Integer.parseInt(rs.getString("transactionid")),
@@ -157,7 +158,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
                                 Double.parseDouble(rs.getString("totalprice")),
                                 rs.getString("email"),
                                 rs.getString("symbol"),
-                                Double.parseDouble(rs.getString("leftinportfolio"))
+                                leftInPortfolio
                                 )
                 );
             }

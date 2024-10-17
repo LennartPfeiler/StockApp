@@ -77,24 +77,43 @@ public class MappingController {
         return ResponseEntity.ok(tokenUser);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserProfile( 
+        @RequestParam(value = "email", defaultValue = "") String email,
+        @RequestParam(value = "token", defaultValue = "") String token) {
+        
+        try {
+            Boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                User user = userManager.getUserProfile(email);
+                return ResponseEntity.ok(user);
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+            } 
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during getting user data."));
+        }  
+    }
+
     @DeleteMapping(
         path = "/auth",
         consumes = {MediaType.APPLICATION_JSON_VALUE}
-)
-public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
-    try{
-        String email = logoutRequest.getEmail();
-        String token = logoutRequest.getToken();
-        Boolean isValid = sessionManager.validToken(token, email);
-        if (isValid) {
-            sessionManager.deleteSession(email, token);
-            return ResponseEntity.ok(new StringAnswer("Logout successfully!"));
-        }
-        else{
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this logout!"));
-        }
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
+    )
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
+        try{
+            String email = logoutRequest.getEmail();
+            String token = logoutRequest.getToken();
+            Boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                sessionManager.deleteSession(email, token);
+                return ResponseEntity.ok(new StringAnswer("Logout successfully!"));
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this logout!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during registration."));
     }
 }
     
@@ -236,7 +255,6 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             Boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 List<Transaction> transactions = transactionManager.getAllTransactions(email, sortby);
-                // List<Transaction> transactions = transactionManager.getAllTransactionsInPortfolioStock(email);
                 return ResponseEntity.ok(transactions);
             }
             else{
@@ -247,36 +265,38 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
         }  
     }
 
-
-
-    @GetMapping("/session")
-    public Session getSession(@RequestParam(value = "email", defaultValue = "") String email) {
-        return sessionManager.getSession(email);   
-    }
-
-    @GetMapping("/user")
-    public User getUserProfile(@RequestParam(value = "email", defaultValue = "") String email) {
-        return userManager.getUserProfile(email);   
-    }
-
     @GetMapping("/portfolio")
-    public Portfolio getUserPortfolio(@RequestParam(value = "email", defaultValue = "") String email) {
-        return portfolioManager.getUserPortfolio(email);   
+    public ResponseEntity<?> getUserPortfolio( 
+        @RequestParam(value = "email", defaultValue = "") String email,
+        @RequestParam(value = "token", defaultValue = "") String token) {
+        
+        try {
+            Boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                Portfolio portfolio = portfolioManager.getUserPortfolio(email);
+                return ResponseEntity.ok(portfolio);
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+            } 
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during getting user portfolio."));
+        }  
     }
 
-    @GetMapping("/transaction")
-    public void getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
-        // userManager.createUserTable();
-        // sessionManager.createSessionTable();
-        // portfolioManager.createPortfolioTable();
-        // stockManager.createStockTable();
-        // portfolioStockManager.createPortfolioStockTable();
-        // portfolioManager.createPortfolioTable();
-        transactionManager.createTransactionTable();
-        // stockManager.createStockTable();
-        //return transactionManager.getTransaction(transactionID);
-        // return new Transaction(null, null, null, null, null, null, null, null, null);   
-    }
+    // @GetMapping("/transaction")
+    // public void getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
+    //     // userManager.createUserTable();
+    //     // sessionManager.createSessionTable();
+    //     // portfolioManager.createPortfolioTable();
+    //     // stockManager.createStockTable();
+    //     // portfolioStockManager.createPortfolioStockTable();
+    //     // portfolioManager.createPortfolioTable();
+    //     transactionManager.createTransactionTable();
+    //     // stockManager.createStockTable();
+    //     //return transactionManager.getTransaction(transactionID);
+    //     // return new Transaction(null, null, null, null, null, null, null, null, null);   
+    // }
 
     @PutMapping(
             path = "/user",

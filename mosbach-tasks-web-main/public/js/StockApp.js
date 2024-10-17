@@ -1,8 +1,13 @@
 ﻿const APIKEY = 'Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D'; // Externer API-Schlüssel
 
-///* Login *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///* Data display *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+function displayAllDatabaseData(){
+    displayUserBudget(); 
+    displayTotalPortfolioValue();
+    getAllTransactions();
+    getAllPortfolioStocks();
+}
 
 
 ///*Cookies*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,8 +217,7 @@ function buyStock(){
             console.log(getCookie("budget"));
             setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") - roundToTwoDecimalPlaces(price * stockAmount)));
             console.log(getCookie("budget"));
-            loadPortfolioDataFromDatabase();
-            displayBudget();
+            displayAllDatabaseData();
         },
         "error": function(xhr) {
             if (xhr.status === 401 || xhr.status === 400) {
@@ -278,11 +282,8 @@ function sellStock(){
         "success": function(data) {
             console.log(data);
             alert(data.answer);
-            console.log(getCookie("budget"));
             setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") + roundToTwoDecimalPlaces(price * stockAmount)));
-            console.log(getCookie("budget"));
-            loadPortfolioDataFromDatabase();
-            displayBudget();
+            displayAllDatabaseData();
         },
         "error": function(xhr) {
             if (xhr.status === 401 || xhr.status === 500 || xhr.status === 404 || xhr.status === 400) {
@@ -420,10 +421,6 @@ function deleteProfile(){
     };
 
     $.ajax(deleteRegister);
-}
-
-function displayBudget() {
-    $(".remaining-budget").text(getCookie("budget") + " $");
 }
 
 //////////////////////////////////////////// Aktienpreis //////////////////////////////////////////
@@ -589,11 +586,6 @@ function checkFields() {
 
 
 ////////////////////////////////// Portfolio //////////////////////////////////////////////
-function loadPortfolioDataFromDatabase(){
-    getAllTransactions();
-    getAllPortfolioStocks();
-}
-
 
 function getAllTransactions(){
     event.preventDefault();
@@ -669,9 +661,6 @@ function displayPortfolioStocks(portfolioStocks) {
         stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
         stockListContainer.appendChild(stockDiv);
     });
-
-    // Gesamtwerte anzeigen
-    displayTotalPortfolioValues(totalCurrentPortfolioValue, totalBoughtPortfolioValue);
 }
 
 
@@ -691,19 +680,54 @@ function calculatePercentage(boughtvalue, currentvalue) {
     };
 }
 
-function displayTotalPortfolioValues(totalCurrentPortfolioValue, totalBoughtPortfolioValue) {
-    const portfolioValueContainer = document.querySelector('.portfolio .portfolio-value');
+function displayUserBudget(){
+    event.preventDefault();
+    const settingsGetBudget = {
+        "async": false,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user?email=" + getCookie("email") + "&token=" + getCookie("token"),
+        "method": "GET",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "success": function(data) {
+            $(".remaining-budget").text(data.budget + " $");
+            setCookie("budget", roundToTwoDecimalPlaces(data.budget));
+        },
+        "error": function(xhr) {
+            if (xhr.status === 401 || xhr.status === 400) {
+                $(".remaining-budget").text(JSON.parse(xhr.responseText).answer);
+            } else{
+                $(".remaining-budget").text("An unexpected error occured");
+                
+            }
+        }
+    }
+    $.ajax(settingsGetBudget);
+}
 
-    // Berechnung der prozentualen Veränderung
-    const percentageChange = roundToTwoDecimalPlaces(((totalCurrentPortfolioValue - totalBoughtPortfolioValue) / totalBoughtPortfolioValue * 100));
-    
-    // Überprüfen, ob die Veränderung positiv oder negativ ist
-    const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
-    const sign = percentageChange >= 0 ? '+' : '';
-    console.log(getCookie("budget"));
-    // Rundung des aktuellen Portfolio-Werts auf zwei Dezimalstellen
-    const roundedCurrentValue = roundToTwoDecimalPlaces(totalCurrentPortfolioValue + parseFloat(getCookie("budget")));
-
-    // Aktualisierung des HTML-Codes
-    portfolioValueContainer.innerHTML = `${roundedCurrentValue} $ <span class="percentage ${changeClass}">${sign}${percentageChange}%</span>`;
+function displayTotalPortfolioValue(){
+    event.preventDefault();
+    const settingsGetPortfolioValue = {
+        "async": false,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolio?email=" + getCookie("email") + "&token=" + getCookie("token"),
+        "method": "GET",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "success": function(data) {
+            console.log(data);
+            $(".portfolio-value").text(data.value  + " $");
+        },
+        "error": function(xhr) {
+            if (xhr.status === 401 || xhr.status === 400) {
+                $(".portfolio-value").text(JSON.parse(xhr.responseText).answer);
+            } else{
+                $(".portfolio-value").text("An unexpected error occured");
+                
+            }
+        }
+    }
+    $.ajax(settingsGetPortfolioValue);
 }
