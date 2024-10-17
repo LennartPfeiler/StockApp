@@ -85,6 +85,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
 
     //CHANGE DATE DATATYPE TO DATE INSTEAD OF STRING
     public void addTransaction(TransactionContent transactionContent){
+        String insertSQL = "";
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("SetNewTransactionWriter").log(Level.INFO, "Start addTransaction-method");
@@ -92,9 +93,8 @@ public class TransactionManagerImplementation implements ITransactionManager{
             // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-    
-            // SQL-Anweisung für das Einfügen eines neuen Portfolios
-            String insertSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
+            if(transactionContent.getTransactionType() == 1){
+                insertSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
                     transactionContent.getTransactionType() + ", " +
                     transactionContent.getStockAmount() + ", " +
                     "'" + transactionContent.getDate() + "', " +
@@ -103,6 +103,18 @@ public class TransactionManagerImplementation implements ITransactionManager{
                     transactionContent.getTotalPrice() + ", " +
                     "'" + transactionContent.getEmail() + "', " + 
                     transactionContent.getTotalPrice() + ")";
+            }
+            else{
+                insertSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
+                transactionContent.getTransactionType() + ", " +
+                transactionContent.getStockAmount() + ", " +
+                "'" + transactionContent.getDate() + "', " +
+                "'" + transactionContent.getSymbol() + "', " +
+                transactionContent.getPricePerStock() + ", " +
+                transactionContent.getTotalPrice() + ", " +
+                "'" + transactionContent.getEmail() + "', " + 
+                null + ")"; 
+            }
     
             // Führe die SQL-Anweisung aus
             stmt.executeUpdate(insertSQL);
@@ -174,7 +186,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            String getTransactions = "SELECT * FROM group12transaction WHERE email = '" + email + "' AND leftinportfolio > 0 ORDER BY date DESC";
+            String getTransactions = "SELECT * FROM group12transaction WHERE email = '" + email + "' AND leftinportfolio > 0 AND transactiontype = 1 ORDER BY date DESC";
 
             ResultSet rs = stmt.executeQuery(getTransactions);
             while (rs.next()) {

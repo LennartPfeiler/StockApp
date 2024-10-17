@@ -180,19 +180,19 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         return portfolioStocks;
     }
 
-
     public void deletePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice, PortfolioStockValue portfolioStockValues, List<Transaction> transactionsInPortfolio){
         Statement stmt = null;
         Connection connection = null;
-        Logger.getLogger("DeletePortfolioStockLogger").log(Level.INFO, "Start deletePortfolioStock-method");
-        if(totalPrice == portfolioStockValues.getCurrentValue()){
+        //IN PORTFOLIO MIT REINNEHMEN
+        final double EPSILON = 0.000001;
+        if (Math.abs(totalPrice - portfolioStockValues.getCurrentValue()) < EPSILON) {
             try {
                 connection = DriverManager.getConnection(dbUrl, username, password);
                 stmt = connection.createStatement();
-                //does not work
+                //works
                 String deletePortfolioStock = "DELETE FROM group12portfoliostock WHERE symbol = '" + symbol + "' AND portfolioid=" + portfolioId;
                 stmt.executeUpdate(deletePortfolioStock);
-                //does not work
+                //works
                 for (Transaction transaction : transactionsInPortfolio) {
                     transactionManager.updateLeftinPortfolio(transaction.getTransactionID(), 0.0);
                 }
@@ -215,7 +215,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             
                 Double remainingAmount = totalPrice;
                 Double totalBoughtValueReduction = 0.0;
-            
+                Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "in else drin: {0}", remainingAmount);
                 // Gehe die Transaktionen durch, bis die zu verkaufende Menge vollständig abgedeckt ist
                 for (Transaction transaction : transactionsInPortfolio) {
                     if (remainingAmount <= 0) {

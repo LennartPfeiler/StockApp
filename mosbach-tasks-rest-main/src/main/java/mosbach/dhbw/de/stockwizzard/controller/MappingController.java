@@ -236,6 +236,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             Boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 List<Transaction> transactions = transactionManager.getAllTransactions(email, sortby);
+                // List<Transaction> transactions = transactionManager.getAllTransactionsInPortfolioStock(email);
                 return ResponseEntity.ok(transactions);
             }
             else{
@@ -354,6 +355,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
                     transactionManager.addTransaction(transactionContent);
                     Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
                     List<Transaction> transactionsInPortfolio = transactionManager.getAllTransactionsInPortfolioStock(transactionContent.getEmail());
+                    Logger.getLogger("MappingMethode").log(Level.SEVERE, "{0}.", transactionsInPortfolio);
                     //PortfolioStock abändern
                     portfolioStockManager.deletePortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getTotalPrice(), portfolioStockValues, transactionsInPortfolio);
                     //Budget ändern works
