@@ -290,7 +290,7 @@ public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest){
             Boolean isValid = sessionManager.validToken(token, currentEmail);
             if (isValid) {
                 userManager.editUser(currentEmail, user);
-                return ResponseEntity.ok("Token gültig"); // Gültiger Token - gib TokenUser zurück
+                return ResponseEntity.ok(new StringAnswer("Editing was successfully completed"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
             }

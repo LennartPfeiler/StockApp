@@ -250,8 +250,7 @@ public class UserManagerImplementation implements IUserManager{
                 String newUserSQL = "INSERT into group12user (email, firstname, lastname, password, budget) VALUES (" +
                     "'" + user.getEmail() + "', " +
                     "'" + user.getFirstName() + "', " +
-                    "'" + user.getLastName() + "', " +
-                    "'" + passwordManager.hashPassword(user.getPassword()) + "', " +
+                    "'" + user.getLastName() + "', " 
                      + (user.getBudget() + oldBudget) + ")";
                 String updateSessionsSQL = "UPDATE group12session SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
                 String updateTransactionsSQL = "UPDATE group12transaction SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";

@@ -312,8 +312,15 @@ function toggleLabel() {
 
 function editUser(){
     event.preventDefault();
+    
+    // Budget aus der Dropdown-Liste abrufen
+    let budgetValue = $('#budget').val();
+    
+    // Überprüfen, ob der Wert numerisch ist, sonst auf 0 setzen
+    let budget = isNaN(parseFloat(budgetValue)) ? 0 : parseFloat(budgetValue);
+    
     const editRegister = {
-        "async": true, // Asynchrone Anfrage
+        "async": true,
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
         "method": "PUT",
         "headers": {
@@ -324,21 +331,22 @@ function editUser(){
             "token": getCookie("token"),
             "currentmail": getCookie("email"),
             "user": {
-            "firstname": $('#first-name').val(),
-            "lastname": $('#last-name').val(),
-            "email": $('#email').val(),
-            "password": getCookie("password"),
-            "budget": getCookie("budget")
-        }}),
+                "firstname": $('#first-name').val(),
+                "lastname": $('#last-name').val(),
+                "email": $('#email').val(),
+                "budget": budget // Verwendet den verarbeiteten Budget-Wert
+            }
+        }),
         "success": function(data) {
-            alert("Erfolgreich geändert!.");
-        },
+    console.log("Antwort vom Server:", data); // Antwortdaten im Logger ausgeben
+    alert("Erfolgreich geändert! Antwort: " + JSON.stringify(data));
+}
+,
         "error": function(xhr) {
             console.log(xhr);
             if (xhr.status === 401) {
-                alert("Sie sind nciht berechtigt das Profil zu ändern!.");
-            }
-            else{
+                alert("Sie sind nicht berechtigt, das Profil zu ändern!");
+            } else {
                 alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
             }
         }
@@ -346,6 +354,7 @@ function editUser(){
 
     $.ajax(editRegister);
 }
+
 
 function resetProfile(){
     event.preventDefault();
