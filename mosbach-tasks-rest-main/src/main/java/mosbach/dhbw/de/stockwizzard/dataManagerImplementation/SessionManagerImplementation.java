@@ -48,22 +48,24 @@ public class SessionManagerImplementation implements ISessionManager{
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
             String dropSessionTableSQL = "DROP TABLE IF EXISTS group12session";
-            stmt.executeUpdate(dropSessionTableSQLSQL);
+            stmt.executeUpdate(dropSessionTableSQL);
 
-            String createSessionTable = "CREATE TABLE group12session (" +
+            String createSessionTableSQL = "CREATE TABLE group12session (" +
                      "token VARCHAR(100) NOT NULL PRIMARY KEY, " +
                      "email VARCHAR(100) NOT NULL, " +
                      "FOREIGN KEY (email) REFERENCES group12user(email) ON DELETE CASCADE)";
 
             stmt.executeUpdate(createSessionTableSQL);
         } catch (Exception e) {
-            Logger.getLogger("CreateSessionTableLogger").log(Level.INFO, "Session table cannot be created. Error: {0}", e);
+            Logger.getLogger("CreateSessionTableLogger").log(Level.SEVERE, "Session table cannot be created. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("CreateSessionTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -84,12 +86,14 @@ public class SessionManagerImplementation implements ISessionManager{
             stmt.executeUpdate(insertSessionSQL);     
         } catch (SQLException e) {
             Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Error when creating a session.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -116,12 +120,14 @@ public class SessionManagerImplementation implements ISessionManager{
             rs.close();
         } catch (SQLException e) {
             Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Error when getting a session.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
         return session;
@@ -141,12 +147,14 @@ public class SessionManagerImplementation implements ISessionManager{
             stmt.executeUpdate(deleteSessionSQL);     
         } catch (SQLException e) {
             Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Error when deleting a session.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -173,6 +181,7 @@ public class SessionManagerImplementation implements ISessionManager{
             }
         } catch (SQLException e) {
             Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Error when getting session data.", e);
+            e.printStackTrace();
             return false;
         } finally {
             try {
@@ -180,6 +189,7 @@ public class SessionManagerImplementation implements ISessionManager{
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -198,12 +208,14 @@ public class SessionManagerImplementation implements ISessionManager{
             stmt.executeUpdate(updateSessionsSQL);
         } catch (SQLException e) {
             Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error when updating a session.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }

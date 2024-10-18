@@ -57,13 +57,15 @@ public class StockManagerImplementation implements IStockManager{
 
             stmt.executeUpdate(createStockTableSQL);
         } catch (Exception e) {
-            Logger.getLogger("CreateStockTableLogger").log(Level.INFO, "Stock table cannot be created. Error: {0}", e);
+            Logger.getLogger("CreateStockTableLogger").log(Level.SEVERE, "Stock table cannot be created. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("CreateStockTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -89,6 +91,7 @@ public class StockManagerImplementation implements IStockManager{
             }
             rs.close();
         } catch (SQLException e) {
+            Logger.getLogger("GetStockLogger").log(Level.SEVERE, "Error when getting a stock. Error: {0}", e);
             e.printStackTrace();
         } finally {
             try {
@@ -96,6 +99,7 @@ public class StockManagerImplementation implements IStockManager{
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetStockLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
         return stock;
@@ -117,6 +121,7 @@ public class StockManagerImplementation implements IStockManager{
 
             stmt.executeUpdate(insertStockSQL);     
         } catch (SQLException e) {
+            Logger.getLogger("SetNewStockWriter").log(Level.SEVERE, "Error when adding a stock. Error: {0}", e);
             e.printStackTrace();
         } finally {
             try {
@@ -124,6 +129,7 @@ public class StockManagerImplementation implements IStockManager{
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("SetNewStockWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }

@@ -56,17 +56,53 @@ function login(profileSchema){
             "password": password
         }),
         "success": function(data) {
+            alert("Login successfully");
             setCookie("token", data.token);
             setCookie("firstname", data.user.firstname);
             setCookie("lastname", data.user.lastname);
             setCookie("email", data.user.email);
-            setCookie("budget", roundToTwoDecimalPlaces(data.user.budget));
-            setCookie("password", data.user.password);
             document.location="home.html";
             
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 404) {
+            if (xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else{
+                alert("An unexpected error occurred. Status: " + xhr.status);
+            }
+        }
+    };
+
+    $.ajax(settingsLogin);
+}
+
+//Get the Profile for an user of the Website
+function logout(){
+    event.preventDefault();
+    const settingsLogin = {
+        "async": true, 
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
+        "method": "DELETE",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "email": getCookie("email")
+        }),
+        "success": function(data) {
+            alert(data.answer);
+            document.location="vorhome.html";
+            document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "budget=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "firstname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "lastname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        },
+        "error": function(xhr) {
+            if (xhr.status === 401 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else{
                 alert("An unexpected error occurred. Status: " + xhr.status);
@@ -101,11 +137,11 @@ function register(profileSchema){
         },
         "error": function(xhr) {
             console.log(xhr);
-            if (xhr.status === 401 || xhr.status === 404) {
+            if (xhr.status === 409 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
                 console.log(xhr);
             } else{
-                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+                alert("An unexpected error occurred. Status: " + xhr.status);
             }
         }
     };
@@ -187,19 +223,17 @@ function buyStock(){
         })
         ,
         "success": function(data) {
-            console.log(data);
             alert(data.answer);
-            console.log(getCookie("budget"));
-            setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") - roundToTwoDecimalPlaces(price * stockAmount)));
-            console.log(getCookie("budget"));
             displayAllDatabaseData();
             $('#quantity').val("");
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 400) {
+            if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
+                $('#quantity').val("");
             } else{
-                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+                alert("An unexpected error occurred. Status: " + xhr.status);
+                $('#quantity').val("");
             }
         }
     };
@@ -257,15 +291,16 @@ function sellStock(){
         "success": function(data) {
             console.log(data);
             alert(data.answer);
-            setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") + roundToTwoDecimalPlaces(price * stockAmount)));
             displayAllDatabaseData();
             $('#quantity').val("");
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 500 || xhr.status === 404 || xhr.status === 400) {
+            if (xhr.status === 400 || xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
+                $('#quantity').val("");
             } else{
-                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+                alert("An unexpected error occurred. Status: " + xhr.status);
+                $('#quantity').val("");
             }
         }
     };
@@ -344,16 +379,15 @@ function editUser(){
             setCookie("firstname", data.firstname);
             setCookie("lastname", data.lastname);
             setCookie("email", data.email);
-            setCookie("budget", roundToTwoDecimalPlaces(data.budget));
             alert("User edited successfully");
         }
         ,
         "error": function(xhr) {
             console.log(xhr);
-            if (xhr.status === 401) {
+            if (xhr.status === 401 || xhr.status === 409 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else {
-                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+                alert("An unexpected error occurred. Status: " + xhr.status);
             }
         }
     };
@@ -379,15 +413,14 @@ function resetProfile(){
         "success": function(data) {
             const confirmation = confirm("Are you sure you want to reset your profile?");
             if (confirmation) {
-                alert("Profile successfully resetted!.");
-            setCookie("budget", data.budget);
+                alert(data.answer);
             } 
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 400) {
+            if (xhr.status === 401 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else{
-                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+                alert("An unexpected error occurred. Status: " + xhr.status);
             }
         }
     };
@@ -418,10 +451,10 @@ function deleteProfile(){
             } 
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 400) {
+            if (xhr.status === 401 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else{
-                alert("Es ist ein unbekannter Fehler aufgetreten. Status: " + xhr.status);
+                alert("An unexpected error occurred. Status: " + xhr.status);
             }
         }
     };
@@ -444,7 +477,7 @@ function fetchStockPrice(){
             displayStockPrice(data.stockprice);
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 500) {
+            if (jqXHR.status === 401 ||jqXHR.status === 404 || jqXHR.status === 500) {
                 displayStockPrice('Error retrieving data. Please try again later.');
             } else {
                 getStockPriceFromAPI(stockName)
@@ -550,7 +583,7 @@ function handleInputKeypress(e) {
 ///*Get and display all portfolio data*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Get all transactions of an user
-function getAllTransactions(){
+function getAllTransactions() {
     event.preventDefault();
     const settingsGetAllTransactions = {
         "async": false,
@@ -560,11 +593,21 @@ function getAllTransactions(){
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         }
-    }
-    $.ajax(settingsGetAllTransactions).done(function (transactions) {
-        displayTransactionHistory(transactions);
-    });
+    };
+    
+    $.ajax(settingsGetAllTransactions)
+        .done(function (transactions) {
+            displayTransactionHistory(transactions);
+        })
+        .fail(function (xhr, textStatus, errorThrown) {
+            if (xhr.status === 401 || xhr.status === 500) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else{
+                alert("An unexpected error occurred. Status: " + xhr.status);
+            }
+        });
 }
+
 
 //Display all transactions of an user
 function displayTransactionHistory(transactions) {
@@ -603,6 +646,13 @@ function getAllPortfolioStocks(){
     }
     $.ajax(settingsGetAllPortfolioStocks).done(function (portfolioStocks) {
         displayPortfolioStocks(portfolioStocks)
+    })
+    .fail(function (xhr, textStatus, errorThrown) {
+        if (xhr.status === 401 || xhr.status === 500) {
+            alert(JSON.parse(xhr.responseText).answer);
+        } else{
+            alert("An unexpected error occurred. Status: " + xhr.status);
+        }
     });
 }
 
@@ -652,10 +702,9 @@ function displayUserBudget(){
         },
         "success": function(data) {
             $(".remaining-budget").text(data.budget + " $");
-            setCookie("budget", roundToTwoDecimalPlaces(data.budget));
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 400) {
+            if (xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
                 $(".remaining-budget").text(JSON.parse(xhr.responseText).answer);
             } else{
                 $(".remaining-budget").text("An unexpected error occured");
@@ -678,11 +727,10 @@ function displayTotalPortfolioValue(){
             'Content-Type': 'application/json'
         },
         "success": function(data) {
-            console.log(data);
             $(".portfolio-value").text(data.value  + " $");
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 400) {
+            if (xhr.status === 401 || xhr.status === 500) {
                 $(".portfolio-value").text(JSON.parse(xhr.responseText).answer);
             } else{
                 $(".portfolio-value").text("An unexpected error occured");

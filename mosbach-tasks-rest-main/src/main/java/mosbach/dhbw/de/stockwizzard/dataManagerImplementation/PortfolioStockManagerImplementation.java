@@ -66,13 +66,15 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
 
             stmt.executeUpdate(createPortfolioStockTableSQL);
         } catch (Exception e) {
-            Logger.getLogger("CreatePortfolioStockTableLogger").log(Level.INFO, "PortfolioStock table cannot be created. Error: {0}", e);
+            Logger.getLogger("CreatePortfolioStockTableLogger").log(Level.SEVERE, "PortfolioStock table cannot be created. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("CreateUserTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -118,12 +120,14 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             rs.close();
         } catch (SQLException e) {
             Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE, "Error when increasing a portfolio stock.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -155,12 +159,14 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             rs.close();
         } catch (Exception e) {
             Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "Error when getting all portfolio stocks. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetPortfolioStocksLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
         return portfolioStocks;
@@ -184,12 +190,14 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
                 }
             } catch (SQLException e) {
                 Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when deleting a portfolio stock.", e);
+                e.printStackTrace();
             } finally {
                 try {
                     if (stmt != null) stmt.close();
                     if (connection != null) connection.close();
                 } catch (SQLException e) {
                     Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                    e.printStackTrace();
                 }
             }
         }
@@ -236,12 +244,14 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             
             } catch (SQLException e) {
                 Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when decreasing a portfolio stock.", e);
+                e.printStackTrace();
             } finally {
                 try {
                     if (stmt != null) stmt.close();
                     if (connection != null) connection.close();
                 } catch (SQLException e) {
                     Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                    e.printStackTrace();
                 }
             }
         }
@@ -274,6 +284,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             }
         } catch (SQLException e) {
             Logger.getLogger("GetPortfolioStockValuesLogger").log(Level.INFO, "Error when fetching value data from portfolio stock", e);
+            e.printStackTrace();
             return null;
         } finally {
             try {
@@ -282,6 +293,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -300,12 +312,14 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             stmt.executeUpdate(deletePortfolioStocksSQL);
         } catch (SQLException e) {
             Logger.getLogger("DeleteAllPortfolioStocksLogger").log(Level.SEVERE, "Error when deleting all portfolio stocks.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("DeleteAllPortfolioStocksLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }

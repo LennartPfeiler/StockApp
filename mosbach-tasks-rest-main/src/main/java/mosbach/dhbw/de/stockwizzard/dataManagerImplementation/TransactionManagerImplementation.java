@@ -70,13 +70,15 @@ public class TransactionManagerImplementation implements ITransactionManager{
 
             stmt.executeUpdate(createTransactionTableSQL);
         } catch (Exception e) {
-            Logger.getLogger("CreateTransactionTableLogger").log(Level.INFO, "Transaction table cannot be created. Error: {0}", e);
+            Logger.getLogger("CreateTransactionTableLogger").log(Level.SEVERE, "Transaction table cannot be created. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("CreateTransactionTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -117,12 +119,14 @@ public class TransactionManagerImplementation implements ITransactionManager{
             stmt.executeUpdate(insertTransactionSQL);
         } catch (SQLException e) {
             Logger.getLogger("SetNewTransactionWriter").log(Level.SEVERE, "Error when adding a new transaction.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("SetNewTransactionWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -158,12 +162,14 @@ public class TransactionManagerImplementation implements ITransactionManager{
             rs.close();
         } catch (Exception e) {
             Logger.getLogger("GetTransactionsLoger").log(Level.INFO, "Error when getting all transactions. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetTransactionsLoger").log(Level.SEVERE, "Error when getting the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
         return transactions;
@@ -199,12 +205,14 @@ public class TransactionManagerImplementation implements ITransactionManager{
             rs.close();
         } catch (Exception e) {
             Logger.getLogger("GetTransactionsLoger").log(Level.INFO, "Error when getting all transactions with stocks in portfolio stocks. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetTransactionsLoger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
         return transactions;
@@ -225,12 +233,14 @@ public class TransactionManagerImplementation implements ITransactionManager{
             stmt.executeUpdate(updateLeftinPortfolioTransactionSQL);
         } catch (Exception e) {
             Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.INFO, "Error when updating leftinportfolio value. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -249,12 +259,14 @@ public class TransactionManagerImplementation implements ITransactionManager{
             stmt.executeUpdate(updateTransactionEmailSQL);
         } catch (SQLException e) {
             Logger.getLogger("UpdateTransactionEmailLogger").log(Level.SEVERE, "Error when updating email of a transaction.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("UpdateTransactionEmailLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }
@@ -273,12 +285,14 @@ public class TransactionManagerImplementation implements ITransactionManager{
             stmt.executeUpdate(deleteTransactionsSQL);
         } catch (SQLException e) {
             Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error when deleting all transactions.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }

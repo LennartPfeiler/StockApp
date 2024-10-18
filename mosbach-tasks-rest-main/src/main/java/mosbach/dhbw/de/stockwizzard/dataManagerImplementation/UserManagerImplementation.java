@@ -63,13 +63,15 @@ public class UserManagerImplementation implements IUserManager{
 
             stmt.executeUpdate(createUserTableSQL);
         } catch (Exception e) {
-            Logger.getLogger("CreateUserTableLogger").log(Level.INFO, "User table cannot be created. Error: {0}", e);
+            Logger.getLogger("CreateUserTableLogger").log(Level.SEVERE, "User table cannot be created. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("CreateUserTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -117,6 +119,7 @@ public class UserManagerImplementation implements IUserManager{
             }
             rs.close();
         } catch (SQLException e) {
+            Logger.getLogger("GetUserByEmail").log(Level.SEVERE, "Error when getting an user. Error: {0}", e);
             e.printStackTrace();
         } finally {
             try {
@@ -124,6 +127,7 @@ public class UserManagerImplementation implements IUserManager{
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetUserByEmail").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
         return user;
@@ -147,6 +151,7 @@ public class UserManagerImplementation implements IUserManager{
 
             stmt.executeUpdate(insertUserSQL);     
         } catch (SQLException e) {
+            Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error when setting a new user. Error: {0}", e);
             e.printStackTrace();
         } finally {
             try {
@@ -154,6 +159,7 @@ public class UserManagerImplementation implements IUserManager{
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -178,12 +184,14 @@ public class UserManagerImplementation implements IUserManager{
             stmt.executeUpdate(updateUserBudgetSQL);
         } catch (SQLException e) {
             Logger.getLogger("UpdateUserBudgetLogger").log(Level.SEVERE, "Error updating user budget.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("UpdateUserBudgetLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }
@@ -207,17 +215,19 @@ public class UserManagerImplementation implements IUserManager{
             stmt.executeUpdate(updateUserSQL);
         } catch (SQLException e) {
             Logger.getLogger("EditUserLogger").log(Level.SEVERE, "Error when editing an user .", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("EditUserLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }
 
-    //Reset an user profile to registration status
+    //Reset an user profile 
     public void resetProfile(String email){
         Statement stmt = null;
         Connection connection = null;
@@ -230,12 +240,14 @@ public class UserManagerImplementation implements IUserManager{
             stmt.executeUpdate(resetUserSQL);
         } catch (SQLException e) {
             Logger.getLogger("ResetProfileLogger").log(Level.SEVERE, "Error when resetting an user.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("ResetProfileLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }
@@ -255,12 +267,14 @@ public class UserManagerImplementation implements IUserManager{
             stmt.executeUpdate(deleteUserSQL);
         } catch (SQLException e) {
             Logger.getLogger("DeleteProfileLogger").log(Level.SEVERE, "Error when deleting an user.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("DeleteProfileLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }

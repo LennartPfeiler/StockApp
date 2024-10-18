@@ -56,13 +56,15 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
 
             stmt.executeUpdate(createPortfolioTableSQL);
         } catch (Exception e) {
-            Logger.getLogger("CreatePortfolioTableLogger").log(Level.INFO, "Portfolio table cannot be created. Error: {0}", e);
+            Logger.getLogger("CreatePortfolioTableLogger").log(Level.SEVERE, "Portfolio table cannot be created. Error: {0}", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("CreatePortfolioTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -85,12 +87,14 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             Logger.getLogger("SetNewPortfolioWriter").log(Level.INFO, "Portfolio successfully added");
         } catch (SQLException e) {
             Logger.getLogger("SetNewPortfolioWriter").log(Level.SEVERE, "Error while creating new portfolio.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("SetNewPortfolioWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
     }
@@ -120,12 +124,14 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             rs.close();
         } catch (SQLException e) {
             Logger.getLogger("GetPortfolioReader").log(Level.SEVERE, "Error when retrieving the portfolio from the database.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetPortfolioReader").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
             }
         }
         return portfolio;
@@ -146,12 +152,14 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             stmt.executeUpdate(updatePortfolioValueSQL);
         } catch (SQLException e) {
             Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error when updating the portfolio value.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }
@@ -171,17 +179,19 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             stmt.executeUpdate(updateAllPortfolioValuesSQL);
         } catch (SQLException e) {
             Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error when updating all portfolio values.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }
 
-    //Reset an user portfolio to registration status
+    //Reset an user portfolio
     public void resetPortfolio(String email) {
         Statement stmt = null;
         Connection connection = null;
@@ -193,12 +203,14 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             stmt.executeUpdate(resetPortfolioSQL);
         } catch (SQLException e) {
             Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error when resetting the portfolio.", e);
+            e.printStackTrace();
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error when closing the resource.", e);
+                e.printStackTrace();
             }
         }
     }
