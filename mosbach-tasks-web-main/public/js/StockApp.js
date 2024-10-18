@@ -12,7 +12,7 @@ function displayAllDatabaseData(){
 
 ///*Cookies*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Getting cookie
+//Get a cookie
 function getCookie(cookieName){
     let name = cookieName + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -29,21 +29,16 @@ function getCookie(cookieName){
     return "";
 }
 
-//Setting cookie
+//Set a cookie
 function setCookie(cookieName, cookieValue) {
     document.cookie = cookieName+"=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict";
     document.cookie = cookieName + "=" + cookieValue + "; SameSite=Strict ; path=/";
 }
 
-//Testing if user cookie is there
-function testCookie(){
-    if(getCookie("userID") != "" && getCookie("userID") != null){}
-    else{
-        document.location = "login.html";
-    }
-}
+///*Auth*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//getting Profile for user of the Website
+
+//Get the Profile for an user of the Website
 function login(profileSchema){
     event.preventDefault();
     let email = profileSchema.email.value;
@@ -82,6 +77,7 @@ function login(profileSchema){
     $.ajax(settingsLogin);
 }
 
+// Create a new user
 function register(profileSchema){
     event.preventDefault();
     const settingsRegister = {
@@ -116,20 +112,18 @@ function register(profileSchema){
     $.ajax(settingsRegister);
 }
 
-function checkIfPriceIsDisplayed(){
-    const priceDisplay = document.getElementById("price-display").textContent.trim();
-    
-    // Überprüfen, ob der Inhalt eine gültige Zahl ist
-    const price = parseFloat(priceDisplay);
-
-    // Prüfen, ob price eine Zahl ist
-    if (isNaN(price)) {
-        alert("Es ist kein gültiger Preis angegeben.");
-    } else {
-        alert("Es ist kein gültiger Preis angegeben.");
-    }
+///*Round functions*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function roundDownToTwoDecimalPlaces(num) {
+    return Math.floor(num * 100) / 100;
 }
 
+function roundToTwoDecimalPlaces(value) {
+    return Math.round(value * 100) / 100;
+}
+
+///*Create orders*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Get todays date
 function getCurrentDateTime() {
     const now = new Date(); // Aktuelles Datum und Uhrzeit
 
@@ -144,19 +138,11 @@ function getCurrentDateTime() {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
-function roundDownToTwoDecimalPlaces(num) {
-    return Math.floor(num * 100) / 100;
-}
-
-function roundToTwoDecimalPlaces(value) {
-    return Math.round(value * 100) / 100;
-}
-
+//Create a buy Order
 function buyStock(){
     event.preventDefault();
     let stockAmount;
     const priceDisplay = document.getElementById("price-display").textContent.trim();
-    // Entferne das Dollarzeichen und parse den Preis
     const price = parseFloat(priceDisplay.replace('$', '').trim());
     console.log(price);
 
@@ -171,7 +157,7 @@ function buyStock(){
             alert("Enter a valid quantity in $!");
             return;
         }
-        stockAmount = quantity / price; // Berechnung für die Menge
+        stockAmount = quantity / price;
     } else {
         stockAmount = parseFloat($('#quantity').val());
         if (isNaN(stockAmount) || stockAmount <= 0) {
@@ -180,7 +166,7 @@ function buyStock(){
         }
     }
     const settingsBuyStock = {
-        "async": true, // Asynchrone Anfrage
+        "async": true,
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy",
         "method": "POST",
         "headers": {
@@ -219,11 +205,11 @@ function buyStock(){
     $.ajax(settingsBuyStock);
 }
 
+//Create a sell order
 function sellStock(){
     event.preventDefault();
     let stockAmount;
     const priceDisplay = document.getElementById("price-display").textContent.trim();
-    // Entferne das Dollarzeichen und parse den Preis
     const price = parseFloat(priceDisplay.replace('$', '').trim());
     console.log(price);
 
@@ -238,7 +224,7 @@ function sellStock(){
             alert("Enter a valid quantity in $!");
             return;
         }
-        stockAmount = quantity / price; // Berechnung für die Menge
+        stockAmount = quantity / price;
     } else {
         stockAmount = parseFloat($('#quantity').val());
         if (isNaN(stockAmount) || stockAmount <= 0) {
@@ -247,7 +233,7 @@ function sellStock(){
         }
     }
     const settingsSellStock = {
-        "async": true, // Asynchrone Anfrage
+        "async": true,
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell",
         "method": "POST",
         "headers": {
@@ -284,7 +270,7 @@ function sellStock(){
     $.ajax(settingsSellStock);
 }
 
-// Funktion, um das Label und den Button zu toggeln (Portfolio-Seite)
+// Change Label text for buy quantity
 function toggleLabel() {
     var label = document.getElementById('quantity-label');
     var button = document.getElementById('toggle-label');
@@ -298,7 +284,33 @@ function toggleLabel() {
     }
 }
 
+// Check if all necessary fields for creating an order are filled
+function checkFields() {
+    const stockName = document.getElementById('stock-name').value.trim();
+    const quantity = document.getElementById('quantity').value.trim();
 
+    const buyButton = document.getElementById('buy-stock');
+    const sellButton = document.getElementById('sell-stock');
+
+    if (stockName !== "" && quantity !== "") {
+        buyButton.disabled = false; 
+        sellButton.disabled = false; 
+    } else {
+        buyButton.disabled = true;
+        sellButton.disabled = true;
+    }
+}
+
+///*Edit/Reset/Delete profile*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Display current profile data
+function setProfileValues(){
+    document.getElementById("first-name").value = getCookie("firstname");
+    document.getElementById("last-name").value = getCookie("lastname");
+    document.getElementById("email").value = getCookie("email");
+}
+
+//Edit an user
 function editUser(){
     event.preventDefault();
     let budgetValue = $('#amount-selection').val(); // Entfernt Leerzeichen am Anfang und Ende
@@ -347,6 +359,7 @@ function editUser(){
     $.ajax(editRegister);
 }
 
+// Reset an user
 function resetProfile(){
     event.preventDefault();
     const resetRegister = {
@@ -380,6 +393,7 @@ function resetProfile(){
     $.ajax(resetRegister);
 }
 
+//Delete an user
 function deleteProfile(){
     event.preventDefault();
     const deleteRegister = {
@@ -413,12 +427,14 @@ function deleteProfile(){
     $.ajax(deleteRegister);
 }
 
-//////////////////////////////////////////// Aktienpreis //////////////////////////////////////////
+///*Get and display stock price*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//Display the stock price in the frontend 
 function displayStockPrice(value){
     $('#price-display').text(value);
 }
 
+//Fetch a stock price of database or external API
 function fetchStockPrice(){
     let stockName = getStockName();
     getStockPriceFromDB(stockName)
@@ -456,6 +472,7 @@ function fetchStockPrice(){
         });
 }
 
+// Get stock price from database
 function getStockPriceFromDB(stockName){
     const getStockPriceDBRegister = {
         "async": true,
@@ -471,14 +488,14 @@ function getStockPriceFromDB(stockName){
     return $.ajax(getStockPriceDBRegister);
 }
 
-//Funktion, um den eingegebenen Aktiennamen innerhalb des Portfolios zu bekommen
+//Get stock name
 function getStockName() {
     let stockNameLabel = document.getElementById("stock-name");
     return stockNameLabel.value;
 
 }
 
-//Funktion, um den aktuellen Preis der eingegebenen Aktie zu bekommen 
+//Get stock price from the external API
 function getStockPriceFromAPI(stockName) {
     const getStockPriceAPIRegister = {
         "async": true, 
@@ -489,6 +506,7 @@ function getStockPriceFromAPI(stockName) {
     return $.ajax(getStockPriceAPIRegister);
 }
 
+//Insert a stock to the database
 function insertNewStock(stockName, stockPrice){
     const settingsInsertStock = {
         "async": true, 
@@ -514,47 +532,23 @@ function insertNewStock(stockName, stockPrice){
     $.ajax(settingsInsertStock);
 }
 
-//Funktion, um die Events zur Preisanzeige zu implementieren
+//Create event for displaying the stock price
 function showStockPriceViaEvent() {
     const inputField = document.getElementById('stock-name');
     inputField.addEventListener('keypress', handleInputKeypress);
     inputField.addEventListener('blur', fetchStockPrice);
 }
 
-//Funktion, um eine Enter-Taste Eingabe zu empfangen
+//Handle enter keypress for displaying the stock price
 function handleInputKeypress(e) {
     if (e.key === 'Enter') { 
         fetchStockPrice();
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-function setProfileValues(){
-    document.getElementById("first-name").value = getCookie("firstname");
-    document.getElementById("last-name").value = getCookie("lastname");
-    document.getElementById("email").value = getCookie("email");
-}
+///*Get and display all portfolio data*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function checkFields() {
-    const stockName = document.getElementById('stock-name').value.trim();
-    const quantity = document.getElementById('quantity').value.trim();
-
-    const buyButton = document.getElementById('buy-stock');
-    const sellButton = document.getElementById('sell-stock');
-
-    // Überprüfen, ob beide Felder ausgefüllt sind
-    if (stockName !== "" && quantity !== "") {
-        buyButton.disabled = false; 
-        sellButton.disabled = false; 
-    } else {
-        buyButton.disabled = true;
-        sellButton.disabled = true;
-    }
-}
-
-
-////////////////////////////////// Portfolio //////////////////////////////////////////////
-
+//Get all transactions of an user
 function getAllTransactions(){
     event.preventDefault();
     const settingsGetAllTransactions = {
@@ -571,6 +565,7 @@ function getAllTransactions(){
     });
 }
 
+//Display all transactions of an user
 function displayTransactionHistory(transactions) {
     const transactionHistoryContainer = document.querySelector('.transaction-history');
     transactionHistoryContainer.innerHTML = ''; 
@@ -593,6 +588,7 @@ function displayTransactionHistory(transactions) {
     });
 }
 
+//Get all stocks in portfolio of an user
 function getAllPortfolioStocks(){
     event.preventDefault();
     const settingsGetAllPortfolioStocks = {
@@ -609,6 +605,7 @@ function getAllPortfolioStocks(){
     });
 }
 
+//Display alle stocks in portfolio of an user
 function displayPortfolioStocks(portfolioStocks) {
     const stockListContainer = document.querySelector('.portfolio .stock-list');
     stockListContainer.innerHTML = ''; 
@@ -621,30 +618,27 @@ function displayPortfolioStocks(portfolioStocks) {
         const stockDiv = document.createElement('div');
         const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentvalue));
 
-        // Berechne die prozentuale Änderung mit der neuen Methode
         const { percentageChange, changeClass } = calculatePercentage(stock.boughtvalue, stock.currentvalue);
 
-        // Füge die Daten in das Div-Element ein
         stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
         stockListContainer.appendChild(stockDiv);
     });
 }
 
-
-
+//Calculate percentage change of portfolio elements
 function calculatePercentage(boughtvalue, currentvalue) {
     const percentageChange = ((currentvalue - boughtvalue) / boughtvalue * 100).toFixed(2);
 
-    // Überprüfe, ob der Wert positiv oder negativ ist, und lege die CSS-Klasse fest
     const changeClass = percentageChange >= 0 ? 'positive' : 'negative';
     const sign = percentageChange >= 0 ? '+' : '';
 
     return {
-        percentageChange: `${sign}${percentageChange}%`, // Prozentwert mit Vorzeichen
-        changeClass: changeClass // CSS-Klasse für positive oder negative Veränderung
+        percentageChange: `${sign}${percentageChange}%`,
+        changeClass: changeClass
     };
 }
 
+//Display the remaining user budget
 function displayUserBudget(){
     event.preventDefault();
     const settingsGetBudget = {
@@ -671,6 +665,7 @@ function displayUserBudget(){
     $.ajax(settingsGetBudget);
 }
 
+//Display the total portfolio value
 function displayTotalPortfolioValue(){
     event.preventDefault();
     const settingsGetPortfolioValue = {
