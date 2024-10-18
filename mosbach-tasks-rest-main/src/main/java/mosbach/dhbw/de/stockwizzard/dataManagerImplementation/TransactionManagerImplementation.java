@@ -221,7 +221,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
         return transactions;
     }
 
-    public void updateLeftinPortfolio(Integer transactionId, Double NewleftInPortfolio){
+    public void editLeftinPortfolio(Integer transactionId, Double NewleftInPortfolio){
         Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Start der updateLeftinPortfolio Methode");
         Statement stmt = null;
         Connection connection = null;
@@ -242,6 +242,58 @@ public class TransactionManagerImplementation implements ITransactionManager{
             } catch (SQLException e) {
                 // Fehler beim Schließen protokollieren
                 Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+            }
+        }
+    }
+
+    public void editTransactionEmail(String email, String newEmail){
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("UpdateTransactionLogger").log(Level.INFO, "Start editSession method");
+
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
+            String updateSessionsSQL = "UPDATE group12transaction SET email = '" + newEmail + "' WHERE email = '" + email + "'";
+            stmt.executeUpdate(updateSessionsSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("UpdateTransactionLogger").log(Level.SEVERE, "Error updating session.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("UpdateTransactionLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
+    }
+
+    public void deleteAllTransactions(String email) {
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("DeleteAllTransactionsLogger").log(Level.INFO, "Start deleteAllTransactions method");
+
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            String deleteTransactionsSQL = "DELETE FROM group12transaction WHERE email= '" + email + "'";
+            stmt.executeUpdate(deleteTransactionsSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error deleting all transactions.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error closing resources.", e);
             }
         }
     }

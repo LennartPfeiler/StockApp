@@ -193,6 +193,7 @@ function buyStock(){
             setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") - roundToTwoDecimalPlaces(price * stockAmount)));
             console.log(getCookie("budget"));
             displayAllDatabaseData();
+            $('#quantity').val("");
         },
         "error": function(xhr) {
             if (xhr.status === 401 || xhr.status === 400) {
@@ -258,6 +259,7 @@ function sellStock(){
             alert(data.answer);
             setCookie("budget", roundToTwoDecimalPlaces(getCookie("budget") + roundToTwoDecimalPlaces(price * stockAmount)));
             displayAllDatabaseData();
+            $('#quantity').val("");
         },
         "error": function(xhr) {
             if (xhr.status === 401 || xhr.status === 500 || xhr.status === 404 || xhr.status === 400) {

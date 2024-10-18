@@ -143,28 +143,6 @@ public class MappingController {
         }
     }
 
-    @PutMapping(
-        path = "/user",
-        consumes = {MediaType.APPLICATION_JSON_VALUE}
-    ) 
-    public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
-        String token = editRequest.getToken();
-        User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
-        User new_user_data = editRequest.getUser();
-
-        if (token != null && currentUser.getEmail() != null) {
-            Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
-            if (isValid) {
-                userManager.editUser(currentUser, new_user_data);
-                return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
-            }
-        } else {
-            return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
-        }
-    }
-
     // @PutMapping(
     //     path = "/user",
     //     consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -177,18 +155,6 @@ public class MappingController {
     //     if (token != null && currentUser.getEmail() != null) {
     //         Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
     //         if (isValid) {
-                    //Boolean emailChanged = !new_user_data .equals(currentUser.getEmail());
-    //              if(emailChanged == false){
-                        //Update user
-                        //Update portfolio
-    //              } else {
-                        //EMail check 
-                        //New suer
-                        //update session
-                        //Update transaction
-                        //Update portfolio
-                        //delete old user
-    //              }
     //             userManager.editUser(currentUser, new_user_data);
     //             return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
     //         } else {
@@ -198,6 +164,47 @@ public class MappingController {
     //         return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
     //     }
     // }
+
+    @PutMapping(
+        path = "/user",
+        consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> editProfile(@RequestBody EditRequest editRequest){
+        try{
+            String token = editRequest.getToken();
+            User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
+            User new_user_data = editRequest.getUser();
+
+            Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
+            if (isValid) {
+                Boolean emailChanged = !new_user_data.getEmail().equals(currentUser.getEmail());
+                Portfolio userPortfolio = portfolioManager.getUserPortfolio(currentUser.getEmail());
+                    if(emailChanged == false){
+                        // Update user
+                        userManager.editProfile(currentUser, new_user_data);
+                        portfolioManager.editAllPortfolioValues(currentUser.getEmail(), new_user_data.getEmail(), (userPortfolio.getStartValue() + new_user_data.getBudget()), (userPortfolio.getValue() + new_user_data.getBudget()));
+                        return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
+                    } else {
+                        Boolean isRegistered = userManager.isEmailAlreadyRegistered(new_user_data.getEmail());
+                        if(isRegistered == false){
+                            userManager.addUser(new User(new_user_data.getFirstName(), new_user_data.getLastName(), new_user_data.getEmail(), currentUser.getPassword(), (new_user_data.getBudget() + currentUser.getBudget())));
+                            sessionManager.editSession(currentUser.getEmail(), new_user_data.getEmail());
+                            transactionManager.editTransactionEmail(currentUser.getEmail(), new_user_data.getEmail());
+                            portfolioManager.editAllPortfolioValues(currentUser.getEmail(), new_user_data.getEmail(), (userPortfolio.getStartValue() + new_user_data.getBudget()), (userPortfolio.getValue() + new_user_data.getBudget()));
+                            userManager.deleteUser(currentUser.getEmail());
+                            return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
+                        }
+                        else{
+                            return ResponseEntity.status(HttpStatus.CONFLICT).body(new StringAnswer("This email is already registered"));
+                        }
+                    }
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction")); // Ungültiger Token - gib Fehlerstatus zurück
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringAnswer("An unexpected error occurred during editing user."));
+        } 
+    }
 
     @PutMapping(
             path = "/user/reset",
@@ -210,39 +217,18 @@ public class MappingController {
             User newUser;
             boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
-                newUser = userManager.resetProfile(email);
-                return ResponseEntity.ok(newUser); // Gültiger Token - gib TokenUser zurück
+                    portfolioStockManager.deleteAllPortfolioStocks(email);
+                    transactionManager.deleteAllTransactions(email);
+                    portfolioManager.resetPortfolio(email);
+                    userManager.resetProfile(email);
+                return ResponseEntity.ok(userManager.getUserProfile(email));
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!")); // Ungültiger Token - gib Fehlerstatus zurück
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!")); 
             }
         } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during resetting."));
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringAnswer("An unexpected error occurred during resetting."));
             } 
     }
-
-    // @PutMapping(
-    //         path = "/user/reset",
-    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
-    // ) 
-    // public ResponseEntity<?> resetProfile(@RequestBody TokenEmail tokenEmail){
-    //     try{
-    //         String token = tokenEmail.getToken();
-    //         String email = tokenEmail.getEmail();
-    //         User newUser;
-    //         boolean isValid = sessionManager.validToken(token, email);
-    //         if (isValid) {
-                    //Delete Portfolio Stock
-                    //Delete Transaction
-                    //Update portfolio
-                    //Update user
-    //             return ResponseEntity.ok(newUser); // Gültiger Token - gib TokenUser zurück
-    //         } else {
-    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!")); // Ungültiger Token - gib Fehlerstatus zurück
-    //         }
-    //     } catch (Exception e) {
-    //             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during resetting."));
-    //         } 
-    // }
 
     @DeleteMapping(
             path = "/user",

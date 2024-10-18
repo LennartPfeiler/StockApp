@@ -194,7 +194,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
                 stmt.executeUpdate(deletePortfolioStock);
                 //works
                 for (Transaction transaction : transactionsInPortfolio) {
-                    transactionManager.updateLeftinPortfolio(transaction.getTransactionID(), 0.0);
+                    transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
                 }
     
             } catch (SQLException e) {
@@ -230,7 +230,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
                         // Verkaufe den gesamten verbleibenden Betrag dieser Transaktion
                         remainingAmount -= leftInTransaction;
                         totalBoughtValueReduction += transactionBoughtValue;
-                        transactionManager.updateLeftinPortfolio(transactionId, 0.0);
+                        transactionManager.editLeftinPortfolio(transactionId, 0.0);
                     } else {
                         // Verkaufe einen Teil des verbleibenden Betrags dieser Transaktion
                         Double proportion = remainingAmount / leftInTransaction;
@@ -239,7 +239,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             
                         Double newLeftInTransaction = leftInTransaction - remainingAmount;
                         remainingAmount = 0.0;
-                        transactionManager.updateLeftinPortfolio(transactionId, newLeftInTransaction);
+                        transactionManager.editLeftinPortfolio(transactionId, newLeftInTransaction);
                     }
                 }
             
@@ -315,4 +315,28 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         }
     }
     
+    public void deleteAllPortfolioStocks(String email) {
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("DeleteAllPortfolioStocksLogger").log(Level.INFO, "Start deleteAllPortfolioStocks method");
+
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            String deletePortfolioStocksSQL = "DELETE FROM group12portfoliostock WHERE portfolioid = (SELECT portfolioid FROM group12portfolio WHERE email= '" + email + "')";
+            stmt.executeUpdate(deletePortfolioStocksSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("DeleteAllPortfolioStocksLogger").log(Level.SEVERE, "Error deleting all portfolio stocks.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("DeleteAllPortfolioStocksLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
+    }
 }

@@ -185,4 +185,53 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
         }
     }
 
+    public void editAllPortfolioValues(String email, String newEmail, Double newStartValue, Double newValue){
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.INFO, "Start editAllPortfolioValues method");
+
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
+            String updatePortfolioSQL = "UPDATE group12portfolio SET email = '" + newEmail + "', startvalue = " + newStartValue + ", value = " + newValue + " WHERE email = '" + email + "'";
+
+            // Führe die SQL-Anweisung aus
+            stmt.executeUpdate(updatePortfolioSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error updating portfolio value.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
+    }
+
+    public void resetPortfolio(String email) {
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("ResetPortfolioLogger").log(Level.INFO, "Start resetPortfolio method");
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+            String resetPortfolioSQL = "UPDATE group12portfolio SET value = (SELECT startvalue from group12portfolio WHERE email = '" + email + "') WHERE email = '" + email + "' ";
+            stmt.executeUpdate(resetPortfolioSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error resetting the portfolio.", e);
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
+    }
 }

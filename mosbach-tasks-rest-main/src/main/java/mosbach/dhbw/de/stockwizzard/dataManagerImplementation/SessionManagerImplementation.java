@@ -199,4 +199,31 @@ public class SessionManagerImplementation implements ISessionManager{
             }
         }
     }
+
+    public void editSession(String email, String newEmail){
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("UpdateSessionLogger").log(Level.INFO, "Start editSession method");
+
+        try {
+            // Stelle die Verbindung zur Datenbank her
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
+            String updateSessionsSQL = "UPDATE group12session SET email = '" + newEmail + "' WHERE email = '" + email + "'";
+            stmt.executeUpdate(updateSessionsSQL);
+        } catch (SQLException e) {
+            Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error updating session.", e);
+        } finally {
+            try {
+                // Schließen von Statement und Connection, um Ressourcen freizugeben
+                if (stmt != null) stmt.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                // Fehler beim Schließen protokollieren
+                Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error closing resources.", e);
+            }
+        }
+    }
 }
