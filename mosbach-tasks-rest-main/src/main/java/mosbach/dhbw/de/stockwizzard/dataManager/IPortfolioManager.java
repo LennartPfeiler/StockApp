@@ -8,4 +8,8 @@ public interface IPortfolioManager{
     public void addPortfolio(Portfolio portfolioData);
 
     public Portfolio getUserPortfolio(String email);
+
+    public void editPortfolioValue(Integer portfolioId, Double oldValue, Double addition);
+
+    public void resetPortfolio(String email);
 }

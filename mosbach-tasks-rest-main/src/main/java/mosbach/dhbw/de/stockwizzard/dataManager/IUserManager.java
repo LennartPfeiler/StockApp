@@ -4,35 +4,22 @@ import mosbach.dhbw.de.stockwizzard.model.User;
 
 public interface IUserManager{
 
-    /**
-     * Get a existing user
-     * @param userID: UserID of the user
-     * @return User object 
-     */
-    public User getUserProfile(String email);
+    public void createUserTable();
 
-    /**
-     * Create a new user
-     * @param user: User object with data without ID
-     * @return Returns generated ID of the new user
-     */
-    public void addUser(User user);
-
-    /**
-     * Edit an existing user
-     * @param user: The user which is currently logged in
-     * @return Returns true if successful, returns false if not successful
-     */
-    //public boolean editUser(String currentEmail, User user);
-
-    /**
-     * Delete an existing user
-     * @param userID: UserID of the user
-     * @return Returns true if successful, returns false if not successful
-     */
-    //public boolean deleteUser(int userID);
+    public Boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser);
 
     public Boolean isEmailAlreadyRegistered(String email);
 
-    public Boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser);
+    public User getUserProfile(String email);
+
+    public void addUser(User user);
+
+    public void editUserBudget(String email, Double oldValue, Double bougthValue, Integer transactionType);
+
+    public void editProfile(User currentUser, User new_user_data);
+
+    public void resetProfile(String email);
+
+    public void deleteUser(String email);
+
 }

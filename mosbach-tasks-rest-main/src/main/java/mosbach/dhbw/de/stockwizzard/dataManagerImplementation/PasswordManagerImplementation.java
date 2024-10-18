@@ -5,8 +5,7 @@ public class PasswordManagerImplementation {
     
     static PasswordManagerImplementation passwordManager = null;
 
-    private PasswordManagerImplementation(){
-        
+    private PasswordManagerImplementation(){  
     }
 
     static public PasswordManagerImplementation getPasswordManager() {
@@ -15,11 +14,12 @@ public class PasswordManagerImplementation {
         return passwordManager;
     }
 
+    //Hash password
     public String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-    // Überprüfe ein Passwort
+    //Check if password is correct
     public boolean checkPassword(String password, String hashed) {
         return BCrypt.checkpw(password, hashed);
     }

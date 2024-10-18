@@ -7,7 +7,6 @@ import java.sql.*;
 
 import mosbach.dhbw.de.stockwizzard.dataManager.IPortfolioManager;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,182 +37,151 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
         return databaseUser;
     }
 
+    //Create Portfolio database table
     public void createPortfolioTable() {
         Statement stmt = null;
         Connection connection = null;
-
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String dropTable = "DROP TABLE IF EXISTS group12portfolio";
-            stmt.executeUpdate(dropTable);
+            String dropPortfolioTableSQL = "DROP TABLE IF EXISTS group12portfolio";
+            stmt.executeUpdate(dropPortfolioTableSQL);
 
-            String createTable = "CREATE TABLE group12portfolio (" +
+            String createPortfolioTableSQL = "CREATE TABLE group12portfolio (" +
                      "portfolioid SERIAL PRIMARY KEY, " +
                      "value DOUBLE PRECISION NOT NULL, " +
                      "startValue DOUBLE PRECISION NOT NULL, " +
                      "email VARCHAR(100) NOT NULL, " +
                      "FOREIGN KEY (email) REFERENCES group12user(email) ON DELETE CASCADE)";
 
-
-            stmt.executeUpdate(createTable);
+            stmt.executeUpdate(createPortfolioTableSQL);
         } catch (Exception e) {
             Logger.getLogger("CreatePortfolioTableLogger").log(Level.INFO, "Portfolio table cannot be created. Error: {0}", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("CreatePortfolioTableLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("CreatePortfolioTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
     
+    //Create a portfolio for a new user
     public void addPortfolio(Portfolio portfolioData) {
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("SetNewPortfolioWriter").log(Level.INFO, "Start addPortfolio-method");
         try {
-            // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
     
-            // SQL-Anweisung für das Einfügen eines neuen Portfolios
-            String insertSQL = "INSERT INTO group12portfolio (value, startValue, email) VALUES (" +
+            String insertPortfolioSQL = "INSERT INTO group12portfolio (value, startValue, email) VALUES (" +
                     portfolioData.getValue() + ", " +
                     portfolioData.getStartValue() + ", " +
                     "'" + portfolioData.getEmail() + "')";
     
-            // Führe die SQL-Anweisung aus
-            stmt.executeUpdate(insertSQL);
-            
-            Logger.getLogger("SetNewPortfolioWriter").log(Level.INFO, "Portfolio erfolgreich hinzugefügt: Value = {0}, Email = {1}",
-                    new Object[]{portfolioData.getValue(), portfolioData.getStartValue(), portfolioData.getEmail()});
-            
-            // Schließe das Statement und die Verbindung
+            stmt.executeUpdate(insertPortfolioSQL);
+            Logger.getLogger("SetNewPortfolioWriter").log(Level.INFO, "Portfolio successfully added");
         } catch (SQLException e) {
-            Logger.getLogger("SetNewPortfolioWriter").log(Level.SEVERE, "Fehler beim Hinzufügen des Portfolios.", e);
+            Logger.getLogger("SetNewPortfolioWriter").log(Level.SEVERE, "Error while creating new portfolio.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("SetNewPortfolioWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("SetNewPortfolioWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
 
+    //Get a user profile by an email
     public Portfolio getUserPortfolio(String email) {
         Statement stmt = null;
         Connection connection = null;
         Portfolio portfolio = null;
-        
         try {
-            // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Query für das Abrufen des Portfolios basierend auf der E-Mail
-            String selectSQL = "SELECT * FROM group12portfolio WHERE email = '" + email + "'";
+            String selectPortfolioSQL = "SELECT * FROM group12portfolio WHERE email = '" + email + "'";
             
-            // Führe die SQL-Query aus und speichere das Ergebnis in einem ResultSet
-            ResultSet rs = stmt.executeQuery(selectSQL);
-
-            // Überprüfe, ob ein Portfolio gefunden wurde
+            ResultSet rs = stmt.executeQuery(selectPortfolioSQL);
             if (rs.next()) {
-                // Extrahiere die Werte aus dem ResultSet
                 int portfolioID = rs.getInt("portfolioid");
                 double value = rs.getDouble("value");
                 double startValue = rs.getDouble("startvalue");
                 String userEmail = rs.getString("email");
-
-                // Erstelle ein neues Portfolio-Objekt
                 portfolio = new Portfolio(portfolioID, value, startValue, userEmail);
-                Logger.getLogger("GetPortfolioReader").log(Level.INFO, "Portfolio gefunden: {0}", portfolio);
+                Logger.getLogger("GetPortfolioReader").log(Level.INFO, "Portfolio found");
             } else {
-                Logger.getLogger("GetPortfolioReader").log(Level.INFO, "Kein Portfolio für die E-Mail {0} gefunden.", email);
+                Logger.getLogger("GetPortfolioReader").log(Level.INFO, "No portfolio found for the given email");
             }
-
-            // Schließe das ResultSet, das Statement und die Verbindung
             rs.close();
         } catch (SQLException e) {
-            Logger.getLogger("GetPortfolioReader").log(Level.SEVERE, "Fehler beim Abrufen des Portfolios aus der Datenbank.", e);
+            Logger.getLogger("GetPortfolioReader").log(Level.SEVERE, "Error when retrieving the portfolio from the database.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("GetPortfolioReader").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("GetPortfolioReader").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
         return portfolio;
     }
 
+    //Change the value of a portfolio
     public void editPortfolioValue(Integer portfolioId, Double oldValue, Double addition){
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("UpdatePortfolioValueLogger").log(Level.INFO, "Start updatePortfolioValue method");
-
         try {
-            // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
-            String updateSQL = "UPDATE group12portfolio SET value = " + (oldValue + addition) +
+            String updatePortfolioValueSQL = "UPDATE group12portfolio SET value = " + (oldValue + addition) +
                             " WHERE portfolioid = " + portfolioId;
 
-            // Führe die SQL-Anweisung aus
-            stmt.executeUpdate(updateSQL);
+            stmt.executeUpdate(updatePortfolioValueSQL);
         } catch (SQLException e) {
-            Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error updating portfolio value.", e);
+            Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error when updating the portfolio value.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error closing resources.", e);
+                Logger.getLogger("UpdatePortfolioValueLogger").log(Level.SEVERE, "Error when closing the resource.", e);
             }
         }
     }
 
+    //Change all portfolio values an user can edit manually in the Frontend
     public void editAllPortfolioValues(String email, String newEmail, Double newStartValue, Double newValue){
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.INFO, "Start editAllPortfolioValues method");
 
         try {
-            // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
-            String updatePortfolioSQL = "UPDATE group12portfolio SET email = '" + newEmail + "', startvalue = " + newStartValue + ", value = " + newValue + " WHERE email = '" + email + "'";
+            String updateAllPortfolioValuesSQL = "UPDATE group12portfolio SET email = '" + newEmail + "', startvalue = " + newStartValue + ", value = " + newValue + " WHERE email = '" + email + "'";
 
-            // Führe die SQL-Anweisung aus
-            stmt.executeUpdate(updatePortfolioSQL);
+            stmt.executeUpdate(updateAllPortfolioValuesSQL);
         } catch (SQLException e) {
-            Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error updating portfolio value.", e);
+            Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error when updating all portfolio values.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error closing resources.", e);
+                Logger.getLogger("UpdateAllPortfolioValuesLogger").log(Level.SEVERE, "Error when closing the resource.", e);
             }
         }
     }
 
+    //Reset an user portfolio to registration status
     public void resetPortfolio(String email) {
         Statement stmt = null;
         Connection connection = null;
@@ -224,13 +192,13 @@ public class PortfolioManagerImplementation implements IPortfolioManager{
             String resetPortfolioSQL = "UPDATE group12portfolio SET value = (SELECT startvalue from group12portfolio WHERE email = '" + email + "') WHERE email = '" + email + "' ";
             stmt.executeUpdate(resetPortfolioSQL);
         } catch (SQLException e) {
-            Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error resetting the portfolio.", e);
+            Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error when resetting the portfolio.", e);
         } finally {
             try {
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error closing resources.", e);
+                Logger.getLogger("ResetPortfolioLogger").log(Level.SEVERE, "Error when closing the resource.", e);
             }
         }
     }

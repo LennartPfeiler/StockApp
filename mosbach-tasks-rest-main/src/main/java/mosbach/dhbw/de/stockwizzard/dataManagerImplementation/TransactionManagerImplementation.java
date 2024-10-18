@@ -45,17 +45,17 @@ public class TransactionManagerImplementation implements ITransactionManager{
         return databaseUser;
     }
 
+    //Create Transaction database table
     public void createTransactionTable() {
         Statement stmt = null;
         Connection connection = null;
-
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String dropTable = "DROP TABLE IF EXISTS group12transaction";
-            stmt.executeUpdate(dropTable);
+            String dropTransactionTableSQL = "DROP TABLE IF EXISTS group12transaction";
+            stmt.executeUpdate(dropTransactionTableSQL);
 
-            String createTable = "CREATE TABLE group12transaction (" +
+            String createTransactionTableSQL = "CREATE TABLE group12transaction (" +
                      "transactionID SERIAL PRIMARY KEY, " +
                      "transactionType INT NOT NULL, " +
                      "stockAmount DOUBLE PRECISION NOT NULL, " +
@@ -68,24 +68,22 @@ public class TransactionManagerImplementation implements ITransactionManager{
                      "FOREIGN KEY (email) REFERENCES group12user(email) ON DELETE CASCADE," +
                      "FOREIGN KEY (symbol) REFERENCES group12stock(symbol) ON DELETE CASCADE)";
 
-            stmt.executeUpdate(createTable);
+            stmt.executeUpdate(createTransactionTableSQL);
         } catch (Exception e) {
             Logger.getLogger("CreateTransactionTableLogger").log(Level.INFO, "Transaction table cannot be created. Error: {0}", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("CreateTransactionTableLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("CreateTransactionTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
 
-    //CHANGE DATE DATATYPE TO DATE INSTEAD OF STRING
+    //Add a new transaction
     public void addTransaction(TransactionContent transactionContent){
-        String insertSQL = "";
+        String insertTransactionSQL = "";
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("SetNewTransactionWriter").log(Level.INFO, "Start addTransaction-method");
@@ -94,7 +92,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
             if(transactionContent.getTransactionType() == 1){
-                insertSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
+                insertTransactionSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
                     transactionContent.getTransactionType() + ", " +
                     transactionContent.getStockAmount() + ", " +
                     "'" + transactionContent.getDate() + "', " +
@@ -105,7 +103,7 @@ public class TransactionManagerImplementation implements ITransactionManager{
                     transactionContent.getTotalPrice() + ")";
             }
             else{
-                insertSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
+                insertTransactionSQL = "INSERT INTO group12transaction (transactionType, stockAmount, date, symbol, pricePerStock, totalPrice, email, leftinportfolio) VALUES (" +
                 transactionContent.getTransactionType() + ", " +
                 transactionContent.getStockAmount() + ", " +
                 "'" + transactionContent.getDate() + "', " +
@@ -116,36 +114,31 @@ public class TransactionManagerImplementation implements ITransactionManager{
                 null + ")"; 
             }
     
-            // Führe die SQL-Anweisung aus
-            stmt.executeUpdate(insertSQL);
-            
-            // Schließe das Statement und die Verbindung
+            stmt.executeUpdate(insertTransactionSQL);
         } catch (SQLException e) {
-            Logger.getLogger("SetNewTransactionWriter").log(Level.SEVERE, "Fehler beim Hinzufügen der Tranaction.", e);
+            Logger.getLogger("SetNewTransactionWriter").log(Level.SEVERE, "Error when adding a new transaction.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("SetNewTransactionWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("SetNewTransactionWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
 
+    //Get all transactions of an user sorted by the sortby parameter
     public List<Transaction> getAllTransactions(String email, String sortby){
         List<Transaction> transactions = new ArrayList<>();
         Statement stmt = null;
         Connection connection = null;
-
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            String getTransactions = "SELECT * FROM group12transaction WHERE email = '" + email + "' ORDER BY " + sortby + " DESC";
+            String getTransactionsSQL = "SELECT * FROM group12transaction WHERE email = '" + email + "' ORDER BY " + sortby + " DESC";
 
-            ResultSet rs = stmt.executeQuery(getTransactions);
+            ResultSet rs = stmt.executeQuery(getTransactionsSQL);
             while (rs.next()) {
                 Double leftInPortfolio = rs.getString("leftinportfolio") != null ? Double.parseDouble(rs.getString("leftinportfolio")) : null;
                 transactions.add(
@@ -164,32 +157,30 @@ public class TransactionManagerImplementation implements ITransactionManager{
             }
             rs.close();
         } catch (Exception e) {
-            Logger.getLogger("GetTransactionsLoger").log(Level.INFO, "Can't get all transactions. Error: {0}", e);
+            Logger.getLogger("GetTransactionsLoger").log(Level.INFO, "Error when getting all transactions. Error: {0}", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("GetTransactionsLoger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("GetTransactionsLoger").log(Level.SEVERE, "Error when getting the resource. Error: {0}", e);
             }
         }
         return transactions;
     }
 
+    //Get all transactions whose stock purchases are still active in the portfoliostocks 
     public List<Transaction> getAllTransactionsInPortfolioStock(String email){
         List<Transaction> transactions = new ArrayList<>();
         Statement stmt = null;
         Connection connection = null;
-
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            String getTransactions = "SELECT * FROM group12transaction WHERE email = '" + email + "' AND leftinportfolio > 0 AND transactiontype = 1 ORDER BY date DESC";
+            String getPortfolioStockTransactionsSQL = "SELECT * FROM group12transaction WHERE email = '" + email + "' AND leftinportfolio > 0 AND transactiontype = 1 ORDER BY date DESC";
 
-            ResultSet rs = stmt.executeQuery(getTransactions);
+            ResultSet rs = stmt.executeQuery(getPortfolioStockTransactionsSQL);
             while (rs.next()) {
                 transactions.add(
                         new Transaction(
@@ -207,22 +198,21 @@ public class TransactionManagerImplementation implements ITransactionManager{
             }
             rs.close();
         } catch (Exception e) {
-            Logger.getLogger("GetTransactionsLoger").log(Level.INFO, "Can't get all transactions. Error: {0}", e);
+            Logger.getLogger("GetTransactionsLoger").log(Level.INFO, "Error when getting all transactions with stocks in portfolio stocks. Error: {0}", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("GetTransactionsLoger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("GetTransactionsLoger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
         return transactions;
     }
 
+    //Edit the leftinportfolio value of a transaction
     public void editLeftinPortfolio(Integer transactionId, Double NewleftInPortfolio){
-        Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Start der updateLeftinPortfolio Methode");
+        Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Start editLeftinPortfolio Methode");
         Statement stmt = null;
         Connection connection = null;
 
@@ -230,70 +220,65 @@ public class TransactionManagerImplementation implements ITransactionManager{
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            String updateTransactionSQL = "UPDATE group12transaction SET leftinportfolio = " + NewleftInPortfolio + "WHERE transactionId = " + transactionId;
-            stmt.executeUpdate(updateTransactionSQL);
+            String updateLeftinPortfolioTransactionSQL = "UPDATE group12transaction SET leftinportfolio = " + NewleftInPortfolio + "WHERE transactionId = " + transactionId;
+
+            stmt.executeUpdate(updateLeftinPortfolioTransactionSQL);
         } catch (Exception e) {
-            Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.INFO, "Can't update LeftinPortfolio. Error: {0}", e);
+            Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.INFO, "Error when updating leftinportfolio value. Error: {0}", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("UpdateLeftinPortfolioLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
 
+    //Edit email value of a transaction
     public void editTransactionEmail(String email, String newEmail){
         Statement stmt = null;
         Connection connection = null;
-        Logger.getLogger("UpdateTransactionLogger").log(Level.INFO, "Start editSession method");
-
+        Logger.getLogger("UpdateTransactionEmailLogger").log(Level.INFO, "Start editTransactionEmail method");
         try {
-            // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
-            String updateSessionsSQL = "UPDATE group12transaction SET email = '" + newEmail + "' WHERE email = '" + email + "'";
-            stmt.executeUpdate(updateSessionsSQL);
+            String updateTransactionEmailSQL = "UPDATE group12transaction SET email = '" + newEmail + "' WHERE email = '" + email + "'";
+
+            stmt.executeUpdate(updateTransactionEmailSQL);
         } catch (SQLException e) {
-            Logger.getLogger("UpdateTransactionLogger").log(Level.SEVERE, "Error updating session.", e);
+            Logger.getLogger("UpdateTransactionEmailLogger").log(Level.SEVERE, "Error when updating email of a transaction.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("UpdateTransactionLogger").log(Level.SEVERE, "Error closing resources.", e);
+                Logger.getLogger("UpdateTransactionEmailLogger").log(Level.SEVERE, "Error when closing the resource.", e);
             }
         }
     }
 
+    //Delete all transactions of an user
     public void deleteAllTransactions(String email) {
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("DeleteAllTransactionsLogger").log(Level.INFO, "Start deleteAllTransactions method");
-
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
             String deleteTransactionsSQL = "DELETE FROM group12transaction WHERE email= '" + email + "'";
+
             stmt.executeUpdate(deleteTransactionsSQL);
         } catch (SQLException e) {
-            Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error deleting all transactions.", e);
+            Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error when deleting all transactions.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error closing resources.", e);
+                Logger.getLogger("DeleteAllTransactionsLogger").log(Level.SEVERE, "Error when closing the resource.", e);
             }
         }
     }

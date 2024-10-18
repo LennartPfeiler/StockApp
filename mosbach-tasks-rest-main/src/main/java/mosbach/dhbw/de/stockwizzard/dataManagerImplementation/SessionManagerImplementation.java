@@ -39,6 +39,7 @@ public class SessionManagerImplementation implements ISessionManager{
         return databaseUser;
     }
 
+    //Create Session database table
     public void createSessionTable() {
         Statement stmt = null;
         Connection connection = null;
@@ -46,29 +47,28 @@ public class SessionManagerImplementation implements ISessionManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String dropTable = "DROP TABLE IF EXISTS group12session";
-            stmt.executeUpdate(dropTable);
+            String dropSessionTableSQL = "DROP TABLE IF EXISTS group12session";
+            stmt.executeUpdate(dropSessionTableSQLSQL);
 
-            String createTable = "CREATE TABLE group12session (" +
+            String createSessionTable = "CREATE TABLE group12session (" +
                      "token VARCHAR(100) NOT NULL PRIMARY KEY, " +
                      "email VARCHAR(100) NOT NULL, " +
                      "FOREIGN KEY (email) REFERENCES group12user(email) ON DELETE CASCADE)";
 
-            stmt.executeUpdate(createTable);
+            stmt.executeUpdate(createSessionTableSQL);
         } catch (Exception e) {
             Logger.getLogger("CreateSessionTableLogger").log(Level.INFO, "Session table cannot be created. Error: {0}", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("CreateSessionTableLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("CreateSessionTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
 
+    //Create a new user session after a successful login
     public void createSession(String email, String token){
         Statement stmt = null;
         Connection connection = null;
@@ -76,25 +76,25 @@ public class SessionManagerImplementation implements ISessionManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String udapteSQL = "INSERT into group12session (token, email) VALUES (" +
+
+            String insertSessionSQL = "INSERT into group12session (token, email) VALUES (" +
                     "'" + token + "', " +
                     "'" + email + "')";
 
-            stmt.executeUpdate(udapteSQL);     
+            stmt.executeUpdate(insertSessionSQL);     
         } catch (SQLException e) {
-            Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Fehler beim Hinzufügen der Sessiondaten in die Datenbank.", e);
+            Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Error when creating a session.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("SetNewSessionWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
     
+    //Get a existing session by email
     public Session getSession(String email) {
         Statement stmt = null;
         Connection connection = null;
@@ -102,39 +102,32 @@ public class SessionManagerImplementation implements ISessionManager{
         Logger.getLogger("GetSessionByEmail").log(Level.INFO, "Start getSession-method");
         
         try {
-            // Verbindung zur Datenbank herstellen
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Abfrage definieren
-            String selectSQL = "SELECT * FROM group12session WHERE email = '" + email + "'";
+            String selectSessionSQL = "SELECT * FROM group12session WHERE email = '" + email + "'";
 
-            // Ausführen der SELECT-Abfrage
-            ResultSet rs = stmt.executeQuery(selectSQL);
-
-            // Prüfen, ob ein Ergebnis zurückgegeben wurde
+            ResultSet rs = stmt.executeQuery(selectSessionSQL);
             if (rs.next()) {
-                // Benutzerobjekt basierend auf den Ergebnissen erstellen
                 session = new Session();
                 session.setToken(rs.getString("token"));
                 session.setEmail(rs.getString("email"));
             }
             rs.close();
         } catch (SQLException e) {
-            Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Fehler beim Abrufen der Sessiondaten aus der Datenbank.", e);
+            Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Error when getting a session.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("GetSessionByEmail").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
         return session;
     }
 
+    //Delete a session after a successful logout
     public void deleteSession(String email, String token){
         Statement stmt = null;
         Connection connection = null;
@@ -142,87 +135,75 @@ public class SessionManagerImplementation implements ISessionManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            String deleteSQL = "DELETE FROM group12session WHERE email = '" + email + "' AND token = '" + token + "'";
-            stmt.executeUpdate(deleteSQL);     
+
+            String deleteSessionSQL = "DELETE FROM group12session WHERE email = '" + email + "' AND token = '" + token + "'";
+
+            stmt.executeUpdate(deleteSessionSQL);     
         } catch (SQLException e) {
-            Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Fehler beim Löschen der Session aus der Datenbank.", e);
+            Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Error when deleting a session.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("DeleteSessionWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
 
+    //Check if email and token are valid
     public boolean validToken(String token, String email){
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("ValidTokenLogger").log(Level.INFO, "Start validToken-method");
-
         try {
-            // Verbindung zur Datenbank herstellen
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Abfrage definieren
-            String selectSQL = "SELECT * FROM group12session WHERE token = '" + token + "'";
+            String selectValidSessionSQL = "SELECT * FROM group12session WHERE token = '" + token + "'";
 
-            // Ausführen der SELECT-Abfrage
-            ResultSet rs = stmt.executeQuery(selectSQL);
-
-            // Prüfen, ob ein Ergebnis zurückgegeben wurde
+            ResultSet rs = stmt.executeQuery(selectValidSessionSQL);
             if (rs.next()) {
-                // Benutzerobjekt basierend auf den Ergebnissen erstellen
                 String currentEmail = rs.getString("email");
                 rs.close();
                 return currentEmail.equals(email);
             } else {
                 rs.close();
-                return false; // Token nicht gefunden
+                return false;
             }
-            
         } catch (SQLException e) {
-            Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Fehler beim Abrufen der Sessiondaten aus der Datenbank.", e);
+            Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Error when getting session data.", e);
             return false;
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Error beim Schließen der Ressourcen. Error: {0}", e);
+                Logger.getLogger("ValidTokenLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
             }
         }
     }
 
+    //Edit session when the user changed email
     public void editSession(String email, String newEmail){
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("UpdateSessionLogger").log(Level.INFO, "Start editSession method");
-
         try {
-            // Stelle die Verbindung zur Datenbank her
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
             String updateSessionsSQL = "UPDATE group12session SET email = '" + newEmail + "' WHERE email = '" + email + "'";
+
             stmt.executeUpdate(updateSessionsSQL);
         } catch (SQLException e) {
-            Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error updating session.", e);
+            Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error when updating a session.", e);
         } finally {
             try {
-                // Schließen von Statement und Connection, um Ressourcen freizugeben
                 if (stmt != null) stmt.close();
                 if (connection != null) connection.close();
             } catch (SQLException e) {
-                // Fehler beim Schließen protokollieren
-                Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error closing resources.", e);
+                Logger.getLogger("UpdateSessionLogger").log(Level.SEVERE, "Error when closing the resource.", e);
             }
         }
     }

@@ -1,13 +1,21 @@
 package mosbach.dhbw.de.stockwizzard.dataManager;
+import java.util.List;
+
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
+import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
+import mosbach.dhbw.de.stockwizzard.model.Transaction;
 
 public interface IPortfolioStockManager{
 
-    // public PortfolioStock getPortfolioStock(Integer portfolioId, String symbol);
+    public void createPortfolioStockTable();
 
-    // public void addPortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double pricePerStock);
+    public void increasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice);
 
-    // public void editPortfolioStock(Integer portfolioId, String symbol, Integer transactionType);
+    public List<PortfolioStock> getAllPortfolioStocks(String email, String sortby);
 
-    // public void deletePortfolioStock(Integer portfolioId, String symbol);
+    public void decreasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice, PortfolioStockValue portfolioStockValues, List<Transaction> transactionsInPortfolio);
+
+    public PortfolioStockValue checkPortfolioStockValue(Double sellRequestAmount, String email, String symbol);
+
+    public void deleteAllPortfolioStocks(String email);
 }
