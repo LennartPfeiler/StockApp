@@ -4,8 +4,8 @@ import { Component } from '@angular/core';
   selector: 'app-navbar-borhome',
   standalone: true,
   imports: [],
-  templateUrl: './navbar-borhome.component.html',
-  styleUrl: './navbar-borhome.component.css'
+  templateUrl: './navbar-vorhome.component.html',
+  styleUrl: './navbar-vorhome.component.css'
 })
 export class NavbarBorhomeComponent {
 
