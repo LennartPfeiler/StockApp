@@ -14,21 +14,21 @@
 <body>
 
     <!-- Header -->
-    <header class="header d-flex justify-content-between align-items-center fixed-top p-3">
+    <header id="header" class="d-flex justify-content-between align-items-center fixed-top p-3">
         <a href="#" class="logo">
             <img src="../../ressources/Logo.png" alt="Logo">
         </a>
 
         <nav class="navbar d-flex">
-            <a href="#home" style="--i:1;" class="active">Home</a>
-            <a href="#about" style="--i:2;">About</a>
-            <a href="#features" style="--i:3;">Features</a>
-            <a href="#contact" style="--i:4;">Contact</a>
+            <a href="#home" class="active nav-link" data-index="1">Home</a>
+            <a href="#about" class="nav-link" data-index="2">About</a>
+            <a href="#features" class="nav-link" data-index="3">Features</a>
+            <a href="#contact" class="nav-link" data-index="4">Contact</a>
         </nav>
 
-        <div class="Login d-flex align-items-center">
-            <a href="Login.html" style="--i:1;" class="logintxt">Login</a>
-            <a href="Login.html" style="--i:2;"><i class='bx bx-log-in-circle'></i></a>
+        <div class="login d-flex align-items-center">
+            <a href="Login.html" class="login-text">Login</a>
+            <a href="Login.html"><i class='bx bx-log-in-circle'></i></a>
         </div>
     </header>
 
@@ -47,16 +47,12 @@
                 <img src="../../ressources/homepagebild1.jpg" alt="Home Image" class="img-fluid">
             </div>
         </div>
-
-        
     </section>
-
-  
 
     <!-- About Section -->
     <section id="about" class="about py-5">
         <div class="container">
-            <h2>About</h2>
+            <h2 class="text-shadow">About</h2>
             <p>Wall Street Wizzard is your platform to learn and perfect trading in a secure environment.</p>
             <img src="../../ressources/überuns.jpg" alt="Über uns Bild">
         </div>
@@ -65,7 +61,7 @@
     <!-- Features Section -->
     <section id="features" class="features py-5 bg-dark text-light">
         <div class="container">
-            <h2>Features</h2>
+            <h2 class="text-shadow">Features</h2>
             <ul>
                 <li>Simulate real market conditions</li>
                 <li>Interactive stock tracking</li>
@@ -78,7 +74,7 @@
     <!-- Contact Section -->
     <section id="contact" class="contact py-5">
         <div class="container">
-            <h2>Contact</h2>
+            <h2 class="text-shadow">Contact</h2>
             <p>Do you have any questions? Contact us via our contact form or by email at support@wallstreetwizzard.com</p>
             <img src="../../ressources/Kontaktvorhome.jpg" alt="Kontakt Bild">
         </div>
