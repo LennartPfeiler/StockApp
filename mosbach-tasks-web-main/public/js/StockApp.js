@@ -477,7 +477,6 @@ function getStockPriceFromDB(stockName){
     const getStockPriceDBRegister = {
         "async": true,
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + stockName,
-
         "method": "GET",
         "headers": {
             'Accept': 'application/json',
