@@ -47,6 +47,8 @@ public class MappingController {
     StockManagerImplementation stockManager = StockManagerImplementation.getStockManager();
     PortfolioStockManagerImplementation portfolioStockManager = PortfolioStockManagerImplementation.getPortfolioStockManager();
 
+//////////////////////////////////////////////////////////////Auth Endpoints////////////////////////////////////////////////////////////////////
+
     @PostMapping(
             path = "/auth",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -77,25 +79,6 @@ public class MappingController {
         return ResponseEntity.ok(tokenUser);
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<?> getUserProfile( 
-        @RequestParam(value = "email", defaultValue = "") String email,
-        @RequestParam(value = "token", defaultValue = "") String token) {
-        
-        try {
-            Boolean isValid = sessionManager.validToken(token, email);
-            if (isValid) {
-                User user = userManager.getUserProfile(email);
-                return ResponseEntity.ok(user);
-            }
-            else{
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
-            } 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during getting user data."));
-        }  
-    }
-
     @DeleteMapping(
         path = "/auth",
         consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -117,6 +100,27 @@ public class MappingController {
     }
 }
     
+//////////////////////////////////////////////////////////////User Endpoints////////////////////////////////////////////////////////////////////
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getUserProfile( 
+        @RequestParam(value = "email", defaultValue = "") String email,
+        @RequestParam(value = "token", defaultValue = "") String token) {
+        
+        try {
+            Boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                User user = userManager.getUserProfile(email);
+                return ResponseEntity.ok(user);
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));
+            } 
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during getting user data."));
+        }  
+    }
+
     @PostMapping(
             path = "/user",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
@@ -140,6 +144,62 @@ public class MappingController {
     }
 
     @PutMapping(
+        path = "/user",
+        consumes = {MediaType.APPLICATION_JSON_VALUE}
+    ) 
+    public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
+        String token = editRequest.getToken();
+        User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
+        User new_user_data = editRequest.getUser();
+
+        if (token != null && currentUser.getEmail() != null) {
+            Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
+            if (isValid) {
+                userManager.editUser(currentUser, new_user_data);
+                return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+            }
+        } else {
+            return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
+        }
+    }
+
+    // @PutMapping(
+    //     path = "/user",
+    //     consumes = {MediaType.APPLICATION_JSON_VALUE}
+    // ) 
+    // public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
+    //     String token = editRequest.getToken();
+    //     User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
+    //     User new_user_data = editRequest.getUser();
+
+    //     if (token != null && currentUser.getEmail() != null) {
+    //         Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
+    //         if (isValid) {
+                    //Boolean emailChanged = !new_user_data .equals(currentUser.getEmail());
+    //              if(emailChanged == false){
+                        //Update user
+                        //Update portfolio
+    //              } else {
+                        //EMail check 
+                        //New suer
+                        //update session
+                        //Update transaction
+                        //Update portfolio
+                        //delete old user
+    //              }
+    //             userManager.editUser(currentUser, new_user_data);
+    //             return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
+    //         } else {
+    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
+    //         }
+    //     } else {
+    //         return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
+    //     }
+    // }
+
+    @PutMapping(
             path = "/user/reset",
             consumes = {MediaType.APPLICATION_JSON_VALUE}
     ) 
@@ -159,6 +219,30 @@ public class MappingController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during resetting."));
             } 
     }
+
+    // @PutMapping(
+    //         path = "/user/reset",
+    //         consumes = {MediaType.APPLICATION_JSON_VALUE}
+    // ) 
+    // public ResponseEntity<?> resetProfile(@RequestBody TokenEmail tokenEmail){
+    //     try{
+    //         String token = tokenEmail.getToken();
+    //         String email = tokenEmail.getEmail();
+    //         User newUser;
+    //         boolean isValid = sessionManager.validToken(token, email);
+    //         if (isValid) {
+                    //Delete Portfolio Stock
+                    //Delete Transaction
+                    //Update portfolio
+                    //Update user
+    //             return ResponseEntity.ok(newUser); // Gültiger Token - gib TokenUser zurück
+    //         } else {
+    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!")); // Ungültiger Token - gib Fehlerstatus zurück
+    //         }
+    //     } catch (Exception e) {
+    //             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during resetting."));
+    //         } 
+    // }
 
     @DeleteMapping(
             path = "/user",
@@ -180,6 +264,7 @@ public class MappingController {
             } 
     }
     
+//////////////////////////////////////////////////////////////Stock Endpoints////////////////////////////////////////////////////////////////////
     @GetMapping("/stock")
     public ResponseEntity<?> getStock(
         @RequestParam(value = "email", defaultValue = "") String email,
@@ -225,6 +310,8 @@ public class MappingController {
         }
     }
 
+//////////////////////////////////////////////////////////////PortfolioStock Endpoints////////////////////////////////////////////////////////////////////
+
     @GetMapping("/portfolioStocks")
     public ResponseEntity<?> getAllPortfolioStocks( 
         @RequestParam(value = "email", defaultValue = "") String email,
@@ -244,6 +331,8 @@ public class MappingController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("An unexpected error occurred during getting portfolioStocks."));
         }  
     }
+
+//////////////////////////////////////////////////////////////Transaction Endpoints////////////////////////////////////////////////////////////////////
 
     @GetMapping("/transactions")
     public ResponseEntity<?> getAllTransactions( 
@@ -265,6 +354,22 @@ public class MappingController {
         }  
     }
 
+    // @GetMapping("/transaction")
+    // public void getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
+    //     // userManager.createUserTable();
+    //     // sessionManager.createSessionTable();
+    //     // portfolioManager.createPortfolioTable();
+    //     // stockManager.createStockTable();
+    //     // portfolioStockManager.createPortfolioStockTable();
+    //     // portfolioManager.createPortfolioTable();
+    //     transactionManager.createTransactionTable();
+    //     // stockManager.createStockTable();
+    //     //return transactionManager.getTransaction(transactionID);
+    //     // return new Transaction(null, null, null, null, null, null, null, null, null);   
+    // }
+
+//////////////////////////////////////////////////////////////Portfolio Endpoints////////////////////////////////////////////////////////////////////
+
     @GetMapping("/portfolio")
     public ResponseEntity<?> getUserPortfolio( 
         @RequestParam(value = "email", defaultValue = "") String email,
@@ -284,41 +389,7 @@ public class MappingController {
         }  
     }
 
-    // @GetMapping("/transaction")
-    // public void getTransaction(@RequestParam(value = "transactionID", defaultValue = "") Integer transactionID) {
-    //     // userManager.createUserTable();
-    //     // sessionManager.createSessionTable();
-    //     // portfolioManager.createPortfolioTable();
-    //     // stockManager.createStockTable();
-    //     // portfolioStockManager.createPortfolioStockTable();
-    //     // portfolioManager.createPortfolioTable();
-    //     transactionManager.createTransactionTable();
-    //     // stockManager.createStockTable();
-    //     //return transactionManager.getTransaction(transactionID);
-    //     // return new Transaction(null, null, null, null, null, null, null, null, null);   
-    // }
-
-    @PutMapping(
-            path = "/user",
-            consumes = {MediaType.APPLICATION_JSON_VALUE}
-    ) 
-    public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
-        String token = editRequest.getToken();
-        User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
-        User new_user_data = editRequest.getUser();
-
-         if (token != null && currentUser.getEmail() != null) {
-            Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
-            if (isValid) {
-                userManager.editUser(currentUser, new_user_data);
-                return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
-            }
-        } else {
-            return ResponseEntity.badRequest().body(null); // Ungültige Anfrage, falls Token oder Email fehlen
-        }
-    }
+//////////////////////////////////////////////////////////////Order Endpoints////////////////////////////////////////////////////////////////////
 
     @PostMapping(
             path = "/order/buy",
