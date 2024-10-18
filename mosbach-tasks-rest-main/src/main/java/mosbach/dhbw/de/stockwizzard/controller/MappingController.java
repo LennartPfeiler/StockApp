@@ -304,14 +304,14 @@ public class MappingController {
     ) 
     public ResponseEntity<?> editUser(@RequestBody EditRequest editRequest){
         String token = editRequest.getToken();
-        String currentEmail = editRequest.getCurrentmail();
-        User user = editRequest.getUser();
+        User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
+        User new_user_data = editRequest.getUser();
 
-         if (token != null && currentEmail != null) {
-            Boolean isValid = sessionManager.validToken(token, currentEmail);
+         if (token != null && currentUser.getEmail() != null) {
+            Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
             if (isValid) {
-                userManager.editUser(currentEmail, user);
-                return ResponseEntity.ok(new StringAnswer("Editing was successfully completed"));
+                userManager.editUser(currentUser, new_user_data);
+                return ResponseEntity.ok(userManager.getUserProfile(new_user_data.getEmail()));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Ungültiger Token - gib Fehlerstatus zurück
             }

@@ -301,10 +301,11 @@ function toggleLabel() {
 
 function editUser(){
     event.preventDefault();
-    let budgetValue = $('#budget').val();
-    
-    // Überprüfen, ob der Wert numerisch ist, sonst auf 0 setzen
-    let budget = isNaN(parseFloat(budgetValue)) ? 0 : parseFloat(budgetValue);
+    let budgetValue = $('#amount-selection').val(); // Entfernt Leerzeichen am Anfang und Ende
+
+    // Überprüfen, ob der Wert numerisch ist und nicht leer, sonst auf 0 setzen
+    let budget = (budgetValue !== '' && !isNaN(parseFloat(budgetValue))) ? parseFloat(budgetValue) : 0;
+
     
     const editRegister = {
         "async": true,
@@ -326,7 +327,11 @@ function editUser(){
         }),
         "success": function(data) {
             console.log("Antwort vom Server:", data);
-            alert(data.answer);
+            setCookie("firstname", data.firstname);
+            setCookie("lastname", data.lastname);
+            setCookie("email", data.email);
+            setCookie("budget", roundToTwoDecimalPlaces(data.budget));
+            alert("User edited successfully");
         }
         ,
         "error": function(xhr) {
@@ -341,7 +346,6 @@ function editUser(){
 
     $.ajax(editRegister);
 }
-
 
 function resetProfile(){
     event.preventDefault();

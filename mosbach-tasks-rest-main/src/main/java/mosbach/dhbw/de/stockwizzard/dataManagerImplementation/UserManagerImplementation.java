@@ -5,6 +5,7 @@ import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
+import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 
 import java.util.Properties;
 import java.util.logging.Level;
@@ -16,6 +17,8 @@ import java.net.URISyntaxException;
 import java.sql.*;
 
 public class UserManagerImplementation implements IUserManager{
+
+    PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
 
     String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
     URI dbUri;
@@ -204,29 +207,32 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    public void editUser(String currentEmail, User user){
+    public void editUser(User currentUser, User new_user_data){
         Logger.getLogger("EditUserLogger").log(Level.WARNING, "Start editUser-method");
         Statement stmt = null;
         Connection connection = null;
         // Prüfen, ob die E-Mail geändert werden muss
-        String newEmail = user.getEmail();
-        Boolean emailChanged = !newEmail.equals(currentEmail);
-        User currentUser = getUserProfile(currentEmail);
+        String newEmail = new_user_data.getEmail();
+        Boolean emailChanged = !newEmail.equals(currentUser.getEmail());
         Double oldBudget = currentUser.getBudget();
+        Portfolio userPortfolio = portfolioManager.getUserPortfolio(currentUser.getEmail());
 
         if(emailChanged == false){
             try{
                 connection = DriverManager.getConnection(dbUrl, username, password);
                 stmt = connection.createStatement();
-
+                Logger.getLogger("EditUserLogger").log(Level.WARNING, "in if {0}", oldBudget);
+                Logger.getLogger("EditUserLogger").log(Level.WARNING, "in if {0}", new_user_data.getBudget());
                 // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
-                String updateSQL = "UPDATE group12user SET " +
-                   "firstname = '" + user.getFirstName() + "', " +
-                   "lastname = '" + user.getLastName() + "', " +
-                   "budget = " + (user.getBudget() + oldBudget) +
-                   " WHERE email = '" + currentEmail + "'";
-
-                stmt.executeUpdate(updateSQL);
+                String updateUserSQL = "UPDATE group12user SET " +
+                   "firstname = '" + new_user_data.getFirstName() + "', " +
+                   "lastname = '" + new_user_data.getLastName() + "', " +
+                   "budget = " + (new_user_data.getBudget() + oldBudget) +
+                   " WHERE email = '" + currentUser.getEmail() + "'";
+                String updatePortfolioSQL = "UPDATE group12portfolio SET startvalue = " + (new_user_data.getBudget() + userPortfolio.getStartValue()) + ", value = " + (new_user_data.getBudget() + userPortfolio.getValue())+ " WHERE email = '" + currentUser.getEmail() + "'";
+                   
+                stmt.executeUpdate(updateUserSQL);
+                stmt.executeUpdate(updatePortfolioSQL);
             } catch (SQLException e) {
                 Logger.getLogger("EditUserLogger").log(Level.SEVERE, "Error editing User .", e);
             } finally {
@@ -247,21 +253,22 @@ public class UserManagerImplementation implements IUserManager{
 
                 // SQL-Anweisung für das Aktualisieren des Portfolio-Wertes
                 if(isEmailAlreadyRegistered(newEmail) == false){
-                String newUserSQL = "INSERT into group12user (email, firstname, lastname, password, budget) VALUES (" +
-                    "'" + user.getEmail() + "', " +
-                    "'" + user.getFirstName() + "', " +
-                    "'" + user.getLastName() + "', " 
-                     + (user.getBudget() + oldBudget) + ")";
-                String updateSessionsSQL = "UPDATE group12session SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
-                String updateTransactionsSQL = "UPDATE group12transaction SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
-                String updatePortfolioSQL = "UPDATE group12portfolio SET email = '" + user.getEmail() + "' WHERE email = '" + currentEmail + "'";
-                String deleteOldUserSQL = "DELETE FROM group12user WHERE email= '" + currentEmail + "'";
+                    String newUserSQL = "INSERT into group12user (email, firstname, lastname, password, budget) VALUES (" +
+                        "'" + newEmail + "', " +
+                        "'" + new_user_data.getFirstName() + "', " +
+                        "'" + new_user_data.getLastName() + "', " +
+                        "'" + currentUser.getPassword() + "', "
+                        + (new_user_data.getBudget() + oldBudget) + ")";
+                    String updateSessionsSQL = "UPDATE group12session SET email = '" + newEmail + "' WHERE email = '" + currentUser.getEmail() + "'";
+                    String updateTransactionsSQL = "UPDATE group12transaction SET email = '" + newEmail + "' WHERE email = '" + currentUser.getEmail() + "'";
+                    String updatePortfolioSQL = "UPDATE group12portfolio SET email = '" + newEmail + "', startvalue = " + (new_user_data.getBudget() + userPortfolio.getStartValue()) + ", value = " + (new_user_data.getBudget() + userPortfolio.getValue()) + " WHERE email = '" + currentUser.getEmail() + "'";
+                    String deleteOldUserSQL = "DELETE FROM group12user WHERE email= '" + currentUser.getEmail() + "'";
 
-                stmt.executeUpdate(newUserSQL);
-                stmt.executeUpdate(updateSessionsSQL);
-                stmt.executeUpdate(updateTransactionsSQL);
-                stmt.executeUpdate(updatePortfolioSQL);
-                stmt.executeUpdate(deleteOldUserSQL);
+                    stmt.executeUpdate(newUserSQL);
+                    stmt.executeUpdate(updateSessionsSQL);
+                    stmt.executeUpdate(updateTransactionsSQL);
+                    stmt.executeUpdate(updatePortfolioSQL);
+                    stmt.executeUpdate(deleteOldUserSQL);
                 }
             } catch (SQLException e) {
                 Logger.getLogger("EditUserLogger").log(Level.SEVERE, "Error editing User .", e);
