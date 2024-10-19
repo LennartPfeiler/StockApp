@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
 import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
@@ -13,21 +13,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
 
-public class UserManagerImplementation implements IUserManager{
+public class UserManagerImplementation implements IUserManager {
 
-    PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
+    private String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
+    private URI dbUri;
+    private String username = "";
+    private String password = "";
+    private String dbUrl = "";
 
-    String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
-    URI dbUri;
-    String username = "";
-    String password = "";
-    String dbUrl = "";
-    
     PasswordManagerImplementation passwordManager = PasswordManagerImplementation.getPasswordManager();
 
-    static UserManagerImplementation databaseUser = null;
+    private static UserManagerImplementation databaseUser = null;
 
-    private UserManagerImplementation(){
+    private UserManagerImplementation() {
         try {
             dbUri = new URI(databaseConnectionnUrl);
         } catch (URISyntaxException e) {
@@ -44,7 +42,7 @@ public class UserManagerImplementation implements IUserManager{
         return databaseUser;
     }
 
-    //Create User database table
+    // Create User database table
     public void createUserTable() {
         Statement stmt = null;
         Connection connection = null;
@@ -67,41 +65,43 @@ public class UserManagerImplementation implements IUserManager{
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
-                Logger.getLogger("CreateUserTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                Logger.getLogger("CreateUserTableLogger").log(Level.SEVERE,
+                        "Error when closing the resource. Error: {0}", e);
                 e.printStackTrace();
             }
         }
     }
 
-    //Compare user budget with a number value
-    public Boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser){
-        if(needed > currentUser.getBudget()){
+    // Compare user budget with a number value
+    public Boolean checkIfEnoughBudgetLeft(Double needed, User currentUser) {
+        if (needed > currentUser.getBudget()) {
             return false;
         }
         return true;
     }
 
-    //Check if an email is registered
+    // Check if an email is registered
     public Boolean isEmailAlreadyRegistered(String email) {
         User user = getUserProfile(email);
-        if(user == null){
+        if (user == null) {
             return false;
-        }
-        else{
+        } else {
             return true;
         }
-    }    
+    }
 
-    //Get a user profile
+    // Get a user profile
     public User getUserProfile(String email) {
         Statement stmt = null;
         Connection connection = null;
         User user = null;
         Logger.getLogger("GetUserByEmail").log(Level.INFO, "Start getUserProfile-method");
-        
+
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
@@ -123,8 +123,10 @@ public class UserManagerImplementation implements IUserManager{
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetUserByEmail").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
                 e.printStackTrace();
@@ -133,7 +135,7 @@ public class UserManagerImplementation implements IUserManager{
         return user;
     }
 
-    //Add a new user
+    // Add a new user
     public void addUser(User user) {
         Statement stmt = null;
         Connection connection = null;
@@ -147,25 +149,28 @@ public class UserManagerImplementation implements IUserManager{
                     "'" + user.getFirstName() + "', " +
                     "'" + user.getLastName() + "', " +
                     "'" + passwordManager.hashPassword(user.getPassword()) + "', " +
-                    + user.getBudget() + ")";
+                    +user.getBudget() + ")";
 
-            stmt.executeUpdate(insertUserSQL);     
+            stmt.executeUpdate(insertUserSQL);
         } catch (SQLException e) {
             Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error when setting a new user. Error: {0}", e);
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
-                Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                Logger.getLogger("SetNewUserWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}",
+                        e);
                 e.printStackTrace();
             }
         }
     }
 
-    //Edit budget of an user
-    public void editUserBudget(String email, Double oldValue, Double bougthValue, Integer transactionType){
+    // Edit budget of an user
+    public void editUserBudget(String email, Double oldValue, Double bougthValue, Integer transactionType) {
         Statement stmt = null;
         Connection connection = null;
         String updateUserBudgetSQL = "";
@@ -174,12 +179,12 @@ public class UserManagerImplementation implements IUserManager{
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-            if(transactionType == 1){
+            if (transactionType == 1) {
                 updateUserBudgetSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
-                            " WHERE email = '" + email + "'";
-            } else{
+                        " WHERE email = '" + email + "'";
+            } else {
                 updateUserBudgetSQL = "UPDATE group12user SET budget = " + (oldValue + bougthValue) +
-                            " WHERE email = '" + email + "'";
+                        " WHERE email = '" + email + "'";
             }
             stmt.executeUpdate(updateUserBudgetSQL);
         } catch (SQLException e) {
@@ -187,8 +192,10 @@ public class UserManagerImplementation implements IUserManager{
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("UpdateUserBudgetLogger").log(Level.SEVERE, "Error when closing the resource.", e);
                 e.printStackTrace();
@@ -196,30 +203,32 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    //Edit an user profile
-    public void editProfile(User currentUser, User new_user_data){
+    // Edit an user profile
+    public void editProfile(User currentUser, User newUserData) {
         Logger.getLogger("EditUserLogger").log(Level.WARNING, "Start editProfile-method");
         Statement stmt = null;
         Connection connection = null;
         Double oldBudget = currentUser.getBudget();
-        try{
+        try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
             String updateUserSQL = "UPDATE group12user SET " +
-                "firstname = '" + new_user_data.getFirstName() + "', " +
-                "lastname = '" + new_user_data.getLastName() + "', " +
-                "budget = " + (new_user_data.getBudget() + oldBudget) +
-                " WHERE email = '" + currentUser.getEmail() + "'";
-                
+                    "firstname = '" + newUserData.getFirstName() + "', " +
+                    "lastname = '" + newUserData.getLastName() + "', " +
+                    "budget = " + (newUserData.getBudget() + oldBudget) +
+                    " WHERE email = '" + currentUser.getEmail() + "'";
+
             stmt.executeUpdate(updateUserSQL);
         } catch (SQLException e) {
             Logger.getLogger("EditUserLogger").log(Level.SEVERE, "Error when editing an user .", e);
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("EditUserLogger").log(Level.SEVERE, "Error when closing the resource.", e);
                 e.printStackTrace();
@@ -227,8 +236,8 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    //Reset an user profile 
-    public void resetProfile(String email){
+    // Reset an user profile
+    public void resetProfile(String email) {
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("ResetProfileLogger").log(Level.INFO, "Start resetProfile method");
@@ -236,15 +245,18 @@ public class UserManagerImplementation implements IUserManager{
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
 
-            String resetUserSQL = "UPDATE group12user SET budget = (SELECT startvalue from group12portfolio WHERE email = '" + email + "') WHERE email = '" + email + "' "; 
+            String resetUserSQL = "UPDATE group12user SET budget = (SELECT startvalue from group12portfolio WHERE email = '"
+                    + email + "') WHERE email = '" + email + "' ";
             stmt.executeUpdate(resetUserSQL);
         } catch (SQLException e) {
             Logger.getLogger("ResetProfileLogger").log(Level.SEVERE, "Error when resetting an user.", e);
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("ResetProfileLogger").log(Level.SEVERE, "Error when closing the resource.", e);
                 e.printStackTrace();
@@ -252,7 +264,7 @@ public class UserManagerImplementation implements IUserManager{
         }
     }
 
-    //Delete an user
+    // Delete an user
     public void deleteUser(String email) {
         Statement stmt = null;
         Connection connection = null;
@@ -263,15 +275,17 @@ public class UserManagerImplementation implements IUserManager{
             stmt = connection.createStatement();
 
             String deleteUserSQL = "DELETE FROM group12user WHERE email= '" + email + "'";
-            
+
             stmt.executeUpdate(deleteUserSQL);
         } catch (SQLException e) {
             Logger.getLogger("DeleteProfileLogger").log(Level.SEVERE, "Error when deleting an user.", e);
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("DeleteProfileLogger").log(Level.SEVERE, "Error when closing the resource.", e);
                 e.printStackTrace();

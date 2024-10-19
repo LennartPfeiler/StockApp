@@ -9,7 +9,7 @@ import mosbach.dhbw.de.stockwizzard.dataManager.IAuthManager;
 
 public class AuthManagerImplementation implements IAuthManager{
 
-    static AuthManagerImplementation databaseUser = null;
+    private static AuthManagerImplementation databaseUser = null;
 
     private AuthManagerImplementation(){
         

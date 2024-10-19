@@ -2,11 +2,11 @@ package mosbach.dhbw.de.stockwizzard.dataManager;
 
 import mosbach.dhbw.de.stockwizzard.model.User;
 
-public interface IUserManager{
+public interface IUserManager {
 
     public void createUserTable();
 
-    public Boolean CheckIfEnoughBudgetLeft(Double needed, User currentUser);
+    public Boolean checkIfEnoughBudgetLeft(Double needed, User currentUser);
 
     public Boolean isEmailAlreadyRegistered(String email);
 
@@ -16,7 +16,7 @@ public interface IUserManager{
 
     public void editUserBudget(String email, Double oldValue, Double bougthValue, Integer transactionType);
 
-    public void editProfile(User currentUser, User new_user_data);
+    public void editProfile(User currentUser, User newUserData);
 
     public void resetProfile(String email);
 

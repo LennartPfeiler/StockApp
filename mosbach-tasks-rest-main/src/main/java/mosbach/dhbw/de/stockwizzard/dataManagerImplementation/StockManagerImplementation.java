@@ -5,7 +5,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
 
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.UUID;
@@ -13,17 +12,17 @@ import mosbach.dhbw.de.stockwizzard.dataManager.IStockManager;
 import mosbach.dhbw.de.stockwizzard.model.Stock;
 import mosbach.dhbw.de.stockwizzard.model.User;
 
-public class StockManagerImplementation implements IStockManager{
+public class StockManagerImplementation implements IStockManager {
 
-    String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
-    URI dbUri;
-    String username = "";
-    String password = "";
-    String dbUrl = "";
+    private String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
+    private URI dbUri;
+    private String username = "";
+    private String password = "";
+    private String dbUrl = "";
 
-    static StockManagerImplementation databaseUser = null;
+    private static StockManagerImplementation databaseUser = null;
 
-    private StockManagerImplementation(){
+    private StockManagerImplementation() {
         try {
             dbUri = new URI(databaseConnectionnUrl);
         } catch (URISyntaxException e) {
@@ -40,7 +39,7 @@ public class StockManagerImplementation implements IStockManager{
         return databaseUser;
     }
 
-    //Create Session database table
+    // Create Session database table
     public void createStockTable() {
         Statement stmt = null;
         Connection connection = null;
@@ -51,26 +50,30 @@ public class StockManagerImplementation implements IStockManager{
             stmt.executeUpdate(dropStockTableSQL);
 
             String createStockTableSQL = "CREATE TABLE group12stock (" +
-                     "symbol VARCHAR(100) PRIMARY KEY, " +
-                     "stockPrice DOUBLE PRECISION NOT NULL, " +
-                     "name VARCHAR(100) NOT NULL)";
+                    "symbol VARCHAR(100) PRIMARY KEY, " +
+                    "stockPrice DOUBLE PRECISION NOT NULL, " +
+                    "name VARCHAR(100) NOT NULL)";
 
             stmt.executeUpdate(createStockTableSQL);
         } catch (Exception e) {
-            Logger.getLogger("CreateStockTableLogger").log(Level.SEVERE, "Stock table cannot be created. Error: {0}", e);
+            Logger.getLogger("CreateStockTableLogger").log(Level.SEVERE, "Stock table cannot be created. Error: {0}",
+                    e);
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
-                Logger.getLogger("CreateStockTableLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                Logger.getLogger("CreateStockTableLogger").log(Level.SEVERE,
+                        "Error when closing the resource. Error: {0}", e);
                 e.printStackTrace();
             }
         }
     }
 
-    //Get stock data by symbol
+    // Get stock data by symbol
     public Stock getStock(String symbol) {
         Statement stmt = null;
         Connection connection = null;
@@ -95,8 +98,10 @@ public class StockManagerImplementation implements IStockManager{
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
                 Logger.getLogger("GetStockLogger").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
                 e.printStackTrace();
@@ -105,7 +110,7 @@ public class StockManagerImplementation implements IStockManager{
         return stock;
     }
 
-    //Add a new stock to the database
+    // Add a new stock to the database
     public void addStock(Stock stock) {
         Statement stmt = null;
         Connection connection = null;
@@ -115,20 +120,23 @@ public class StockManagerImplementation implements IStockManager{
             stmt = connection.createStatement();
 
             String insertStockSQL = "INSERT INTO group12stock (symbol, stockprice, name) VALUES (" +
-                   "'" + stock.getSymbol() + "', " +
-                   stock.getStockPrice() + ", " +
-                   "'" + stock.getName() + "')";
+                    "'" + stock.getSymbol() + "', " +
+                    stock.getStockPrice() + ", " +
+                    "'" + stock.getName() + "')";
 
-            stmt.executeUpdate(insertStockSQL);     
+            stmt.executeUpdate(insertStockSQL);
         } catch (SQLException e) {
             Logger.getLogger("SetNewStockWriter").log(Level.SEVERE, "Error when adding a stock. Error: {0}", e);
             e.printStackTrace();
         } finally {
             try {
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
             } catch (SQLException e) {
-                Logger.getLogger("SetNewStockWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}", e);
+                Logger.getLogger("SetNewStockWriter").log(Level.SEVERE, "Error when closing the resource. Error: {0}",
+                        e);
                 e.printStackTrace();
             }
         }
