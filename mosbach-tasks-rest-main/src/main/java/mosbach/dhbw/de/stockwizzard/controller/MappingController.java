@@ -63,9 +63,8 @@ public class MappingController {
 
             String token = authManager.generateToken();
             sessionManager.createSession(user.getEmail(), token);
-            TokenUser tokenUser = new TokenUser(token, user);
 
-            return ResponseEntity.ok(tokenUser);
+            return ResponseEntity.ok(new TokenUser(token, user));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new StringAnswer("An unexpected error occurred during login."));
         }

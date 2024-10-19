@@ -1,5 +1,28 @@
 ﻿const APIKEY = 'Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D'; // Externer API-Schlüssel
 
+///*Timer Event to update the database stock data*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// function runAtSpecificTimeOfDay(hour, minutes, func)
+// {
+//   const twentyFourHours = 86400000;
+//   const now = new Date();
+//   let eta_ms = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime() - now;
+//   if (eta_ms < 0)
+//   {
+//     eta_ms += twentyFourHours;
+//   }
+//   setTimeout(function() {
+//     //run once
+//     func();
+//     // run every 24 hours from now on
+//     setInterval(func, twentyFourHours);
+//   }, eta_ms);
+// }
+
+// runAtSpecificTimeOfDay(23,34,() => { console.log(new Date())});
+
+
+
 ///* Data display *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function displayAllDatabaseData(){
@@ -56,11 +79,11 @@ function login(profileSchema){
             "password": password
         }),
         "success": function(data) {
-            alert("Login successfully");
             setCookie("token", data.token);
             setCookie("firstname", data.user.firstname);
             setCookie("lastname", data.user.lastname);
             setCookie("email", data.user.email);
+            alert("Login successfully");
             document.location="home.html";
             
         },
