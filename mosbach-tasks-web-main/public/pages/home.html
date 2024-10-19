@@ -14,9 +14,7 @@
 <script>
     // Überwacht, wenn die Fenstergröße geändert wird
     window.addEventListener('resize', function() {
-        // Prüfen, ob die Bildschirmbreite größer als 768px wird
         if (window.innerWidth > 768) {
-            // Scrollt die Seite nach oben
             window.scrollTo(0, 0);
         }
     });
@@ -24,27 +22,22 @@
 
 <body>
 
-    <header class="header d-flex justify-content-between align-items-center fixed-top p-3">
+    <header id="header" class="d-flex justify-content-between align-items-center fixed-top p-3">
         <a href="#" class="logo">
             <img src="../../ressources/Logo.png">
         </a>
 
-
-
         <nav class="navbar d-flex">
-            <a href="home.html" style="--i:1;"class="active">Home </a>
-            <a href="tracker.html" style="--i:2;">Stock tracker</a>
-            <a href="portfolio.html"  style="--i:3;">Portfolio</a>
-            <a href="profile.html" style="--i:4;">Profile </a>
+            <a href="home.html" class="nav-link active" data-index="1">Home</a>
+            <a href="tracker.html" class="nav-link" data-index="2">Stock tracker</a>
+            <a href="portfolio.html" class="nav-link" data-index="3">Portfolio</a>
+            <a href="profile.html" class="nav-link" data-index="4">Profile</a>
         </nav>
 
-        
-        <div class="Login">
-            <a href="vorHome.html" style="--i:1;" class="logintxt" onclick="logout()">Logout</a>
-            <a href="vorHome.html" style="--i:2;" onclick="logout()"><i class='bx bx-log-out-circle'></i></a>
+        <div class="login">
+            <a href="vorHome.html" class="login-text" onclick="logout()">Logout</a>
+            <a href="vorHome.html" onclick="logout()"><i class='bx bx-log-out-circle'></i></a>
         </div>
-
-
     </header>
 
     <section class="home d-flex flex-column flex-md-row align-items-center justify-content-between pt-5 pt-md-0">
@@ -53,28 +46,16 @@
             <h3 class="display-5 text-warning">Practise trading, master the market!</h3>
             <p class="lead">Unleash your inner trading wizard and sharpen your financial skills with Wall Street Wizzard! Whether you're a beginner learning the ropes or an experienced investor aiming to refine your strategies, our platform offers a safe and dynamic environment to practice trading in real-time market conditions. Track the latest market trends, compete with fellow traders, and build the confidence to master the stock market. Step into the world of Wall Street with no risk—just pure, powerful learning.</p>
             <p class="lead">Your journey to becoming a market master starts here!</p>
-
-
         </div>
 
-
-
-
         <div class="home-img position-relative text-center mt-4 mt-md-0">
-            
             <div class="rhombus">
                 <img src="../../ressources/homepagebild1.jpg" alt="Home Image" class="img-fluid">
             </div>
         </div>
 
         <div class="rhombus2"></div>
-
-
-
     </section>
 
 </body>
-
-
-
 </html>

@@ -92,8 +92,8 @@ public class MappingController {
 }
     
 //////////////////////////////////////////////////////////////User Endpoints////////////////////////////////////////////////////////////////////
-
-    @GetMapping("/user")
+    
+     @GetMapping("/user")
     public ResponseEntity<?> getUserProfile( 
         @RequestParam(value = "email", defaultValue = "") String email,
         @RequestParam(value = "token", defaultValue = "") String token) {

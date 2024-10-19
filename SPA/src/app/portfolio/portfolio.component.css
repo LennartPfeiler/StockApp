@@ -2,14 +2,20 @@
 
 * {
     margin: 0;
-    padding: 0;
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
     
 }
 
-html body {
+html{
     background-color: black; /* Hintergrundfarbe festlegen */
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding-top: 120px; /* Passe diesen Wert an die Höhe der Navbar an */
+    background-color: black; /* Hintergrund der gesamten Seite auf schwarz setzen */
+    color: #eaeaea; /* Textfarbe auf Weiß setzen, falls benötigt */
 }
 
 .header {
@@ -132,14 +138,6 @@ html body {
 }
 
 /* Globale Einstellungen */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding-top: 100px; /* Abstand an die Navbar-Höhe anpassen */
-    background-color: black; /* Hintergrund der gesamten Seite auf schwarz setzen */
-    color: #eaeaea; /* Textfarbe auf Weiß setzen, falls benötigt */
-}
-
 
 /* Login-Button */
 .login-button {
@@ -219,7 +217,7 @@ main {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
     gap: 40px;
-    padding: 40px 20px;
+    padding: 140px 20px;
     max-width: 1200px;
     margin: 0 auto;
     opacity: 0;

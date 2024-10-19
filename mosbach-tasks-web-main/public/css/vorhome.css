@@ -9,23 +9,23 @@
 }
 
 html {
-    scroll-behavior: smooth; /* Sanftes Scrollen aktivieren */
+    scroll-behavior: smooth;
 }
 
 body {
     background: #000;
     padding-top: 100px;
-    overflow-x: hidden; /* Nur horizontales Scrollen deaktivieren */
+    overflow-x: hidden;
     color: #eaeaea;
 }
 
 /* Header */
-.header {
+#header {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    background: transparent; /* Leicht transparente Header-Hintergrundfarbe */
+    background: transparent;
     z-index: 100;
     padding: 20px 8%;
     display: flex;
@@ -33,7 +33,7 @@ body {
     align-items: center;
 }
 
-.header .logo img {
+#header .logo img {
     max-width: 150px;
     height: auto;
 }
@@ -52,34 +52,24 @@ body {
     color: #33e39a;
 }
 
-/* Login Button */
-.logintxt {
-    font-size: 25px;
-    color: #900808;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.Login {
+/* Login Section */
+.login {
     display: flex;
     justify-content: space-between;
     width: 180px;
     height: 60px;
     transition: transform 0.7s ease;
-    animation: slideSci 1s ease forwards;
-    animation-delay: calc(.2s * var(--i));
 }
 
-.Login:hover {
+.login:hover {
     transform: scale(1.10);
 }
 
-/* Stil für das <a>-Element */
-.Login a {
+.login a {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 600px;
+    width: 60px;
     height: 60px;
     background: transparent;
     text-decoration: none;
@@ -91,14 +81,13 @@ body {
 }
 
 /* Stil für das <i>-Element */
-.Login a i {
+.login a i {
     font-size: 50px;
     color: rgb(255, 255, 255);
     transition: color 0.3s ease;
 }
 
-/* Wenn über das <a> oder <i> gehovert wird, färbe sowohl <a> als auch <i> */
-.Login:hover a, .Login:hover a i {
+.login:hover a, .login:hover a i {
     color: #33e39a;
     text-shadow: none;
 }
@@ -162,8 +151,8 @@ body {
 }
 
 .btn:hover {
-    background: #c6a300; /* Beispiel: Ändert den Hintergrund beim Hover */
-    color: white; /* Ändert die Schriftfarbe auf Weiß */
+    background: #c6a300;
+    color: white;
     box-shadow: 0 0 15px white;
 }
 
@@ -193,7 +182,6 @@ body {
     max-width: 600px;
     top: 110px;
     left: -250px;
-    border: 0px solid #000;
     border-radius: 15px;
     transform: rotate(-45deg);
     box-shadow: 0px 0px 10px whitesmoke;
@@ -202,103 +190,36 @@ body {
     animation-delay: 2s;
 }
 
-.home .rhombus2 {
-    position: absolute;
-    top: -25%;
-    right: -25%;
-    width: 700px;
-    height: 700px;
-    border: 25px solid #c6a300;
-    border-radius: 15px;
-    background-color: #c6a300;
-    transform: rotate(45deg);
-    box-shadow: 0px 0px 10px whitesmoke;
-    opacity: 0;
-    animation: rhombus2 1s ease forwards;
+/* About, Features, and Contact Sections */
+#about, #features, #contact {
+    padding: 100px 8%;
+    color: #eaeaea;
+    text-align: left;
 }
 
-/* About Section */
 #about {
-    padding: 100px 8%;
     background-color: #1c1c1c;
-    color: #eaeaea;
-    text-align: left;
 }
 
-#about h2 {
-    font-size: 50px;
-    color: #fbcf04;
-    margin-bottom: 20px;
-    text-shadow: 0px 5px 10px grey;
-}
-
-#about p {
-    font-size: 18px;
-    line-height: 1.8;
-    margin-bottom: 30px;
-}
-
-#about img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 15px;
-    box-shadow: 0 0 10px #33e39a;
-}
-
-/* Features Section */
 #features {
-    padding: 100px 8%;
     background-color: #000;
-    color: #eaeaea;
-    text-align: left;
 }
 
-#features h2 {
-    font-size: 50px;
-    color: #fbcf04;
-    margin-bottom: 20px;
-    text-shadow: 0px 5px 10px grey;
-}
-
-#features ul {
-    list-style: none;
-    padding: 0;
-    font-size: 18px;
-}
-
-#features li {
-    margin: 10px 0;
-}
-
-#features img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 15px;
-    box-shadow: 0 0 10px #33e39a;
-}
-
-/* Contact Section */
 #contact {
-    padding: 100px 8%;
     background-color: #1c1c1c;
-    color: #eaeaea;
-    text-align: left;
 }
 
-#contact h2 {
+h2 {
     font-size: 50px;
     color: #fbcf04;
     margin-bottom: 20px;
+}
+
+.text-shadow {
     text-shadow: 0px 5px 10px grey;
 }
 
-#contact p {
-    font-size: 18px;
-    line-height: 1.8;
-    margin-bottom: 30px;
-}
-
-#contact img {
+#about img, #features img, #contact img {
     max-width: 100%;
     height: auto;
     border-radius: 15px;
@@ -307,8 +228,7 @@ body {
 
 /* Spacer */
 .spacer-space {
-    height: 245px; /* Höhe des leeren Bereichs */
-    background: #1c1c1c; /* Keine Hintergrundfarbe */
+    height: 245px;
 }
 
 .spacer {
@@ -318,11 +238,9 @@ body {
     text-align: center;
 }
 
-/* Copyright */
 .copyright-section p {
     font-size: 14px;
     margin: 0;
-    color: #eaeaea;
 }
 
 /* Animationen */
@@ -343,7 +261,7 @@ body {
         opacity: 0;
     }
     100% {
-        transform: translateX(0px);
+        transform: translateX(0);
         opacity: 1;
     }
 }
@@ -408,11 +326,11 @@ body {
     }
 
     .home-content h1 {
-        font-size: 32px; /* Kleinere Überschrift auf Mobilgeräten */
+        font-size: 32px;
     }
 
     .home-content h3 {
-        font-size: 24px; /* Kleinere Schriftgröße */
+        font-size: 24px;
     }
 
     .home-content p {
@@ -433,11 +351,11 @@ body {
         margin: 10px 0;
     }
 
-    .header {
+    #header {
         padding: 10px 5%;
     }
 
     .rhombus2 {
-        display: none; /* Entfernt das große Rhombus-Element auf kleinen Bildschirmen */
+        display: none;
     }
 }
