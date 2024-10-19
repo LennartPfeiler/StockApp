@@ -1,0 +1,99 @@
+type Query {
+
+}
+
+type User {
+    firstname: String
+    lastname: String
+    email: ID!
+    password: String
+    budget: Float
+}
+
+type TransactionContent {
+    transactionType: Int
+    stockAmount: Float
+    date: String
+    pricePerStock: Float
+    totalPrice: Float
+    email: ID!
+    symbol: String
+}
+
+type Transaction{
+    transactionID: ID!
+    transactionType: Int
+    stockAmount: Float
+    date: String
+    pricePerStock: Float
+    totalPrice: Float
+    email: ID!
+    symbol: String
+    leftInPortfolio: Float
+}
+
+type TokenUser{
+    token: String
+    user: User
+}
+
+type TokenTransactionContent{
+    token: String
+    transactionContent: TransactionContent
+}
+
+type TokenEmail{
+    token: String
+    email: ID!
+}
+
+type StringAnswer{
+    answer: String
+}
+
+type Stock{
+    symbol: String
+    stockPrice: Float
+    name: String
+}
+
+type Session{
+    email: ID!
+    token: String
+}
+
+type PortfolioStock{
+    portfolioID: ID!
+    symbol: String
+    stockAmount: Float
+    boughtValue: Float
+    currentValue: Float
+}
+
+type Portfolio{
+    portfolioID: ID!
+    value: Float
+    startValue: Float
+    email: ID!
+}
+
+type LogoutRequest{
+    email: String
+    token: String
+}
+
+type LoginRequest{
+    email: ID!
+    password: String
+}
+
+type EditRequest{
+    token: String
+    currentmail: String
+    user: User
+}
+
+type AddStockRequest{
+    tokenEmail: TokenEmail
+    stock: Stock
+}S
