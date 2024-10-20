@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation;
 
 import java.io.*;
 import java.net.URI;
@@ -8,9 +8,9 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.UUID;
-import mosbach.dhbw.de.stockwizzard.dataManager.IStockManager;
-import mosbach.dhbw.de.stockwizzard.model.Stock;
-import mosbach.dhbw.de.stockwizzard.model.User;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.IStockManager;
+import dhbw.mosbach.de.stockwizzard.model.Stock;
+import dhbw.mosbach.de.stockwizzard.model.User;
 
 public class StockManagerImplementation implements IStockManager {
 

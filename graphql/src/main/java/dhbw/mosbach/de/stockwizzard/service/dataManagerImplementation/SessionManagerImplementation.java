@@ -1,12 +1,12 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation;
 
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.UUID;
-import mosbach.dhbw.de.stockwizzard.dataManager.ISessionManager;
-import mosbach.dhbw.de.stockwizzard.model.Portfolio;
-import mosbach.dhbw.de.stockwizzard.model.Session;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.ISessionManager;
+import dhbw.mosbach.de.stockwizzard.model.Portfolio;
+import dhbw.mosbach.de.stockwizzard.model.Session;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
@@ -21,7 +21,7 @@ public class SessionManagerImplementation implements ISessionManager {
 
     private static SessionManagerImplementation databaseUser = null;
 
-    private SessionManagerImplementation() {
+    public SessionManagerImplementation() {
         try {
             dbUri = new URI(databaseConnectionnUrl);
         } catch (URISyntaxException e) {

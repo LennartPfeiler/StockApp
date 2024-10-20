@@ -1,9 +1,9 @@
-package mosbach.dhbw.de.stockwizzard.dataManager;
+package dhbw.mosbach.de.stockwizzard.service.dataManager;
 import java.util.List;
 
-import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
-import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
-import mosbach.dhbw.de.stockwizzard.model.Transaction;
+import dhbw.mosbach.de.stockwizzard.model.PortfolioStock;
+import dhbw.mosbach.de.stockwizzard.model.PortfolioStockValue;
+import dhbw.mosbach.de.stockwizzard.model.Transaction;
 
 public interface IPortfolioStockManager{
 

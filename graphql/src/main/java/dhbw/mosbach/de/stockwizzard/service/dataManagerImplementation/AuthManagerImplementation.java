@@ -1,11 +1,11 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation;
 
 import java.io.*;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.UUID;
-import mosbach.dhbw.de.stockwizzard.dataManager.IAuthManager;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.IAuthManager;
 
 public class AuthManagerImplementation implements IAuthManager{
 

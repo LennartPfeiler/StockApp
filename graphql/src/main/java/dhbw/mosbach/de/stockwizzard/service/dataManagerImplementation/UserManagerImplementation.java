@@ -1,11 +1,11 @@
-﻿package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+﻿package dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation;
 
 import java.io.*;
-import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
-import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
-import mosbach.dhbw.de.stockwizzard.model.User;
-import mosbach.dhbw.de.stockwizzard.model.EditRequest;
-import mosbach.dhbw.de.stockwizzard.model.Portfolio;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.IUserManager;
+import dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation.PasswordManagerImplementation;
+import dhbw.mosbach.de.stockwizzard.model.User;
+import dhbw.mosbach.de.stockwizzard.model.EditRequest;
+import dhbw.mosbach.de.stockwizzard.model.Portfolio;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hibernate.Session;

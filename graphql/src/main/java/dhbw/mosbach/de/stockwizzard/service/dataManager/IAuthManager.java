@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManager;
+package dhbw.mosbach.de.stockwizzard.service.dataManager;
 
 public interface IAuthManager{
 

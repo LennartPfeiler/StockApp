@@ -1,16 +1,16 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
 
-import mosbach.dhbw.de.stockwizzard.dataManager.ITransactionManager;
-import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
-import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
-import mosbach.dhbw.de.stockwizzard.model.Transaction;
-import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
-import mosbach.dhbw.de.stockwizzard.model.User;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.ITransactionManager;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.IUserManager;
+import dhbw.mosbach.de.stockwizzard.model.PortfolioStock;
+import dhbw.mosbach.de.stockwizzard.model.Transaction;
+import dhbw.mosbach.de.stockwizzard.model.TransactionContent;
+import dhbw.mosbach.de.stockwizzard.model.User;
 
 import java.util.ArrayList;
 import java.util.List;

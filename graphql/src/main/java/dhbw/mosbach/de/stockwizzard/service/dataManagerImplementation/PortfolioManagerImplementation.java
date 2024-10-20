@@ -1,12 +1,12 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
 
-import mosbach.dhbw.de.stockwizzard.dataManager.IPortfolioManager;
-import mosbach.dhbw.de.stockwizzard.model.Portfolio;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.IPortfolioManager;
+import dhbw.mosbach.de.stockwizzard.model.Portfolio;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

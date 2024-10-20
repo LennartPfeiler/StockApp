@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
+package dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation;
 
 import java.io.*;
 import java.net.URI;
@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mosbach.dhbw.de.stockwizzard.dataManager.IPortfolioStockManager;
-import mosbach.dhbw.de.stockwizzard.model.Portfolio;
-import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
-import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
-import mosbach.dhbw.de.stockwizzard.model.Transaction;
+import dhbw.mosbach.de.stockwizzard.service.dataManager.IPortfolioStockManager;
+import dhbw.mosbach.de.stockwizzard.model.Portfolio;
+import dhbw.mosbach.de.stockwizzard.model.PortfolioStock;
+import dhbw.mosbach.de.stockwizzard.model.PortfolioStockValue;
+import dhbw.mosbach.de.stockwizzard.model.Transaction;
 
 public class PortfolioStockManagerImplementation implements IPortfolioStockManager{
 

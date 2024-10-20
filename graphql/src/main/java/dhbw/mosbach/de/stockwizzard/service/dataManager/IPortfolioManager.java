@@ -1,6 +1,6 @@
-package mosbach.dhbw.de.stockwizzard.dataManager;
+package dhbw.mosbach.de.stockwizzard.service.dataManager;
 
-import mosbach.dhbw.de.stockwizzard.model.Portfolio;
+import dhbw.mosbach.de.stockwizzard.model.Portfolio;
 
 public interface IPortfolioManager {
 

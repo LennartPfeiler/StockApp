@@ -1,4 +1,4 @@
-package mosbach.dhbw.de.stockwizzard.model;
+package dhbw.mosbach.de.stockwizzard.model;
 
 public class PortfolioStockValue {
     private Double currentValue;
