@@ -12,7 +12,6 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.SessionManagerImpl
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.StockManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.TransactionManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
-import mosbach.dhbw.de.stockwizzard.model.LogoutRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
 import mosbach.dhbw.de.stockwizzard.model.TokenEmail;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
@@ -73,10 +72,10 @@ public class MappingController {
     }
 
     @DeleteMapping(path = "/auth", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest) {
+    public ResponseEntity<?> logout(@RequestBody Session session) {
         try {
-            String email = logoutRequest.getEmail();
-            String token = logoutRequest.getToken();
+            String email = session.getEmail();
+            String token = session.getToken();
             Boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 sessionManager.deleteSession(email, token);
