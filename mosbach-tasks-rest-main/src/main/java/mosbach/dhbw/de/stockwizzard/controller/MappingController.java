@@ -41,13 +41,12 @@ public class MappingController {
     StockManagerImplementation stockManager = StockManagerImplementation.getStockManager();
     PortfolioStockManagerImplementation portfolioStockManager = PortfolioStockManagerImplementation
             .getPortfolioStockManager();
+    private final double EPSILON = 0.000001;
 
-    ////////////////////////////////////////////////////////////// Auth Endpoints////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////// Auth
+    ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
 
-    @PostMapping(
-        path = "/auth", 
-        consumes = { MediaType.APPLICATION_JSON_VALUE }
-        )
+    @PostMapping(path = "/auth", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         try {
             String email = loginRequest.getEmail();
@@ -413,9 +412,49 @@ public class MappingController {
                         Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
                         List<Transaction> transactionsInPortfolio = transactionManager
                                 .getAllTransactionsInPortfolioStock(transactionContent.getEmail());
-                        portfolioStockManager.decreasePortfolioStock(userPortfolio.getPortfolioID(),
-                                transactionContent.getSymbol(), transactionContent.getStockAmount(),
-                                transactionContent.getTotalPrice(), portfolioStockValues, transactionsInPortfolio);
+                        if (Math.abs(transactionContent.getTotalPrice()- portfolioStockValues.getCurrentValue()) < EPSILON) {
+                            portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(),userPortfolio.getPortfolioID());
+                            for (Transaction transaction : transactionsInPortfolio) {
+                                transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
+                            }
+                        } else {
+                            Double remainingAmount = transactionContent.getTotalPrice();
+                            Double totalBoughtValueReduction = 0.0;
+                            for (Transaction transaction : transactionsInPortfolio) {
+                                if (remainingAmount <= 0) {
+                                    break;
+                                }
+
+                                Double leftInTransaction = transaction.getLeftInPortfolio();
+                                Double transactionBoughtValue = transaction.getTotalPrice();
+                                Integer transactionId = transaction.getTransactionID();
+
+                                if (remainingAmount >= leftInTransaction) {
+                                    remainingAmount -= leftInTransaction;
+                                    totalBoughtValueReduction += transactionBoughtValue;
+                                    transactionManager.editLeftinPortfolio(transactionId, 0.0);
+                                } else {
+                                    Double proportion = remainingAmount / leftInTransaction;
+                                    Double reductionInBoughtValue = transactionBoughtValue * proportion;
+                                    totalBoughtValueReduction += reductionInBoughtValue;
+
+                                    Double newLeftInTransaction = leftInTransaction - remainingAmount;
+                                    remainingAmount = 0.0;
+                                    transactionManager.editLeftinPortfolio(transactionId, newLeftInTransaction);
+                                }
+                            }
+
+                            Double newCurrentValue = portfolioStockValues.getCurrentValue()
+                                    - transactionContent.getTotalPrice();
+                            Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
+                            portfolioStockManager.decreasePortfolioStock(newCurrentValue, newBoughtValue,
+                                    transactionContent.getStockAmount(), userPortfolio.getPortfolioID(),
+                                    transactionContent.getSymbol());
+                        }
+
+                        // portfolioStockManager.decreasePortfolioStock(userPortfolio.getPortfolioID(),
+                        //         transactionContent.getSymbol(), transactionContent.getStockAmount(),
+                        //         transactionContent.getTotalPrice(), portfolioStockValues, transactionsInPortfolio);
                         userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                                 transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                         return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
