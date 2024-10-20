@@ -17,9 +17,6 @@ import mosbach.dhbw.de.stockwizzard.model.Transaction;
 
 public class PortfolioStockManagerImplementation implements IPortfolioStockManager {
 
-    private TransactionManagerImplementation transactionManager = TransactionManagerImplementation
-            .getTransactionManager();
-
     private String databaseConnectionnUrl = "postgresql://mhartwig:BE1yEbCLMjy7r2ozFRGHZaE6jHZUx0fFadiuqgW7TtVs1k15XZVwPSBkPLZVTle6@b8b0e4b9-8325-4a3f-be73-74f20266cd1a.postgresql.eu01.onstackit.cloud:5432/stackit";
     private URI dbUri;
     private String username = "";
