@@ -20,6 +20,7 @@ import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
 import mosbach.dhbw.de.stockwizzard.model.Stock;
+import mosbach.dhbw.de.stockwizzard.model.Session;
 import mosbach.dhbw.de.stockwizzard.model.AddStockRequest;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
 import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
@@ -138,7 +139,7 @@ public class MappingController {
     public ResponseEntity<?> editProfile(@RequestBody EditRequest editRequest) {
         try {
             String token = editRequest.getToken();
-            User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
+            User currentUser = userManager.getUserProfile(editRequest.getCurrentMail());
             User new_user_data = editRequest.getUser();
 
             Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());

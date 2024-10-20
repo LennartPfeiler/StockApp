@@ -1,5 +1,5 @@
 
-package mosbach.dhbw.de.stockwizzard.model
+package mosbach.dhbw.de.stockwizzard.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
