@@ -1,5 +1,5 @@
 
-package mosbach.dhbw.de.stockwizzard.model ;
+package mosbach.dhbw.de.stockwizzard.model
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ public class EditRequest {
     @JsonProperty("token")
     private String token;
     @JsonProperty("currentmail")
-    private String currentmail;
+    private String currentMail;
     @JsonProperty("user")
     private User user;
     @JsonIgnore
@@ -31,14 +31,14 @@ public class EditRequest {
 
     /**
      * 
-     * @param currentmail
+     * @param currentMail
      * @param user
      * @param token
      */
-    public EditRequest(String token, String currentmail, User user) {
+    public EditRequest(String token, String currentMail, User user) {
         super();
         this.token = token;
-        this.currentmail = currentmail;
+        this.currentMail = currentMail;
         this.user = user;
     }
 
@@ -53,13 +53,13 @@ public class EditRequest {
     }
 
     @JsonProperty("currentmail")
-    public String getCurrentmail() {
-        return currentmail;
+    public String getCurrentMail() {
+        return currentMail;
     }
 
     @JsonProperty("currentmail")
-    public void setCurrentmail(String currentmail) {
-        this.currentmail = currentmail;
+    public void setCurrentMail(String currentMail) {
+        this.currentMail = currentMail;
     }
 
     @JsonProperty("user")

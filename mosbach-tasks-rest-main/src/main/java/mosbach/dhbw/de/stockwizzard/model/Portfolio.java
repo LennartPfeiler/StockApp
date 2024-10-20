@@ -35,6 +35,7 @@ public class Portfolio {
      * 
      * @param portfolioID
      * @param value
+     * @param startValue
      * @param email
      */
     public Portfolio(Integer portfolioID, Double value, Double startValue, String email) {
