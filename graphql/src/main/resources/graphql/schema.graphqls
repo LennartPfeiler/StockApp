@@ -1,6 +1,24 @@
 type Query {
-
+    userByEmail(email: ID!): User
+    login(loginRequest: LoginRequest!): TokenUser
+    logout(logoutRequest: LogoutRequest!): StringAnswer
+    getUserProfile(email: ID!, token: String!): User
+    getStock(email: ID!, token: String!, symbol: String!): Stock
+    getAllPortfolioStocks(email: ID!, token: String!, sortby: String): [PortfolioStock]
+    getAllTransactions(email: ID!, token: String!, sortby: String): [Transaction]
+    getUserPortfolio(email: ID!, token: String!): Portfolio
 }
+
+type Mutation {
+    createUser(user: User!): StringAnswer
+    editProfile(editRequest: EditRequest!): StringAnswer
+    resetProfile(tokenEmail: TokenEmail!): StringAnswer
+    deleteProfile(tokenEmail: TokenEmail!): StringAnswer
+    createStock(addStockRequest: AddStockRequest!): StringAnswer
+    createBuyOrder(tokenTransactionContent: TokenTransactionContent!): StringAnswer
+    createSellOrder(tokenTransactionContent: TokenTransactionContent!): StringAnswer
+}
+
 
 type User {
     firstname: String
