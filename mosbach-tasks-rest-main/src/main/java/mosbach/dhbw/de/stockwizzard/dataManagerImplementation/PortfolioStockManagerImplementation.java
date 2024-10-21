@@ -423,15 +423,16 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
     public void editCurrentValue(String email, String symbol, Double newCurrentValue) {
         Statement stmt = null;
         Connection connection = null;
-        String updateUserBudgetSQL = "";
+        String updateCurrentValueSQL = "";
         Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "Start editCurrentValue method");
+        Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "{0}", newCurrentValue);
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
             updateCurrentValueSQL = "UPDATE group12portfolioStock SET currentvalue = " + newCurrentValue +
-                    " WHERE email = '" + email + "' AND symbol = '" + symbol;
-
-            stmt.executeUpdate(updateUserBudgetSQL);
+                    " WHERE portfolioid = (SELECT portfolioid from group12portfolio WHERE email = '" + email + "') AND symbol = '" + symbol + "'";
+    
+            stmt.executeUpdate(updateCurrentValueSQL);
         } catch (SQLException e) {
             Logger.getLogger("editCurrentValue").log(Level.SEVERE, "Error updating current value.", e);
             e.printStackTrace();
@@ -447,4 +448,5 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             }
         }
     }
+    
 }

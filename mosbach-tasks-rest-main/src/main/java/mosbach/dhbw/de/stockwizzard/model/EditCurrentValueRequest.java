@@ -77,7 +77,7 @@ public class EditCurrentValueRequest {
 
     @JsonProperty("newvalue")
     public void setNewValue(Double newValue) {
-        this.newValue = n
+        this.newValue = newValue;
 
     
 

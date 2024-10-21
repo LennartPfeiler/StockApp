@@ -500,6 +500,7 @@ function getStockPriceFromAPI(stockName) {
         "method": "GET",
         "dataType": 'json',
         "success": function(data) {
+            insertNewStock(stockName, 0.0);
             if (data.status === 'OK' && data.results && data.results.length > 0) {
                 const closeValue = parseFloat(data.results[0].c); 
                 const roundedCloseValue = closeValue.toFixed(2);
@@ -722,11 +723,11 @@ function getAllPortfolioStocks(){
         displayPortfolioStocks(portfolioStocks);
 
         portfolioStocks.forEach(portfolioStock => {
-            let positionAmount = portfolioStock.stockAmount;
+            let positionAmount = portfolioStock.stockamount;
             getNewCurrentValue(portfolioStock.symbol, function(price) {
                 let totalValue = price * positionAmount;
                 setNewCurrentValue(totalValue, portfolioStock.symbol);
-                updateStockDisplay(portfolioStock.symbol, totalValue, portfolioStock.boughtValue);
+                updateStockDisplay(portfolioStock.symbol, totalValue, portfolioStock.boughtvalue);
             });
         });
     })
@@ -741,13 +742,15 @@ function getAllPortfolioStocks(){
 
 
 function getNewCurrentValue(stockName, callback) {
+    console.log("GetCurrentValue");
+    console.log(stockName);
     const getStockPriceAPIRegister = {
         "async": true, 
         "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
         "method": "GET",
         "dataType": 'json',
         "success": function(data) {
-            callback(data.close); // Preis zurückgeben
+            callback(data.results[0].c); // Preis zurückgeben
         },
         "error": function(jqXHR, textStatus, errorThrown) {
             console.log("Error fetching stock price, retrying...");
@@ -762,10 +765,13 @@ function getNewCurrentValue(stockName, callback) {
 
 
 function setNewCurrentValue(currentValue, symbol){
+    console.log("SetCurrentValue");
+    console.log(currentValue);
+    console.log(symbol);
     //Set new value
     const editCurrentValueRegister = {
         "async": true,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock/currentValue",
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStocks/currentValue",
         "method": "PUT",
         "headers": {
             'Accept': 'application/json',
@@ -775,7 +781,7 @@ function setNewCurrentValue(currentValue, symbol){
             "token": getCookie("token"),
             "email": getCookie("email"),
             "symbol": symbol,
-            "newValue": currentValue
+            "newvalue": currentValue
         }),
         "success": function(data) {
             console.log("Antwort vom Server:", data);
@@ -795,6 +801,10 @@ function setNewCurrentValue(currentValue, symbol){
 }
 
 function updateStockDisplay(symbol, currentValue, boughtValue) {
+    console.log("updateStockDisplay");
+    console.log(symbol);
+    console.log(currentValue);
+    console.log(boughtValue);
     const stockElement = document.getElementById(symbol);
     const stockValue = roundToTwoDecimalPlaces(currentValue);
 
@@ -819,7 +829,7 @@ function displayPortfolioStocks(portfolioStocks) {
         // Zeige den Platzhalter für den aktuellen Preis
         const stockDiv = document.createElement('div');
         stockDiv.id = stock.symbol; // Füge eine ID für die spätere Aktualisierung hinzu
-        stockDiv.innerHTML = `${stock.symbol}: Calculating Percentage... <span class="change"></span>`;
+        stockDiv.innerHTML = `${stock.symbol}: Calculating Portfolio data... <span class="change"></span>`;
         stockListContainer.appendChild(stockDiv);
     });
 }

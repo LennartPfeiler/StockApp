@@ -2,6 +2,9 @@ package mosbach.dhbw.de.stockwizzard.controller;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.springframework.http.*;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
@@ -26,6 +29,7 @@ import mosbach.dhbw.de.stockwizzard.model.EditRequest;
 import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
+import mosbach.dhbw.de.stockwizzard.model.EditCurrentValueRequest;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -296,7 +300,8 @@ public class MappingController {
         try {
             Boolean isValid = sessionManager.validToken(editCurrentValueRequest.getToken(), editCurrentValueRequest.getEmail());
             if (isValid) {
-                portfolioStockManager.editCurrentValue(editCurrentValueRequest.getEmail(), editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue);
+                Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "{0}", editCurrentValueRequest.getNewValue());
+                portfolioStockManager.editCurrentValue(editCurrentValueRequest.getEmail(), editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue());
                 return ResponseEntity.ok(new StringAnswer("Current Value successfully updated"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
