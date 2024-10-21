@@ -183,6 +183,48 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         return portfolioStocks;
     }
 
+    // Get a portfolio stock
+    public List<PortfolioStock> getPortfolioStock(String email, String symbol) {
+        PortfolioStock portfolioStock = null;
+        Statement stmt = null;
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+
+            String getPortfolioStockSQL = "SELECT * FROM group12portfoliostock WHERE portfolioid =" +
+                    "(SELECT portfolioid FROM group12portfolio WHERE email = '" + email + "') AND symbol = '" + symbol
+                    + "'";
+
+            ResultSet rs = stmt.executeQuery(getPortfolioStockSQL);
+            while (rs.next()) {
+                portfolioStock =  new PortfolioStock(
+                                Integer.parseInt(rs.getString("portfolioid")),
+                                rs.getString("symbol"),
+                                Double.parseDouble(rs.getString("stockamount")),
+                                Double.parseDouble(rs.getString("boughtvalue")),
+                                Double.parseDouble(rs.getString("currentvalue")));
+            }
+            rs.close();
+        } catch (Exception e) {
+            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,
+                    "Error when getting  portfolio stock. Error: {0}", e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                Logger.getLogger("GetPortfolioStocksLogger").log(Level.SEVERE,
+                        "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
+            }
+        }
+        return portfolioStocks;
+    }
+
     // Delete oder update a portfolio stock
     // public void decreasePortfolioStock(Integer portfolioId, String symbol, Double
     // stockAmount, Double totalPrice, PortfolioStockValue portfolioStockValues,
@@ -430,8 +472,9 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
             updateCurrentValueSQL = "UPDATE group12portfolioStock SET currentvalue = " + newCurrentValue +
-                    " WHERE portfolioid = (SELECT portfolioid from group12portfolio WHERE email = '" + email + "') AND symbol = '" + symbol + "'";
-    
+                    " WHERE portfolioid = (SELECT portfolioid from group12portfolio WHERE email = '" + email
+                    + "') AND symbol = '" + symbol + "'";
+
             stmt.executeUpdate(updateCurrentValueSQL);
         } catch (SQLException e) {
             Logger.getLogger("editCurrentValue").log(Level.SEVERE, "Error updating current value.", e);
@@ -448,5 +491,5 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             }
         }
     }
-    
+
 }

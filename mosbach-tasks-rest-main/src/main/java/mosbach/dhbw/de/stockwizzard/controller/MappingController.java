@@ -295,13 +295,42 @@ public class MappingController {
         }
     }
 
+    @GetMapping("/portfolioStock")
+    public ResponseEntity<?> getPortfolioStock(
+            @RequestParam(value = "email", defaultValue = "") String email,
+            @RequestParam(value = "token", defaultValue = "") String token,
+            @RequestParam(value = "symbol", defaultValue = "") String symbol) {
+
+        try {
+            Boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                PortfolioStock portfolioStock = portfolioStockManager.getPortfolioStock(email, symbol);
+                if (portfolioStock != null) {
+                    return ResponseEntity.ok(portfolioStock);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new StringAnswer("PortfolioStock is not in the database."));
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new StringAnswer("Unauthorized for this transaction!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new StringAnswer("An unexpected error occurred during getting portfolioStocks."));
+        }
+    }
+
     @PutMapping(path = "/portfolioStocks/currentValue", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createStock(@RequestBody EditCurrentValueRequest editCurrentValueRequest) {
         try {
-            Boolean isValid = sessionManager.validToken(editCurrentValueRequest.getToken(), editCurrentValueRequest.getEmail());
+            Boolean isValid = sessionManager.validToken(editCurrentValueRequest.getToken(),
+                    editCurrentValueRequest.getEmail());
             if (isValid) {
-                Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "{0}", editCurrentValueRequest.getNewValue());
-                portfolioStockManager.editCurrentValue(editCurrentValueRequest.getEmail(), editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue());
+                Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "{0}",
+                        editCurrentValueRequest.getNewValue());
+                portfolioStockManager.editCurrentValue(editCurrentValueRequest.getEmail(),
+                        editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue());
                 return ResponseEntity.ok(new StringAnswer("Current Value successfully updated"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -433,8 +462,10 @@ public class MappingController {
                         Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
                         List<Transaction> transactionsInPortfolio = transactionManager
                                 .getAllTransactionsInPortfolioStock(transactionContent.getEmail());
-                        if (Math.abs(transactionContent.getTotalPrice()- portfolioStockValues.getCurrentValue()) < EPSILON) {
-                            portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(),userPortfolio.getPortfolioID());
+                        if (Math.abs(transactionContent.getTotalPrice()
+                                - portfolioStockValues.getCurrentValue()) < EPSILON) {
+                            portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(),
+                                    userPortfolio.getPortfolioID());
                             for (Transaction transaction : transactionsInPortfolio) {
                                 transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
                             }
@@ -474,8 +505,9 @@ public class MappingController {
                         }
 
                         // portfolioStockManager.decreasePortfolioStock(userPortfolio.getPortfolioID(),
-                        //         transactionContent.getSymbol(), transactionContent.getStockAmount(),
-                        //         transactionContent.getTotalPrice(), portfolioStockValues, transactionsInPortfolio);
+                        // transactionContent.getSymbol(), transactionContent.getStockAmount(),
+                        // transactionContent.getTotalPrice(), portfolioStockValues,
+                        // transactionsInPortfolio);
                         userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                                 transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                         return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
