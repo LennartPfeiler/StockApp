@@ -1,8 +1,7 @@
 type Query {
-    userByEmail(email: ID!): User
     login(loginRequest: LoginRequest!): TokenUser
     logout(session: SessionInput!): StringAnswer
-    getUserProfile(email: ID!, token: String!): User
+    getUserProfile(email: ID!): User
     getStock(email: ID!, token: String!, symbol: String!): Stock
     getAllPortfolioStocks(email: ID!, token: String!, sortby: String): [PortfolioStock]
     getAllTransactions(email: ID!, token: String!, sortby: String): [Transaction]
