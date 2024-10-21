@@ -184,7 +184,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
     }
 
     // Get a portfolio stock
-    public List<PortfolioStock> getPortfolioStock(String email, String symbol) {
+    public PortfolioStock getPortfolioStock(String email, String symbol) {
         PortfolioStock portfolioStock = null;
         Statement stmt = null;
         Connection connection = null;
@@ -222,7 +222,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
                 e.printStackTrace();
             }
         }
-        return portfolioStocks;
+        return portfolioStock;
     }
 
     // Delete oder update a portfolio stock

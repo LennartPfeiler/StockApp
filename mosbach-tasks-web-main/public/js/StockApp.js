@@ -26,6 +26,7 @@
 ///* Data display *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function displayAllDatabaseData(){
+    console.log("DatabaseMethode");
     displayUserBudget(); 
     displayTotalPortfolioValue();
     getAllTransactions();
@@ -200,7 +201,7 @@ function getCurrentDateTime() {
 //Create a buy Order
 function buyStock(){
     event.preventDefault();
-    const stockDiv = document.getElementById(stockSymbol);
+    const stockDiv = document.getElementById($('#stock-name').val());
     let stockAmount;
     const priceDisplay = document.getElementById("price-display").textContent.trim();
     const price = parseFloat(priceDisplay.replace('$', '').trim());
@@ -265,6 +266,7 @@ function buyStock(){
             getPortfolioStockData(stockSymbol, function(currentValue, boughtValue) {
                 updateStockDisplay(stockSymbol, currentValue, boughtValue);
             });
+            displayAllDatabaseData();
         },
         "error": function(xhr) {
             if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
@@ -280,15 +282,18 @@ function buyStock(){
 }
 
 function getPortfolioStockData(symbol, callback){
+    console.log("Start getMethode");
+    console.log(symbol);
     const settingsGetPortfolioStock = {
         "async": false,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&sortby=" + symbol,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + symbol,
         "method": "GET",
         "headers": {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         "success": function(data) {
+            console.log(data);
             let boughtValue = data.boughtvalue;
             let currentValue = data.currentvalue;
             callback(currentValue, boughtValue);
@@ -299,10 +304,8 @@ function getPortfolioStockData(symbol, callback){
                 callback(-1.0, -1.0)
             } else {
                 console.error("Error fetching bought value:", xhr);
-            callback(0.0,0.0)
+                callback(0.0,0.0)
             }
-            console.error("Error fetching bought value:", xhr);
-            callback(0.0,0.0)
         }
     };
     $.ajax(settingsGetPortfolioStock);    
@@ -360,19 +363,18 @@ function sellStock(){
         "success": function(data) {
             console.log(data);
             alert(data.answer);
-            displayAllDatabaseData();
             $('#quantity').val("");
 
-            getPortfolioStockData(stockSymbol, function(currentValue, boughtValue) {
-
+            getPortfolioStockData($('#stock-name').val(), function(currentValue, boughtValue) {
                 if(currentValue == -1.0){
-                    const stockDiv = document.getElementById(stockSymbol);
+                    const stockDiv = document.getElementById($('#stock-name').val());
                     stockDiv.remove();
                 }
                 else{
-                    updateStockDisplay(stockSymbol, currentValue, boughtValue);
+                    updateStockDisplay($('#stock-name').val(), currentValue, boughtValue);
                 }
             });
+            displayAllDatabaseData();
         },
         "error": function(xhr) {
             if (xhr.status === 400 || xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
@@ -628,9 +630,9 @@ function addNewStockIfNotExists(stockName, stockPrice) {
                     "error": function(xhr) {
                         console.error("Error inserting stock:", xhr);
                         if (xhr.status === 401 || xhr.status === 500) {
-                            alert(JSON.parse(xhr.responseText).answer);
+                            console.log(JSON.parse(xhr.responseText).answer);
                         } else {
-                            alert("An unexpected error occurred. Status: " + xhr.status);
+                            console.log("An unexpected error occurred. Status: " + xhr.status);
                         }
                     }
                 };
@@ -639,7 +641,6 @@ function addNewStockIfNotExists(stockName, stockPrice) {
             });
         } else {
             console.log("Stock already exists in the database.");
-            alert("This stock is already in your portfolio.");
         }
     });
 }
@@ -846,7 +847,6 @@ function displayTransactionHistory(transactions) {
     transactionHistoryContainer.appendChild(heading);
 
     transactions.forEach(transaction => {
-        console.log(transaction);
         const transactionDiv = document.createElement('div');
         if(transaction.transactiontype === 1){
             type = "Bought"
