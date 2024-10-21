@@ -14,7 +14,7 @@ public interface IPortfolioStockManager {
 
     public List<PortfolioStock> getAllPortfolioStocks(String email, String sortby);
 
-    public void decreasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice, PortfolioStockValue portfolioStockValues, List<Transaction> transactionsInPortfolio);
+    public void decreasePortfolioStock(Double newCurrentValue, Double newBoughtValue, Double stockAmount, Integer portfolioId, String symbol);
 
     public PortfolioStockValue getPortfolioStockValues(Double sellRequestAmount, String email, String symbol);
 

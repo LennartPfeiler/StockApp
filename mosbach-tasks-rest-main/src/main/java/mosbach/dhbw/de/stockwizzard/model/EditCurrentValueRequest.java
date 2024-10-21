@@ -1,4 +1,3 @@
-
 package mosbach.dhbw.de.stockwizzard.model;
 
 import java.util.LinkedHashMap;
@@ -11,14 +10,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EditRequest {
+public class EditCurrentValueRequest {
 
     @JsonProperty("token")
     private String token;
-    @JsonProperty("currentmail")
-    private String currentMail;
-    @JsonProperty("user")
-    private User user;
+    @JsonProperty("email")
+    private String email;
+    @JsonProperty("symbol")
+    private String symbol;
+    @JsonProperty("newvalue")
+    private Double newValue;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -26,20 +27,15 @@ public class EditRequest {
      * No args constructor for use in serialization
      * 
      */
-    public EditRequest() {
+    public EditCurrentValueRequest() {
     }
 
-    /**
-     * 
-     * @param currentMail
-     * @param user
-     * @param token
-     */
-    public EditRequest(String token, String currentMail, User user) {
+    public EditCurrentValueRequest(String token, String email, String symbol, Double newValue) {
         super();
         this.token = token;
-        this.currentMail = currentMail;
-        this.user = user;
+        this.email = email;
+        this.symbol = symbol;
+        this.newValue = newValue;
     }
 
     @JsonProperty("token")
@@ -52,24 +48,40 @@ public class EditRequest {
         this.token = token;
     }
 
-    @JsonProperty("currentmail")
-    public String getCurrentMail() {
-        return currentMail;
+    @JsonProperty("email")
+    public String getEmail() {
+        return email;
     }
 
-    @JsonProperty("currentmail")
-    public void setCurrentMail(String currentMail) {
-        this.currentMail = currentMail;
+    @JsonProperty("email")
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    @JsonProperty("user")
-    public User getUser() {
-        return user;
+    @JsonProperty("symbol")
+    public String getSymbol() {
+        return symbol;
     }
 
-    @JsonProperty("user")
-    public void setUser(User user) {
-        this.user = user;
+    @JsonProperty("symbol")
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+
+    }
+
+    @JsonProperty("newvalue")
+    public Double getNewValue() {
+        return newValue;
+
+    }
+
+    @JsonProperty("newvalue")
+    public void setNewValue(Double newValue) {
+        this.newValue = n
+
+    
+
+    
     }
 
     @JsonAnyGetter

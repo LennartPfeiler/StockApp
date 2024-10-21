@@ -20,6 +20,7 @@ import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
 import mosbach.dhbw.de.stockwizzard.model.Stock;
+import mosbach.dhbw.de.stockwizzard.model.Session;
 import mosbach.dhbw.de.stockwizzard.model.AddStockRequest;
 import mosbach.dhbw.de.stockwizzard.model.EditRequest;
 import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
@@ -138,7 +139,7 @@ public class MappingController {
     public ResponseEntity<?> editProfile(@RequestBody EditRequest editRequest) {
         try {
             String token = editRequest.getToken();
-            User currentUser = userManager.getUserProfile(editRequest.getCurrentmail());
+            User currentUser = userManager.getUserProfile(editRequest.getCurrentMail());
             User new_user_data = editRequest.getUser();
 
             Boolean isValid = sessionManager.validToken(token, currentUser.getEmail());
@@ -290,6 +291,22 @@ public class MappingController {
         }
     }
 
+    @PutMapping(path = "/portfolioStocks/currentValue", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<?> createStock(@RequestBody EditCurrentValueRequest editCurrentValueRequest) {
+        try {
+            Boolean isValid = sessionManager.validToken(editCurrentValueRequest.getToken(), editCurrentValueRequest.getEmail());
+            if (isValid) {
+                portfolioStockManager.editCurrentValue(editCurrentValueRequest.getEmail(), editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue);
+                return ResponseEntity.ok(new StringAnswer("Current Value successfully updated"));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new StringAnswer("Unauthorized for this transaction!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new StringAnswer("An unexpected error occurred during updating current value of stock."));
+        }
+    }
     ////////////////////////////////////////////////////////////// Transaction
     ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
 

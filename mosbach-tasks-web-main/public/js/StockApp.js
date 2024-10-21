@@ -492,57 +492,51 @@ function displayStockPrice(value){
     $('#price-display').text(value);
 }
 
-//Fetch a stock price of database or external API
-function fetchStockPrice(){
-    let stockName = getStockName();
-    getStockPriceFromDB(stockName)
-        .done(function(data) {
-            displayStockPrice(data.stockprice);
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 401 ||jqXHR.status === 404 || jqXHR.status === 500) {
-                displayStockPrice('Error retrieving data. Please try again later.');
-            } else {
-                getStockPriceFromAPI(stockName)
-                    .done(function(data) {
-                        if (data.status === 'OK' && data.results && data.results.length > 0) {
-                            const closeValue = parseFloat(data.results[0].c); 
-                            const roundedCloseValue = closeValue.toFixed(2);
-                            insertNewStock(stockName, roundedCloseValue);
-                            displayStockPrice(roundedCloseValue);
-                        } else if (!data.results) {
-                            displayStockPrice('Stock not found or no data available.');
-                        } else if (data.results.length === 0) {
-                            displayStockPrice('No closing price data available.');
-                        } else {
-                            displayStockPrice('Unknown error retrieving data.');
-                        }
-                    })
-                    .fail(function(jqXHR, textStatus, errorThrown) {
-                        if (jqXHR.status === 429) {
-                            displayStockPrice('Too many requests. Please try again later.');
-                        } else {
-                            console.error('Error:', textStatus, errorThrown);
-                            displayStockPrice('Error retrieving data. Please try again later.');
-                        }
-                    });            
-                    }
-        });
-}
-
-// Get stock price from database
-function getStockPriceFromDB(stockName){
-    const getStockPriceDBRegister = {
-        "async": true,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + stockName,
+// Get stock price from the external API
+function getStockPriceFromAPI(stockName) {
+    const getStockPriceAPIRegister = {
+        "async": true, 
+        "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
         "method": "GET",
-        "headers": {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+        "dataType": 'json',
+        "success": function(data) {
+            if (data.status === 'OK' && data.results && data.results.length > 0) {
+                const closeValue = parseFloat(data.results[0].c); 
+                const roundedCloseValue = closeValue.toFixed(2);
+                displayStockPrice(roundedCloseValue);
+            } else if (!data.results) {
+                displayStockPrice('Stock not found or no data available.');
+            } else if (data.results.length === 0) {
+                displayStockPrice('No closing price data available.');
+            } else {
+                displayStockPrice('Unknown error retrieving data.');
+            }
+        },
+        "error": function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 429) {
+                displayStockPrice('Too many requests. Please try again later.');
+            } else {
+                console.error('Error:', textStatus, errorThrown);
+                displayStockPrice('Error retrieving data. Please try again later.');
+            }
         }
     };
+    
+    $.ajax(getStockPriceAPIRegister);
+}
 
-    return $.ajax(getStockPriceDBRegister);
+//Create event for displaying the stock price
+function showStockPriceViaEvent() {
+    const inputField = document.getElementById('stock-name');
+    inputField.addEventListener('keypress', handleInputKeypress);
+    inputField.addEventListener('blur', () => getStockPriceFromAPI(getStockName()));
+}
+
+//Handle enter keypress for displaying the stock price
+function handleInputKeypress(e) {
+    if (e.key === 'Enter') { 
+        getStockPriceFromAPI(getStockName());
+    }
 }
 
 //Get stock name
@@ -551,57 +545,112 @@ function getStockName() {
     return stockNameLabel.value;
 
 }
+//The following functions would make it unnecessary to send many queries directly to the API. Instead, the price of existing shares is queried via the database. 
+//The requirement for this functionality is the daily update of the share data in the database using a timer event. As this could not be realised, only the share price is always retrieved via the API 
+//
+// //Fetch a stock price of database or external API
+// function fetchStockPrice(){
+//     let stockName = getStockName();
+//     getStockPriceFromDB(stockName)
+//         .done(function(data) {
+//             displayStockPrice(data.stockprice);
+//         })
+//         .fail(function(jqXHR, textStatus, errorThrown) {
+//             if (jqXHR.status === 401 ||jqXHR.status === 404 || jqXHR.status === 500) {
+//                 displayStockPrice('Error retrieving data. Please try again later.');
+//             } else {
+//                 getStockPriceFromAPI(stockName)
+//                     .done(function(data) {
+//                         if (data.status === 'OK' && data.results && data.results.length > 0) {
+//                             const closeValue = parseFloat(data.results[0].c); 
+//                             const roundedCloseValue = closeValue.toFixed(2);
+//                             insertNewStock(stockName, roundedCloseValue);
+//                             displayStockPrice(roundedCloseValue);
+//                         } else if (!data.results) {
+//                             displayStockPrice('Stock not found or no data available.');
+//                         } else if (data.results.length === 0) {
+//                             displayStockPrice('No closing price data available.');
+//                         } else {
+//                             displayStockPrice('Unknown error retrieving data.');
+//                         }
+//                     })
+//                     .fail(function(jqXHR, textStatus, errorThrown) {
+//                         if (jqXHR.status === 429) {
+//                             displayStockPrice('Too many requests. Please try again later.');
+//                         } else {
+//                             console.error('Error:', textStatus, errorThrown);
+//                             displayStockPrice('Error retrieving data. Please try again later.');
+//                         }
+//                     });            
+//                     }
+//         });
+// }
 
-//Get stock price from the external API
-function getStockPriceFromAPI(stockName) {
-    const getStockPriceAPIRegister = {
-        "async": true, 
-        "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
-        "method": "GET",
-        "dataType": 'json',
-        };
-    return $.ajax(getStockPriceAPIRegister);
-}
+// // Get stock price from database
+// function getStockPriceFromDB(stockName){
+//     const getStockPriceDBRegister = {
+//         "async": true,
+//         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + stockName,
+//         "method": "GET",
+//         "headers": {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json'
+//         }
+//     };
 
-//Insert a stock to the database
-function insertNewStock(stockName, stockPrice){
-    const settingsInsertStock = {
-        "async": true, 
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock",
-        "method": "POST",
-        "headers": {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        "data": JSON.stringify({
-            "tokenemail": {
-                "token": getCookie("token"),
-                "email": getCookie("email")
-            },
-            "stock": {
-                "symbol": stockName,
-                "stockprice": stockPrice,
-                "name": "-"
-            }
-        })
-    };
+//     return $.ajax(getStockPriceDBRegister);
+// }
 
-    $.ajax(settingsInsertStock);
-}
+// //Get stock price from the external API
+// function getStockPriceFromAPI(stockName) {
+//     const getStockPriceAPIRegister = {
+//         "async": true, 
+//         "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
+//         "method": "GET",
+//         "dataType": 'json',
+//         };
+//     return $.ajax(getStockPriceAPIRegister);
+// }
 
-//Create event for displaying the stock price
-function showStockPriceViaEvent() {
-    const inputField = document.getElementById('stock-name');
-    inputField.addEventListener('keypress', handleInputKeypress);
-    inputField.addEventListener('blur', fetchStockPrice);
-}
+// //Insert a stock to the database
+// function insertNewStock(stockName, stockPrice){
+//     const settingsInsertStock = {
+//         "async": true, 
+//         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock",
+//         "method": "POST",
+//         "headers": {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json'
+//         },
+//         "data": JSON.stringify({
+//             "tokenemail": {
+//                 "token": getCookie("token"),
+//                 "email": getCookie("email")
+//             },
+//             "stock": {
+//                 "symbol": stockName,
+//                 "stockprice": stockPrice,
+//                 "name": "-"
+//             }
+//         })
+//     };
 
-//Handle enter keypress for displaying the stock price
-function handleInputKeypress(e) {
-    if (e.key === 'Enter') { 
-        fetchStockPrice();
-    }
-}
+//     $.ajax(settingsInsertStock);
+// }
+
+// //Create event for displaying the stock price
+// function showStockPriceViaEvent() {
+//     const inputField = document.getElementById('stock-name');
+//     inputField.addEventListener('keypress', handleInputKeypress);
+//     inputField.addEventListener('blur', fetchStockPrice);
+// }
+
+// //Handle enter keypress for displaying the stock price
+// function handleInputKeypress(e) {
+//     if (e.key === 'Enter') { 
+//         fetchStockPrice();
+//     }
+// }
 
 ///*Get and display all portfolio data*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -621,6 +670,7 @@ function getAllTransactions() {
     $.ajax(settingsGetAllTransactions)
         .done(function (transactions) {
             displayTransactionHistory(transactions);
+
         })
         .fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 401 || xhr.status === 500) {
@@ -667,19 +717,95 @@ function getAllPortfolioStocks(){
             'Content-Type': 'application/json'
         }
     }
+
     $.ajax(settingsGetAllPortfolioStocks).done(function (portfolioStocks) {
-        displayPortfolioStocks(portfolioStocks)
+        displayPortfolioStocks(portfolioStocks);
+
+        portfolioStocks.forEach(portfolioStock => {
+            let positionAmount = portfolioStock.stockAmount;
+            getNewCurrentValue(portfolioStock.symbol, function(price) {
+                let totalValue = price * positionAmount;
+                setNewCurrentValue(totalValue, portfolioStock.symbol);
+                updateStockDisplay(portfolioStock.symbol, totalValue, portfolioStock.boughtValue);
+            });
+        });
     })
     .fail(function (xhr, textStatus, errorThrown) {
         if (xhr.status === 401 || xhr.status === 500) {
             alert(JSON.parse(xhr.responseText).answer);
-        } else{
+        } else {
             alert("An unexpected error occurred. Status: " + xhr.status);
         }
     });
 }
 
-//Display alle stocks in portfolio of an user
+
+function getNewCurrentValue(stockName, callback) {
+    const getStockPriceAPIRegister = {
+        "async": true, 
+        "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
+        "method": "GET",
+        "dataType": 'json',
+        "success": function(data) {
+            callback(data.close); // Preis zurückgeben
+        },
+        "error": function(jqXHR, textStatus, errorThrown) {
+            console.log("Error fetching stock price, retrying...");
+            setTimeout(() => {
+                getNewCurrentValue(stockName, callback); // Erneuter Versuch
+            }, 2000);
+        }
+    };
+
+    $.ajax(getStockPriceAPIRegister);
+}
+
+
+function setNewCurrentValue(currentValue, symbol){
+    //Set new value
+    const editCurrentValueRegister = {
+        "async": true,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock/currentValue",
+        "method": "PUT",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "email": getCookie("email"),
+            "symbol": symbol,
+            "newValue": currentValue
+        }),
+        "success": function(data) {
+            console.log("Antwort vom Server:", data);
+        }
+        ,
+        "error": function(xhr) {
+            console.log(xhr);
+            if (xhr.status === 401 || xhr.status === 500) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else {
+                alert("An unexpected error occurred. Status: " + xhr.status);
+            }
+        }
+    };
+
+    $.ajax(editCurrentValueRegister); 
+}
+
+function updateStockDisplay(symbol, currentValue, boughtValue) {
+    const stockElement = document.getElementById(symbol);
+    const stockValue = roundToTwoDecimalPlaces(currentValue);
+
+    // Berechne den prozentualen Wert
+    const { percentageChange, changeClass } = calculatePercentage(boughtValue, currentValue);
+
+    // Aktualisiere die Anzeige
+    stockElement.innerHTML = `${symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}</span>`;
+}
+
+// Zeige die Portfolio-Aktien an
 function displayPortfolioStocks(portfolioStocks) {
     const stockListContainer = document.querySelector('.portfolio .stock-list');
     stockListContainer.innerHTML = ''; 
@@ -689,15 +815,34 @@ function displayPortfolioStocks(portfolioStocks) {
     portfolioStocks.forEach(stock => {
         totalCurrentPortfolioValue += stock.currentvalue;
         totalBoughtPortfolioValue += stock.boughtvalue;
+
+        // Zeige den Platzhalter für den aktuellen Preis
         const stockDiv = document.createElement('div');
-        const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentvalue));
-
-        const { percentageChange, changeClass } = calculatePercentage(stock.boughtvalue, stock.currentvalue);
-
-        stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
+        stockDiv.id = stock.symbol; // Füge eine ID für die spätere Aktualisierung hinzu
+        stockDiv.innerHTML = `${stock.symbol}: Calculating Percentage... <span class="change"></span>`;
         stockListContainer.appendChild(stockDiv);
     });
 }
+
+// //Display alle stocks in portfolio of an user
+// function displayPortfolioStocks(portfolioStocks) {
+//     const stockListContainer = document.querySelector('.portfolio .stock-list');
+//     stockListContainer.innerHTML = ''; 
+//     let totalCurrentPortfolioValue = 0; 
+//     let totalBoughtPortfolioValue = 0; 
+
+//     portfolioStocks.forEach(stock => {
+//         totalCurrentPortfolioValue += stock.currentvalue;
+//         totalBoughtPortfolioValue += stock.boughtvalue;
+//         const stockDiv = document.createElement('div');
+//         const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentvalue));
+
+//         const { percentageChange, changeClass } = calculatePercentage(stock.boughtvalue, stock.currentvalue);
+
+//         stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
+//         stockListContainer.appendChild(stockDiv);
+//     });
+// }
 
 //Calculate percentage change of portfolio elements
 function calculatePercentage(boughtvalue, currentvalue) {
