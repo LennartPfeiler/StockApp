@@ -1,4 +1,5 @@
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\controller\MappingController.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\controller\PersonController.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IAuthManager.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPasswordManager.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioManager.java
@@ -19,6 +20,7 @@ C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mos
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditCurrentValueRequest.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditRequest.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LoginRequest.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LogoutRequest.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Portfolio.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\PortfolioStock.java
 C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\PortfolioStockValue.java
