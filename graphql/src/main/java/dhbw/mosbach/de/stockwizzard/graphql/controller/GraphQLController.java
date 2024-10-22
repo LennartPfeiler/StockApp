@@ -15,15 +15,13 @@ import dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation.*;
 @Controller
 public class GraphQLController {
 
-private IUserManager userService = UserManagerImplementation.getUserManager();
-private ITransactionManager  transactionService = TransactionManagerImplementation.getTransactionManager();
-private IStockManager stockService = StockManagerImplementation.getStockManager();
-private ISessionManager sessionService = SessionManagerImplementation.getSessionManager();
-
-    // @QueryMapping
-    // public User getUserProfile(@Argument String email) {
-    //     return userService.getUserProfile(email);
-    // }
+    private IUserManager userService = UserManagerImplementation.getUserManager();
+    private ITransactionManager  transactionService = TransactionManagerImplementation.getTransactionManager();
+    private IStockManager stockService = StockManagerImplementation.getStockManager();
+    private ISessionManager sessionService = SessionManagerImplementation.getSessionManager();
+    private IPortfolioStockManager portfolioStockService = PortfolioStockManagerImplementation.getPortfolioStockManager();
+    private IPortfolioManager portfolioService = PortfolioManagerImplementation.getPortfolioManager();
+    private IAuthManager authService = AuthManagerImplementation.getAuthManager();
 
     @QueryMapping
     public User getUserProfile(@Argument String email, @Argument String token) {
@@ -43,9 +41,27 @@ private ISessionManager sessionService = SessionManagerImplementation.getSession
             throw new RuntimeException("An unexpected error occurred while fetching user data.");
         }
     }
-}
 
-    
+
+    @MutationMapping
+    public StringAnswer createUser(@Argument User input) {
+        try {
+            Boolean isRegistered = userService.isEmailAlreadyRegistered(input.getEmail());
+            if (isRegistered) {
+                return new StringAnswer("You are already registered!");
+            } else {
+                userService.addUser(input);
+            
+                Portfolio portfolio = new Portfolio(null, input.getBudget(), input.getBudget(), input.getEmail());
+                portfolioService.addPortfolio(portfolio);
+
+                return new StringAnswer("User successfully registered!");
+            }
+        } catch (Exception e) {
+            return new StringAnswer("An unexpected error occurred while creating the profile.");
+        }
+    }
+}   
     // @MutationMapping
     // public StringAnswer createUser(@Argument User user) {
     //     return userService.createUser(user);
