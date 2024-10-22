@@ -8,9 +8,6 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
 import dhbw.mosbach.de.stockwizzard.model.*;
-
-import dhbw.mosbach.de.stockwizzard.model.TokenEmail;
-import dhbw.mosbach.de.stockwizzard.model.TokenTransactionContent;
 import dhbw.mosbach.de.stockwizzard.service.dataManager.*;
 import dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation.*;
 
@@ -23,11 +20,32 @@ private ITransactionManager  transactionService = TransactionManagerImplementati
 private IStockManager stockService = StockManagerImplementation.getStockManager();
 private ISessionManager sessionService = SessionManagerImplementation.getSessionManager();
 
-    @QueryMapping
-    public User getUserProfile(@Argument String email) {
-        return userService.getUserProfile(email);
-    }
+    // @QueryMapping
+    // public User getUserProfile(@Argument String email) {
+    //     return userService.getUserProfile(email);
+    // }
 
+    @QueryMapping
+    public User getUserProfile(@Argument String email, @Argument String token) {
+        try {
+            Boolean isValid = sessionService.validToken(token, email);
+            if (isValid) {
+                User user = userService.getUserProfile(email);
+                if (user == null) {
+                    throw new RuntimeException("Please register first!");
+                } else {
+                    return user;
+                }
+            } else {
+                throw new RuntimeException("Unauthorized for this transaction!");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred while fetching user data.");
+        }
+    }
+}
+
+    
     // @MutationMapping
     // public StringAnswer createUser(@Argument User user) {
     //     return userService.createUser(user);
@@ -82,4 +100,4 @@ private ISessionManager sessionService = SessionManagerImplementation.getSession
     // public StringAnswer createSellOrder(@Argument TokenTransactionContent tokenTransactionContent) {
     //     return OrderService.createSellOrder(tokenTransactionContent);
     // }
-}
+
