@@ -10,10 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mosbach.dhbw.de.stockwizzard.dataManager.IPortfolioStockManager;
-import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
 import mosbach.dhbw.de.stockwizzard.model.PortfolioStockValue;
-import mosbach.dhbw.de.stockwizzard.model.Transaction;
 
 public class PortfolioStockManagerImplementation implements IPortfolioStockManager {
 
@@ -277,11 +275,18 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             if (rs.next()) {
                 Double boughtValue = rs.getDouble("boughtvalue");
                 Double currentValue = rs.getDouble("currentvalue");
-                if (currentValue >= sellRequestAmount) {
+                Logger.getLogger("GetPortfolioStockValuesLogger").log(Level.INFO,
+                "Double value (currentValue): {0}, Type: {1}", new Object[]{currentValue, currentValue.getClass().getName()});
+                Logger.getLogger("GetPortfolioStockValuesLogger").log(Level.INFO,
+                "sellRequest value: {0}, Type: {1}", new Object[]{sellRequestAmount, sellRequestAmount.getClass().getName()});
+
+                double epsilon = 0.0001; // Toleranzwert
+                if (currentValue - sellRequestAmount >= -epsilon) {
                     return new PortfolioStockValue(currentValue, boughtValue);
                 } else {
                     return new PortfolioStockValue(-1.0, -1.0);
                 }
+
             } else {
                 return null;
             }

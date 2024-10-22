@@ -89,7 +89,7 @@ function login(profileSchema){
             
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
+            if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else{
                 alert("An unexpected error occurred. Status: " + xhr.status);
@@ -337,6 +337,8 @@ function sellStock(){
             return;
         }
     }
+
+    console.log(stockAmount);
     const settingsSellStock = {
         "async": true,
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell",
@@ -985,26 +987,6 @@ function displayPortfolioStocks(portfolioStocks) {
     });
 }
 
-// //Display alle stocks in portfolio of an user
-// function displayPortfolioStocks(portfolioStocks) {
-//     const stockListContainer = document.querySelector('.portfolio .stock-list');
-//     stockListContainer.innerHTML = ''; 
-//     let totalCurrentPortfolioValue = 0; 
-//     let totalBoughtPortfolioValue = 0; 
-
-//     portfolioStocks.forEach(stock => {
-//         totalCurrentPortfolioValue += stock.currentvalue;
-//         totalBoughtPortfolioValue += stock.boughtvalue;
-//         const stockDiv = document.createElement('div');
-//         const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentvalue));
-
-//         const { percentageChange, changeClass } = calculatePercentage(stock.boughtvalue, stock.currentvalue);
-
-//         stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
-//         stockListContainer.appendChild(stockDiv);
-//     });
-// }
-
 //Calculate percentage change of portfolio elements
 function calculatePercentage(boughtvalue, currentvalue) {
     const percentageChange = ((currentvalue - boughtvalue) / boughtvalue * 100).toFixed(2);
@@ -1078,3 +1060,30 @@ function disableGoBackFunction(){
         document.location = "vorHome.html"
     }
 }
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.getElementById("tradingview_1dcca")) {
+        new TradingView.widget({
+            "autosize": true,
+            "symbol": "NASDAQ:AAPL",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": true,
+            "withdateranges": true,
+            "range": "YTD",
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "details": true,
+            "hotlist": true,
+            "calendar": true,
+            "show_popup_button": true,
+            "popup_width": "1000",
+            "popup_height": "24650",
+            "container_id": "tradingview_1dcca"
+        });
+    }
+});
