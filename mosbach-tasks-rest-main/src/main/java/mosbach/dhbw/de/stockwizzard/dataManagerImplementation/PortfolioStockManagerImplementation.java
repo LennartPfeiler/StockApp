@@ -183,100 +183,47 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         return portfolioStocks;
     }
 
-    // Delete oder update a portfolio stock
-    // public void decreasePortfolioStock(Integer portfolioId, String symbol, Double
-    // stockAmount, Double totalPrice, PortfolioStockValue portfolioStockValues,
-    // List<Transaction> transactionsInPortfolio){
-    // Statement stmt = null;
-    // Connection connection = null;
-    // final double EPSILON = 0.000001;
-    // if (Math.abs(totalPrice - portfolioStockValues.getCurrentValue()) < EPSILON)
-    // {
-    // try {
-    // connection = DriverManager.getConnection(dbUrl, username, password);
-    // stmt = connection.createStatement();
+    // Get a portfolio stock
+    public PortfolioStock getPortfolioStock(String email, String symbol) {
+        PortfolioStock portfolioStock = null;
+        Statement stmt = null;
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
 
-    // String deletePortfolioStockSQL = "DELETE FROM group12portfoliostock WHERE
-    // symbol = '" + symbol + "' AND portfolioid=" + portfolioId;
+            String getPortfolioStockSQL = "SELECT * FROM group12portfoliostock WHERE portfolioid =" +
+                    "(SELECT portfolioid FROM group12portfolio WHERE email = '" + email + "') AND symbol = '" + symbol
+                    + "'";
 
-    // stmt.executeUpdate(deletePortfolioStockSQL);
-    // for (Transaction transaction : transactionsInPortfolio) {
-    // transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
-    // }
-    // } catch (SQLException e) {
-    // Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when
-    // deleting a portfolio stock.", e);
-    // e.printStackTrace();
-    // } finally {
-    // try {
-    // if (stmt != null) stmt.close();
-    // if (connection != null) connection.close();
-    // } catch (SQLException e) {
-    // Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when
-    // closing the resource. Error: {0}", e);
-    // e.printStackTrace();
-    // }
-    // }
-    // }
-    // else {
-    // try {
-    // connection = DriverManager.getConnection(dbUrl, username, password);
-    // stmt = connection.createStatement();
-
-    // Double remainingAmount = totalPrice;
-    // Double totalBoughtValueReduction = 0.0;
-    // for (Transaction transaction : transactionsInPortfolio) {
-    // if (remainingAmount <= 0) {
-    // break;
-    // }
-
-    // Double leftInTransaction = transaction.getLeftInPortfolio();
-    // Double transactionBoughtValue = transaction.getTotalPrice();
-    // Integer transactionId = transaction.getTransactionID();
-
-    // if (remainingAmount >= leftInTransaction) {
-    // remainingAmount -= leftInTransaction;
-    // totalBoughtValueReduction += transactionBoughtValue;
-    // transactionManager.editLeftinPortfolio(transactionId, 0.0);
-    // } else {
-    // Double proportion = remainingAmount / leftInTransaction;
-    // Double reductionInBoughtValue = transactionBoughtValue * proportion;
-    // totalBoughtValueReduction += reductionInBoughtValue;
-
-    // Double newLeftInTransaction = leftInTransaction - remainingAmount;
-    // remainingAmount = 0.0;
-    // transactionManager.editLeftinPortfolio(transactionId, newLeftInTransaction);
-    // }
-    // }
-
-    // Double newCurrentValue = portfolioStockValues.getCurrentValue() - totalPrice;
-    // Double newBoughtValue = portfolioStockValues.getBoughtValue() -
-    // totalBoughtValueReduction;
-
-    // String updatePortfolioStockSQL = "UPDATE group12portfoliostock SET
-    // currentvalue = " + newCurrentValue +
-    // ", boughtvalue = " + newBoughtValue +
-    // ", stockamount = stockamount - " + stockAmount +
-    // " WHERE portfolioid = " + portfolioId +
-    // " AND symbol = '" + symbol + "'";
-    // stmt.executeUpdate(updatePortfolioStockSQL);
-
-    // } catch (SQLException e) {
-    // Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when
-    // decreasing a portfolio stock.", e);
-    // e.printStackTrace();
-    // } finally {
-    // try {
-    // if (stmt != null) stmt.close();
-    // if (connection != null) connection.close();
-    // } catch (SQLException e) {
-    // Logger.getLogger("DeletePortfolioStockLogger").log(Level.SEVERE, "Error when
-    // closing the resource. Error: {0}", e);
-    // e.printStackTrace();
-    // }
-    // }
-    // }
-    // }
+            ResultSet rs = stmt.executeQuery(getPortfolioStockSQL);
+            while (rs.next()) {
+                portfolioStock =  new PortfolioStock(
+                                Integer.parseInt(rs.getString("portfolioid")),
+                                rs.getString("symbol"),
+                                Double.parseDouble(rs.getString("stockamount")),
+                                Double.parseDouble(rs.getString("boughtvalue")),
+                                Double.parseDouble(rs.getString("currentvalue")));
+            }
+            rs.close();
+        } catch (Exception e) {
+            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,
+                    "Error when getting  portfolio stock. Error: {0}", e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                Logger.getLogger("GetPortfolioStocksLogger").log(Level.SEVERE,
+                        "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
+            }
+        }
+        return portfolioStock;
+    }
 
     public void decreasePortfolioStock(Double newCurrentValue, Double newBoughtValue, Double stockAmount,
             Integer portfolioId, String symbol) {
@@ -423,15 +370,17 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
     public void editCurrentValue(String email, String symbol, Double newCurrentValue) {
         Statement stmt = null;
         Connection connection = null;
-        String updateUserBudgetSQL = "";
+        String updateCurrentValueSQL = "";
         Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "Start editCurrentValue method");
+        Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "{0}", newCurrentValue);
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
             updateCurrentValueSQL = "UPDATE group12portfolioStock SET currentvalue = " + newCurrentValue +
-                    " WHERE email = '" + email + "' AND symbol = '" + symbol;
+                    " WHERE portfolioid = (SELECT portfolioid from group12portfolio WHERE email = '" + email
+                    + "') AND symbol = '" + symbol + "'";
 
-            stmt.executeUpdate(updateUserBudgetSQL);
+            stmt.executeUpdate(updateCurrentValueSQL);
         } catch (SQLException e) {
             Logger.getLogger("editCurrentValue").log(Level.SEVERE, "Error updating current value.", e);
             e.printStackTrace();
@@ -447,4 +396,5 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             }
         }
     }
+
 }

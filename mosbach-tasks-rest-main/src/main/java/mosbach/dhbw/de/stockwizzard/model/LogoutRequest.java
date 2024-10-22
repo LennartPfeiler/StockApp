@@ -1,3 +1,4 @@
+
 package mosbach.dhbw.de.stockwizzard.model;
 
 import java.util.LinkedHashMap;
@@ -10,16 +11,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EditCurrentValueRequest {
+public class LogoutRequest {
 
-    @JsonProperty("token")
-    private String token;
     @JsonProperty("email")
     private String email;
-    @JsonProperty("symbol")
-    private String symbol;
-    @JsonProperty("newvalue")
-    private Double newValue;
+    @JsonProperty("token")
+    private String token;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -27,24 +24,12 @@ public class EditCurrentValueRequest {
      * No args constructor for use in serialization
      * 
      */
-    public EditCurrentValueRequest() {
+    public LogoutRequest() {
     }
 
-    public EditCurrentValueRequest(String token, String email, String symbol, Double newValue) {
+    public LogoutRequest(String email, String token) {
         super();
-        this.token = token;
         this.email = email;
-        this.symbol = symbol;
-        this.newValue = newValue;
-    }
-
-    @JsonProperty("token")
-    public String getToken() {
-        return token;
-    }
-
-    @JsonProperty("token")
-    public void setToken(String token) {
         this.token = token;
     }
 
@@ -58,30 +43,14 @@ public class EditCurrentValueRequest {
         this.email = email;
     }
 
-    @JsonProperty("symbol")
-    public String getSymbol() {
-        return symbol;
+    @JsonProperty("token")
+    public String getToken() {
+        return token;
     }
 
-    @JsonProperty("symbol")
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-
-    }
-
-    @JsonProperty("newvalue")
-    public Double getNewValue() {
-        return newValue;
-
-    }
-
-    @JsonProperty("newvalue")
-    public void setNewValue(Double newValue) {
-        this.newValue = newValue;
-
-    
-
-    
+    @JsonProperty("token")
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @JsonAnyGetter

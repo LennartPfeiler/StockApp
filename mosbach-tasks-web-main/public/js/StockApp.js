@@ -26,10 +26,11 @@
 ///* Data display *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function displayAllDatabaseData(){
+    console.log("DatabaseMethode");
     displayUserBudget(); 
     displayTotalPortfolioValue();
     getAllTransactions();
-    getAllPortfolioStocks();
+    //getAllPortfolioStocks();
 }
 
 
@@ -200,6 +201,7 @@ function getCurrentDateTime() {
 //Create a buy Order
 function buyStock(){
     event.preventDefault();
+    const stockDiv = document.getElementById($('#stock-name').val());
     let stockAmount;
     const priceDisplay = document.getElementById("price-display").textContent.trim();
     const price = parseFloat(priceDisplay.replace('$', '').trim());
@@ -247,14 +249,30 @@ function buyStock(){
         ,
         "success": function(data) {
             alert(data.answer);
-            displayAllDatabaseData();
             $('#quantity').val("");
+            const stockSymbol = $('#stock-name').val();
+            
+            // Überprüfen, ob das Div für die Aktie bereits existiert
+            const stockDiv = document.getElementById(stockSymbol);
+            if (!stockDiv) {
+                const stockListContainer = document.querySelector('.portfolio .stock-list');
+                let NewstockDiv = document.createElement('div');
+                NewstockDiv.id = stockSymbol; // Füge eine ID für die spätere Aktualisierung hinzu
+                NewstockDiv.innerHTML = `${stockSymbol}: Calculating Portfolio data... <span class="change"></span>`;
+                stockListContainer.appendChild(NewstockDiv);
+            }
+
+            // Portfolio-Daten abrufen und dann aktualisieren
+            getPortfolioStockData(stockSymbol, function(currentValue, boughtValue) {
+                updateStockDisplay(stockSymbol, currentValue, boughtValue);
+            });
+            displayAllDatabaseData();
         },
         "error": function(xhr) {
             if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
                 $('#quantity').val("");
-            } else{
+            } else {
                 alert("An unexpected error occurred. Status: " + xhr.status);
                 $('#quantity').val("");
             }
@@ -262,6 +280,37 @@ function buyStock(){
     };
     $.ajax(settingsBuyStock);
 }
+
+function getPortfolioStockData(symbol, callback){
+    console.log("Start getMethode");
+    console.log(symbol);
+    const settingsGetPortfolioStock = {
+        "async": false,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + symbol,
+        "method": "GET",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "success": function(data) {
+            console.log(data);
+            let boughtValue = data.boughtvalue;
+            let currentValue = data.currentvalue;
+            callback(currentValue, boughtValue);
+        },
+        "error": function(xhr) {
+            if (xhr.status === 404) {
+                console.log("PortfolioStock not in Portfolio");
+                callback(-1.0, -1.0)
+            } else {
+                console.error("Error fetching bought value:", xhr);
+                callback(0.0,0.0)
+            }
+        }
+    };
+    $.ajax(settingsGetPortfolioStock);    
+}
+
 
 //Create a sell order
 function sellStock(){
@@ -314,8 +363,18 @@ function sellStock(){
         "success": function(data) {
             console.log(data);
             alert(data.answer);
-            displayAllDatabaseData();
             $('#quantity').val("");
+
+            getPortfolioStockData($('#stock-name').val(), function(currentValue, boughtValue) {
+                if(currentValue == -1.0){
+                    const stockDiv = document.getElementById($('#stock-name').val());
+                    stockDiv.remove();
+                }
+                else{
+                    updateStockDisplay($('#stock-name').val(), currentValue, boughtValue);
+                }
+            });
+            displayAllDatabaseData();
         },
         "error": function(xhr) {
             if (xhr.status === 400 || xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
@@ -492,14 +551,110 @@ function displayStockPrice(value){
     $('#price-display').text(value);
 }
 
+// Check if the stock is already in the database
+function checkStockInDB(stockName, callback) {
+    const getStockPriceDBRegister = {
+        "async": true,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + stockName,
+        "method": "GET",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "success": function() {
+            callback(true);
+        },
+        "error": function(xhr) {
+            if (xhr.status === 404) {
+                callback(false);
+            } else {
+                callback(true);
+            }
+        }
+    };
+    
+    return $.ajax(getStockPriceDBRegister);    
+}
+
+// Get company name from the external API with a callback
+function getCompanyValueFromAPI(stockName, callback) {
+    const getCompanyNameAPIRegister = {
+        "async": true, 
+        "url": `https://api.polygon.io/v3/reference/tickers/${stockName}?apiKey=` + APIKEY,
+        "method": "GET",
+        "dataType": 'json',
+        "success": function(data) {
+            if (data.status === 'OK' && data.results) {
+                const name = data.results.name;
+                callback(name); 
+            } else {
+                callback(""); 
+            }
+        },
+        "error": function(jqXHR, textStatus, errorThrown) {
+            console.error('Error fetching company name:', textStatus, errorThrown);
+            callback(""); 
+        }
+    };
+    
+    $.ajax(getCompanyNameAPIRegister); 
+}
+
+// Insert new stock only if it doesn't exist in the database
+function addNewStockIfNotExists(stockName, stockPrice) {
+    checkStockInDB(stockName, function(stockExists) {
+        if (!stockExists) { // If stock does not exist
+            getCompanyValueFromAPI(stockName, function(companyName) {
+                const settingsInsertStock = {
+                    "async": true, 
+                    "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock",
+                    "method": "POST",
+                    "headers": {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    "data": JSON.stringify({
+                        "tokenemail": {
+                            "token": getCookie("token"),
+                            "email": getCookie("email")
+                        },
+                        "stock": {
+                            "symbol": stockName,
+                            "stockprice": stockPrice,
+                            "name": companyName 
+                        }
+                    }),
+                    "success": function(response) {
+                        console.log("Stock inserted successfully:", response);
+                    },
+                    "error": function(xhr) {
+                        console.error("Error inserting stock:", xhr);
+                        if (xhr.status === 401 || xhr.status === 500) {
+                            console.log(JSON.parse(xhr.responseText).answer);
+                        } else {
+                            console.log("An unexpected error occurred. Status: " + xhr.status);
+                        }
+                    }
+                };
+
+                $.ajax(settingsInsertStock);
+            });
+        } else {
+            console.log("Stock already exists in the database.");
+        }
+    });
+}
+
 // Get stock price from the external API
 function getStockPriceFromAPI(stockName) {
     const getStockPriceAPIRegister = {
         "async": true, 
-        "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
+        "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=` + APIKEY,
         "method": "GET",
         "dataType": 'json',
         "success": function(data) {
+            //Only temporarily as the price in the database is not retrieved and updated in the db anyway. However, the database column exists if the call is changed to the commented-out code in the future 
+            addNewStockIfNotExists(stockName, 0.0);
             if (data.status === 'OK' && data.results && data.results.length > 0) {
                 const closeValue = parseFloat(data.results[0].c); 
                 const roundedCloseValue = closeValue.toFixed(2);
@@ -692,7 +847,6 @@ function displayTransactionHistory(transactions) {
     transactionHistoryContainer.appendChild(heading);
 
     transactions.forEach(transaction => {
-        console.log(transaction);
         const transactionDiv = document.createElement('div');
         if(transaction.transactiontype === 1){
             type = "Bought"
@@ -722,11 +876,11 @@ function getAllPortfolioStocks(){
         displayPortfolioStocks(portfolioStocks);
 
         portfolioStocks.forEach(portfolioStock => {
-            let positionAmount = portfolioStock.stockAmount;
+            let positionAmount = portfolioStock.stockamount;
             getNewCurrentValue(portfolioStock.symbol, function(price) {
                 let totalValue = price * positionAmount;
                 setNewCurrentValue(totalValue, portfolioStock.symbol);
-                updateStockDisplay(portfolioStock.symbol, totalValue, portfolioStock.boughtValue);
+                updateStockDisplay(portfolioStock.symbol, totalValue, portfolioStock.boughtvalue);
             });
         });
     })
@@ -741,13 +895,15 @@ function getAllPortfolioStocks(){
 
 
 function getNewCurrentValue(stockName, callback) {
+    console.log("GetCurrentValue");
+    console.log(stockName);
     const getStockPriceAPIRegister = {
         "async": true, 
         "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
         "method": "GET",
         "dataType": 'json',
         "success": function(data) {
-            callback(data.close); // Preis zurückgeben
+            callback(data.results[0].c); // Preis zurückgeben
         },
         "error": function(jqXHR, textStatus, errorThrown) {
             console.log("Error fetching stock price, retrying...");
@@ -762,10 +918,13 @@ function getNewCurrentValue(stockName, callback) {
 
 
 function setNewCurrentValue(currentValue, symbol){
+    console.log("SetCurrentValue");
+    console.log(currentValue);
+    console.log(symbol);
     //Set new value
     const editCurrentValueRegister = {
         "async": true,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock/currentValue",
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStocks/currentValue",
         "method": "PUT",
         "headers": {
             'Accept': 'application/json',
@@ -775,7 +934,7 @@ function setNewCurrentValue(currentValue, symbol){
             "token": getCookie("token"),
             "email": getCookie("email"),
             "symbol": symbol,
-            "newValue": currentValue
+            "newvalue": currentValue
         }),
         "success": function(data) {
             console.log("Antwort vom Server:", data);
@@ -795,6 +954,10 @@ function setNewCurrentValue(currentValue, symbol){
 }
 
 function updateStockDisplay(symbol, currentValue, boughtValue) {
+    console.log("updateStockDisplay");
+    console.log(symbol);
+    console.log(currentValue);
+    console.log(boughtValue);
     const stockElement = document.getElementById(symbol);
     const stockValue = roundToTwoDecimalPlaces(currentValue);
 
@@ -819,7 +982,7 @@ function displayPortfolioStocks(portfolioStocks) {
         // Zeige den Platzhalter für den aktuellen Preis
         const stockDiv = document.createElement('div');
         stockDiv.id = stock.symbol; // Füge eine ID für die spätere Aktualisierung hinzu
-        stockDiv.innerHTML = `${stock.symbol}: Calculating Percentage... <span class="change"></span>`;
+        stockDiv.innerHTML = `${stock.symbol}: Calculating Portfolio data... <span class="change"></span>`;
         stockListContainer.appendChild(stockDiv);
     });
 }

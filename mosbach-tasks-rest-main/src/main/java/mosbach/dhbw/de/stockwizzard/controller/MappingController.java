@@ -2,6 +2,9 @@ package mosbach.dhbw.de.stockwizzard.controller;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.springframework.http.*;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
@@ -26,6 +29,7 @@ import mosbach.dhbw.de.stockwizzard.model.EditRequest;
 import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
+import mosbach.dhbw.de.stockwizzard.model.EditCurrentValueRequest;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -291,12 +295,42 @@ public class MappingController {
         }
     }
 
+    @GetMapping("/portfolioStock")
+    public ResponseEntity<?> getPortfolioStock(
+            @RequestParam(value = "email", defaultValue = "") String email,
+            @RequestParam(value = "token", defaultValue = "") String token,
+            @RequestParam(value = "symbol", defaultValue = "") String symbol) {
+
+        try {
+            Boolean isValid = sessionManager.validToken(token, email);
+            if (isValid) {
+                PortfolioStock portfolioStock = portfolioStockManager.getPortfolioStock(email, symbol);
+                if (portfolioStock != null) {
+                    return ResponseEntity.ok(portfolioStock);
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new StringAnswer("PortfolioStock is not in the database."));
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new StringAnswer("Unauthorized for this transaction!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new StringAnswer("An unexpected error occurred during getting portfolioStocks."));
+        }
+    }
+
     @PutMapping(path = "/portfolioStocks/currentValue", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createStock(@RequestBody EditCurrentValueRequest editCurrentValueRequest) {
         try {
-            Boolean isValid = sessionManager.validToken(editCurrentValueRequest.getToken(), editCurrentValueRequest.getEmail());
+            Boolean isValid = sessionManager.validToken(editCurrentValueRequest.getToken(),
+                    editCurrentValueRequest.getEmail());
             if (isValid) {
-                portfolioStockManager.editCurrentValue(editCurrentValueRequest.getEmail(), editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue);
+                Logger.getLogger("UpdateCurrentValueLogger").log(Level.INFO, "{0}",
+                        editCurrentValueRequest.getNewValue());
+                portfolioStockManager.editCurrentValue(editCurrentValueRequest.getEmail(),
+                        editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue());
                 return ResponseEntity.ok(new StringAnswer("Current Value successfully updated"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -414,27 +448,24 @@ public class MappingController {
             Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
             if (isValid) {
                 User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(
-                        transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
+                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
                 if (portfolioStockValues == null) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new StringAnswer("You don't own a position with the selected stock!"));
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("You don't own a position with the selected stock!"));
                 } else {
                     if (portfolioStockValues.getCurrentValue() == -1) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body(new StringAnswer("Your stock position is not that high!"));
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Your stock position is not that high!"));
                     } else {
                         transactionManager.addTransaction(transactionContent);
                         Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                        List<Transaction> transactionsInPortfolio = transactionManager
-                                .getAllTransactionsInPortfolioStock(transactionContent.getEmail());
-                        if (Math.abs(transactionContent.getTotalPrice()- portfolioStockValues.getCurrentValue()) < EPSILON) {
-                            portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(),userPortfolio.getPortfolioID());
+                        List<Transaction> transactionsInPortfolio = transactionManager.getAllTransactionsInPortfolioStock(transactionContent.getEmail());
+                        if (Math.abs(transactionContent.getTotalPrice() - portfolioStockValues.getCurrentValue()) < EPSILON) {
+                            portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(), userPortfolio.getPortfolioID());
                             for (Transaction transaction : transactionsInPortfolio) {
                                 transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
                             }
                         } else {
                             Double remainingAmount = transactionContent.getTotalPrice();
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"remainingAmount {0}", remainingAmount);
                             Double totalBoughtValueReduction = 0.0;
                             for (Transaction transaction : transactionsInPortfolio) {
                                 if (remainingAmount <= 0) {
@@ -442,17 +473,21 @@ public class MappingController {
                                 }
 
                                 Double leftInTransaction = transaction.getLeftInPortfolio();
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"leftInTransaction {0}", leftInTransaction);
                                 Double transactionBoughtValue = transaction.getTotalPrice();
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"transactionBoughtValue {0}", transactionBoughtValue);
                                 Integer transactionId = transaction.getTransactionID();
 
                                 if (remainingAmount >= leftInTransaction) {
                                     remainingAmount -= leftInTransaction;
                                     totalBoughtValueReduction += transactionBoughtValue;
+                                    Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"totalBoughtValueReduction {0}", totalBoughtValueReduction);
                                     transactionManager.editLeftinPortfolio(transactionId, 0.0);
                                 } else {
                                     Double proportion = remainingAmount / leftInTransaction;
                                     Double reductionInBoughtValue = transactionBoughtValue * proportion;
                                     totalBoughtValueReduction += reductionInBoughtValue;
+                                    Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"totalBoughtValueReduction {0}", totalBoughtValueReduction);
 
                                     Double newLeftInTransaction = leftInTransaction - remainingAmount;
                                     remainingAmount = 0.0;
@@ -460,17 +495,17 @@ public class MappingController {
                                 }
                             }
 
-                            Double newCurrentValue = portfolioStockValues.getCurrentValue()
-                                    - transactionContent.getTotalPrice();
+                            Double newCurrentValue = portfolioStockValues.getCurrentValue()- transactionContent.getTotalPrice();
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"newCurrentValue {0}", newCurrentValue);
                             Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
-                            portfolioStockManager.decreasePortfolioStock(newCurrentValue, newBoughtValue,
-                                    transactionContent.getStockAmount(), userPortfolio.getPortfolioID(),
-                                    transactionContent.getSymbol());
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"newBoughtValue {0}", newBoughtValue);
+                            portfolioStockManager.decreasePortfolioStock(newCurrentValue, newBoughtValue, transactionContent.getStockAmount(), userPortfolio.getPortfolioID(), transactionContent.getSymbol());
                         }
 
                         // portfolioStockManager.decreasePortfolioStock(userPortfolio.getPortfolioID(),
-                        //         transactionContent.getSymbol(), transactionContent.getStockAmount(),
-                        //         transactionContent.getTotalPrice(), portfolioStockValues, transactionsInPortfolio);
+                        // transactionContent.getSymbol(), transactionContent.getStockAmount(),
+                        // transactionContent.getTotalPrice(), portfolioStockValues,
+                        // transactionsInPortfolio);
                         userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                                 transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                         return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
