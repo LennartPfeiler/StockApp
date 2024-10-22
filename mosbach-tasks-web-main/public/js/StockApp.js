@@ -120,8 +120,6 @@ function logout(){
             document.location="vorhome.html";
             document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "password=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "budget=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "firstname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "lastname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         },
@@ -1070,4 +1068,13 @@ function displayTotalPortfolioValue(){
         }
     }
     $.ajax(settingsGetPortfolioValue);
+}
+
+//Check after logout
+function disableGoBackFunction(){
+    const token = getCookie("token");
+    if(!token){
+        alert("Please log in first again!");
+        document.location = "vorHome.html"
+    }
 }
