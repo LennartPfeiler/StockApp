@@ -448,29 +448,24 @@ public class MappingController {
             Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
             if (isValid) {
                 User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(
-                        transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
+                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
                 if (portfolioStockValues == null) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new StringAnswer("You don't own a position with the selected stock!"));
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("You don't own a position with the selected stock!"));
                 } else {
                     if (portfolioStockValues.getCurrentValue() == -1) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body(new StringAnswer("Your stock position is not that high!"));
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Your stock position is not that high!"));
                     } else {
                         transactionManager.addTransaction(transactionContent);
                         Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                        List<Transaction> transactionsInPortfolio = transactionManager
-                                .getAllTransactionsInPortfolioStock(transactionContent.getEmail());
-                        if (Math.abs(transactionContent.getTotalPrice()
-                                - portfolioStockValues.getCurrentValue()) < EPSILON) {
-                            portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(),
-                                    userPortfolio.getPortfolioID());
+                        List<Transaction> transactionsInPortfolio = transactionManager.getAllTransactionsInPortfolioStock(transactionContent.getEmail());
+                        if (Math.abs(transactionContent.getTotalPrice() - portfolioStockValues.getCurrentValue()) < EPSILON) {
+                            portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(), userPortfolio.getPortfolioID());
                             for (Transaction transaction : transactionsInPortfolio) {
                                 transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
                             }
                         } else {
                             Double remainingAmount = transactionContent.getTotalPrice();
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"remainingAmount {0}", remainingAmount);
                             Double totalBoughtValueReduction = 0.0;
                             for (Transaction transaction : transactionsInPortfolio) {
                                 if (remainingAmount <= 0) {
@@ -478,17 +473,21 @@ public class MappingController {
                                 }
 
                                 Double leftInTransaction = transaction.getLeftInPortfolio();
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"leftInTransaction {0}", leftInTransaction);
                                 Double transactionBoughtValue = transaction.getTotalPrice();
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"transactionBoughtValue {0}", transactionBoughtValue);
                                 Integer transactionId = transaction.getTransactionID();
 
                                 if (remainingAmount >= leftInTransaction) {
                                     remainingAmount -= leftInTransaction;
                                     totalBoughtValueReduction += transactionBoughtValue;
+                                    Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"totalBoughtValueReduction {0}", totalBoughtValueReduction);
                                     transactionManager.editLeftinPortfolio(transactionId, 0.0);
                                 } else {
                                     Double proportion = remainingAmount / leftInTransaction;
                                     Double reductionInBoughtValue = transactionBoughtValue * proportion;
                                     totalBoughtValueReduction += reductionInBoughtValue;
+                                    Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"totalBoughtValueReduction {0}", totalBoughtValueReduction);
 
                                     Double newLeftInTransaction = leftInTransaction - remainingAmount;
                                     remainingAmount = 0.0;
@@ -496,12 +495,11 @@ public class MappingController {
                                 }
                             }
 
-                            Double newCurrentValue = portfolioStockValues.getCurrentValue()
-                                    - transactionContent.getTotalPrice();
+                            Double newCurrentValue = portfolioStockValues.getCurrentValue()- transactionContent.getTotalPrice();
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"newCurrentValue {0}", newCurrentValue);
                             Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
-                            portfolioStockManager.decreasePortfolioStock(newCurrentValue, newBoughtValue,
-                                    transactionContent.getStockAmount(), userPortfolio.getPortfolioID(),
-                                    transactionContent.getSymbol());
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,"newBoughtValue {0}", newBoughtValue);
+                            portfolioStockManager.decreasePortfolioStock(newCurrentValue, newBoughtValue, transactionContent.getStockAmount(), userPortfolio.getPortfolioID(), transactionContent.getSymbol());
                         }
 
                         // portfolioStockManager.decreasePortfolioStock(userPortfolio.getPortfolioID(),
