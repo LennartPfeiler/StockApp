@@ -1,33 +1,11 @@
 ﻿const APIKEY = 'Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D'; // Externer API-Schlüssel
 
-///*Timer Event to update the database stock data*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// function runAtSpecificTimeOfDay(hour, minutes, func)
-// {
-//   const twentyFourHours = 86400000;
-//   const now = new Date();
-//   let eta_ms = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime() - now;
-//   if (eta_ms < 0)
-//   {
-//     eta_ms += twentyFourHours;
-//   }
-//   setTimeout(function() {
-//     //run once
-//     func();
-//     // run every 24 hours from now on
-//     setInterval(func, twentyFourHours);
-//   }, eta_ms);
-// }
-
-// runAtSpecificTimeOfDay(23,34,() => { console.log(new Date())});
-
-
-
 ///* Data display *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function displayAllDatabaseData(){
     console.log("DatabaseMethode");
-    displayUserBudget(); 
+    displayUserBudget();
+    setTotalPortoflioValue(); 
     displayTotalPortfolioValue();
     getAllTransactions();
     //getAllPortfolioStocks();
@@ -89,7 +67,7 @@ function login(profileSchema){
             
         },
         "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
+            if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else{
                 alert("An unexpected error occurred. Status: " + xhr.status);
@@ -337,6 +315,8 @@ function sellStock(){
             return;
         }
     }
+
+    console.log(stockAmount);
     const settingsSellStock = {
         "async": true,
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell",
@@ -881,6 +861,9 @@ function getAllPortfolioStocks(){
                 updateStockDisplay(portfolioStock.symbol, totalValue, portfolioStock.boughtvalue);
             });
         });
+
+        //einfügen des neuen Portfolio values
+        //einfügen in die Datenbank
     })
     .fail(function (xhr, textStatus, errorThrown) {
         if (xhr.status === 401 || xhr.status === 500) {
@@ -985,26 +968,6 @@ function displayPortfolioStocks(portfolioStocks) {
     });
 }
 
-// //Display alle stocks in portfolio of an user
-// function displayPortfolioStocks(portfolioStocks) {
-//     const stockListContainer = document.querySelector('.portfolio .stock-list');
-//     stockListContainer.innerHTML = ''; 
-//     let totalCurrentPortfolioValue = 0; 
-//     let totalBoughtPortfolioValue = 0; 
-
-//     portfolioStocks.forEach(stock => {
-//         totalCurrentPortfolioValue += stock.currentvalue;
-//         totalBoughtPortfolioValue += stock.boughtvalue;
-//         const stockDiv = document.createElement('div');
-//         const stockValue = roundToTwoDecimalPlaces(parseFloat(stock.currentvalue));
-
-//         const { percentageChange, changeClass } = calculatePercentage(stock.boughtvalue, stock.currentvalue);
-
-//         stockDiv.innerHTML = `${stock.symbol}: ${stockValue}$ <span class="change ${changeClass}">${percentageChange}%</span>`;
-//         stockListContainer.appendChild(stockDiv);
-//     });
-// }
-
 //Calculate percentage change of portfolio elements
 function calculatePercentage(boughtvalue, currentvalue) {
     const percentageChange = ((currentvalue - boughtvalue) / boughtvalue * 100).toFixed(2);
@@ -1045,29 +1008,8 @@ function displayUserBudget(){
 }
 
 //Display the total portfolio value
-function displayTotalPortfolioValue(){
-    event.preventDefault();
-    const settingsGetPortfolioValue = {
-        "async": false,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolio?email=" + getCookie("email") + "&token=" + getCookie("token"),
-        "method": "GET",
-        "headers": {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        "success": function(data) {
-            $(".portfolio-value").text(data.value  + " $");
-        },
-        "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 500) {
-                $(".portfolio-value").text(JSON.parse(xhr.responseText).answer);
-            } else{
-                $(".portfolio-value").text("An unexpected error occured");
-                
-            }
-        }
-    }
-    $.ajax(settingsGetPortfolioValue);
+function displayTotalPortfolioValue(value){
+    $(".portfolio-value").text(value + " $");
 }
 
 //Check after logout
@@ -1078,3 +1020,60 @@ function disableGoBackFunction(){
         document.location = "vorHome.html"
     }
 }
+
+function setTotalPortoflioValue(){
+    const editPortfolioValueRegister = {
+        "async": true,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolio/value",
+        "method": "PUT",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "email": getCookie("email")
+        }),
+        "success": function(data) {
+            console.log(data);
+            displayTotalPortfolioValue(data);
+        }
+        ,
+        "error": function(xhr) {
+            console.log(xhr);
+            if (xhr.status === 401 || xhr.status === 500) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else {
+                alert("An unexpected error occurred. Status: " + xhr.status);
+            }
+        }
+    };
+
+    $.ajax(editPortfolioValueRegister); 
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.getElementById("tradingview_1dcca")) {
+        new TradingView.widget({
+            "autosize": true,
+            "symbol": "NASDAQ:AAPL",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": true,
+            "withdateranges": true,
+            "range": "YTD",
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "details": true,
+            "hotlist": true,
+            "calendar": true,
+            "show_popup_button": true,
+            "popup_width": "1000",
+            "popup_height": "24650",
+            "container_id": "tradingview_1dcca"
+        });
+    }
+});

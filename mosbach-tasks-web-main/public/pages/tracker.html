@@ -2,12 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aktien-Tracker</title>
     <link rel="icon" type="image/x-icon" sizes="32x32" href="../../ressources/candles-regular-24.ico">
     <link rel="stylesheet" href="../css/tracker.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="../js/StockApp.js"></script>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript" src="../js/tradingview-widget.js"></script>
 </head>
 <body onload="disableGoBackFunction();">
     <header id="header">
@@ -38,30 +43,5 @@
             </div>
         </div>
     </main>
-    
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-        new TradingView.widget({
-            "autosize": true,
-            "symbol": "NASDAQ:AAPL",
-            "timezone": "Etc/UTC",
-            "theme": "dark",
-            "style": "1",
-            "locale": "en",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": true,
-            "withdateranges": true,
-            "range": "YTD",
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "details": true,
-            "hotlist": true,
-            "calendar": true,
-            "show_popup_button": true,
-            "popup_width": "1000",
-            "popup_height": "24650",
-            "container_id": "tradingview_1dcca"
-        });
-    </script>
 </body>
 </html>
