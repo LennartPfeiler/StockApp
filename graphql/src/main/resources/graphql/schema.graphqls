@@ -1,66 +1,48 @@
 type Query {
     getUserProfile(email: ID!, token: String!): User
-    getStock(email: ID!, token: String!, symbol: String!): Stock
+    getStock(email: ID!, token: String!, symbol: String!): StockResult
     getAllPortfolioStocks(email: ID!, token: String!, sortby: String): [PortfolioStock]
-    getAllTransactions(email: ID!, token: String!, sortby: String): [Transaction]
-    getUserPortfolio(email: ID!, token: String!): Portfolio
+    # getAllTransactions(email: ID!, token: String!, sortby: String): [Transaction]
+    # getUserPortfolio(email: ID!, token: String!): Portfolio
 }
 
 type Mutation {
-    createUser(userInput: UserInput!): StringAnswer
-    editProfile(editRequest: EditRequest!): StringAnswer
-    resetProfile(tokenEmailInput: TokenEmailInput!): StringAnswer
-    deleteProfile(tokenEmailInput: TokenEmailInput!): StringAnswer
-    createStock(addStockRequest: AddStockRequestInput!): StringAnswer
-    createBuyOrder(tokenTransactionContent: TokenTransactionContentInput!): StringAnswer
-    createSellOrder(tokenTransactionContent: TokenTransactionContentInput!): StringAnswer
+    createUser(firstname: String!, lastname: String!, email: ID!, password:String!, budget: Float!): StringAnswer
+    editProfile(currentToken: String!, currentMail: String!, firstname: String, lastname: String, email: String, password: String, budget: Float): UserResult
+    resetProfile(tokenEmail: ID!, token: String!): StringAnswer
+    deleteProfile(tokenEmail: ID!, token:String!): StringAnswer
+    createStock(email: ID!, token: String!, symbol: String!, stockPrice: Float!, name: String!): StringAnswer
+    # createBuyOrder(tokenTransactionContent: TokenTransactionContentInput!): StringAnswer
+    # createSellOrder(tokenTransactionContent: TokenTransactionContentInput!): StringAnswer
 }
 
 # Input Types
 
-input UserInput {
-    firstname: String
-    lastname: String
-    email: ID!
-    password: String
-    budget: Float
-}
 
 input EditRequest {
-    token: String
-    currentmail: String
-    user: UserInput # Hier ersetzt durch UserInput
+    currentToken: String!
+    currentMail: String!
 }
 
-input AddStockRequestInput {
-    tokenEmail: TokenEmailInput
-    stock: StockInput
+input TokenEmail {
+    token: String
+    tokenEmail: ID!
 }
 
-input TokenEmailInput {
-    token: String
-    email: ID!
-}
-
-input TokenTransactionContentInput {
-    token: String
-    transactionContent: TransactionContentInput
-}
+# input TokenTransactionContentInput {
+    # token: String
+    # transactionContent: TransactionContentInput
+# }
 
 input SessionInput {
     email: ID!
     token: String
 }
 
-input LoginRequest{
-    email: ID!
-    password: String
-}
-
-input AddStockRequest{
-    tokenEmailInput: TokenEmailInput
-    stockInput: StockInput
-}
+# input AddStockRequest{
+   # tokenEmailInput: TokenEmailInput
+    # stockInput: StockInput
+# }
 
 input TransactionContentInput {
     transactionType: Int
@@ -97,6 +79,7 @@ type Stock {
     symbol: String
     stockPrice: Float
     name: String
+    sortby: String
 }
 
 type StringAnswer {
@@ -139,3 +122,10 @@ type Portfolio {
     startValue: Float
     email: ID!
 }
+
+
+union UserResult = User | StringAnswer
+
+union StockResult = Stock | StringAnswer
+
+
