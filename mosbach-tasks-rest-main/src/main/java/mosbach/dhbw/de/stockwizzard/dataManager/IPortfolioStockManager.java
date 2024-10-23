@@ -10,7 +10,7 @@ public interface IPortfolioStockManager {
 
     public void createPortfolioStockTable();
 
-    public void increasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice);
+    public void increasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice, String email);
 
     public List<PortfolioStock> getAllPortfolioStocks(String email, String sortby);
 

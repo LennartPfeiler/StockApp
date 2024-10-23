@@ -438,20 +438,19 @@ public class MappingController {
     ////////////////////////////////////////////////////////////// Order
     ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
 
-    @PostMapping(path = "/order/buy", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> createBuyOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
-        try {
+    @PostMapping(path = "/order", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<?> addPortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+        try{
             String token = tokenTransactionContent.getToken();
             TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
             Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
             if (isValid) {
                 User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-                Boolean enoughBudget = userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(),
-                        currentUser);
+                Boolean enoughBudget = userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
                 if (enoughBudget == true) {
                     transactionManager.addTransaction(transactionContent);
                     Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                    portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
+                    portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(),
                             transactionContent.getSymbol(), transactionContent.getStockAmount(),
                             transactionContent.getTotalPrice());
                     userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
@@ -470,6 +469,114 @@ public class MappingController {
                     .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
         }
     }
+
+    @PutMapping(path = "/order/buy", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<?> increasePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+        try{
+            String token = tokenTransactionContent.getToken();
+            TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+            Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+            if (isValid) {
+                User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+                Boolean enoughBudget = userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
+                if (enoughBudget == true) {
+                    transactionManager.addTransaction(transactionContent);
+                    Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+                    portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getTotalPrice(), currentUser.getEmail());
+                    userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(), transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                    return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(new StringAnswer("Not enough budget for this transaction!"));
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new StringAnswer("Unauthorized for this transaction!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
+        }
+    }
+
+    @PutMapping(path = "/order/sell", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<?> decreasePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+        return null;
+    }
+
+    @DeleteMapping(path = "/order", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<?> deletePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent){
+        try {
+            String token = tokenTransactionContent.getToken();
+            TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+            Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+            if (isValid) {
+                User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+                Logger.getLogger("GetPortfolioStockValuesLogger").log(Level.INFO, "Start sellStock{0}", transactionContent.getTotalPrice());
+                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
+                if (portfolioStockValues == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new StringAnswer("You don't own a position with the selected stock!"));
+                } else {
+                    if (portfolioStockValues.getCurrentValue() == -1) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new StringAnswer("Your stock position is not that high!"));
+                    } else {
+                        transactionManager.addTransaction(transactionContent);
+                        Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+                        List<Transaction> transactionsInPortfolio = transactionManager.getAllTransactionsInPortfolioStock(transactionContent.getEmail());
+                        portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(),
+                                userPortfolio.getPortfolioID());
+                        for (Transaction transaction : transactionsInPortfolio) {
+                            transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
+                        }
+                        userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
+                                transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                    }
+                }
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new StringAnswer("Unauthorized for this transaction!"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
+            }
+    }
+
+
+    // @PostMapping(path = "/order/buy", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    // public ResponseEntity<?> createBuyOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
+    //     try {
+    //         String token = tokenTransactionContent.getToken();
+    //         TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+    //         Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+    //         if (isValid) {
+    //             User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+    //             Boolean enoughBudget = userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(),
+    //                     currentUser);
+    //             if (enoughBudget == true) {
+    //                 transactionManager.addTransaction(transactionContent);
+    //                 Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+    //                 portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
+    //                         transactionContent.getSymbol(), transactionContent.getStockAmount(),
+    //                         transactionContent.getTotalPrice());
+    //                 userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
+    //                         transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+    //                 return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+    //             } else {
+    //                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    //                         .body(new StringAnswer("Not enough budget for this transaction!"));
+    //             }
+    //         } else {
+    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    //                     .body(new StringAnswer("Unauthorized for this transaction!"));
+    //         }
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    //                 .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
+    //     }
+    // }
 
     @PostMapping(path = "/order/sell", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createSellOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {

@@ -79,49 +79,25 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         }
     }
 
-    // Add a new or update an existing PortfolioStock
-    public void increasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice) {
+    // Add a new PortfolioStock
+    public void addPortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice) {
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Start addPortfolioStock-method");
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
-
-            String checkSQL = "SELECT * FROM group12portfolioStock WHERE portfolioid = " + portfolioId
-                    + " AND symbol = '" + symbol + "'";
-            ResultSet rs = stmt.executeQuery(checkSQL);
-
-            if (rs.next()) {
-                Double existingAmount = rs.getDouble("stockamount");
-                Double existingboughtValue = rs.getDouble("boughtvalue");
-                Double existingCurrentValue = rs.getDouble("currentvalue");
-                Double newAmount = existingAmount + stockAmount;
-                Double newBoughtValue = existingboughtValue + totalPrice;
-                Double newCurrentValue = existingCurrentValue + totalPrice;
-
-                String updatePortfolioStockSQL = "UPDATE group12portfolioStock SET " +
-                        "stockamount = " + newAmount + ", " +
-                        "boughtvalue = " + newBoughtValue + ", " +
-                        "currentvalue = " + newCurrentValue + " " +
-                        "WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
-                stmt.executeUpdate(updatePortfolioStockSQL);
-                Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
-
-            } else {
-                String insertPortfolioStockSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockamount, boughtvalue, currentvalue) VALUES ("
-                        +
-                        portfolioId + ", '" +
-                        symbol + "', " +
-                        stockAmount + ", " +
-                        totalPrice + ", " +
-                        totalPrice + ")";
-                stmt.executeUpdate(insertPortfolioStockSQL);
-                Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
-            }
-            rs.close();
+            String insertPortfolioStockSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockamount, boughtvalue, currentvalue) VALUES ("
+                    +
+                    portfolioId + ", '" +
+                    symbol + "', " +
+                    stockAmount + ", " +
+                    totalPrice + ", " +
+                    totalPrice + ")";
+            stmt.executeUpdate(insertPortfolioStockSQL);
+            Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
         } catch (SQLException e) {
-            Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE, "Error when increasing a portfolio stock.",
+            Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE, "Error when adding a portfolio stock.",
                     e);
             e.printStackTrace();
         } finally {
@@ -137,6 +113,108 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             }
         }
     }
+
+    // Add a new or update an existing PortfolioStock
+    public void increasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice, String email) {
+        Statement stmt = null;
+        Connection connection = null;
+        Logger.getLogger("IncreasePortfolioStockLogger").log(Level.INFO, "Start increasePortfolioStock-method");
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+            PortfolioStock portfolioStock = getPortfolioStock(email, symbol);
+
+            Double existingAmount = portfolioStock.getStockAmount();
+            Double existingboughtValue = portfolioStock.getBoughtValue();
+            Double existingCurrentValue = portfolioStock.getCurrentValue();
+            Double newAmount = existingAmount + stockAmount;
+            Double newBoughtValue = existingboughtValue + totalPrice;
+            Double newCurrentValue = existingCurrentValue + totalPrice;
+
+            String updatePortfolioStockSQL = "UPDATE group12portfolioStock SET " +
+                    "stockamount = " + newAmount + ", " +
+                    "boughtvalue = " + newBoughtValue + ", " +
+                    "currentvalue = " + newCurrentValue + " " +
+                    "WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
+            stmt.executeUpdate(updatePortfolioStockSQL);
+            Logger.getLogger("IncreasePortfolioStockLogger").log(Level.INFO, "Stock increased successfully.");
+
+        } catch (SQLException e) {
+            Logger.getLogger("IncreasePortfolioStockLogger").log(Level.SEVERE, "Error when increasing a portfolio stock.",
+                    e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                Logger.getLogger("IncreasePortfolioStockLogger").log(Level.SEVERE,
+                        "Error when closing the resource. Error: {0}", e);
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // // Add a new or update an existing PortfolioStock
+    // public void increasePortfolioStock(Integer portfolioId, String symbol, Double stockAmount, Double totalPrice) {
+    //     Statement stmt = null;
+    //     Connection connection = null;
+    //     Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Start addPortfolioStock-method");
+    //     try {
+    //         connection = DriverManager.getConnection(dbUrl, username, password);
+    //         stmt = connection.createStatement();
+
+    //         String checkSQL = "SELECT * FROM group12portfolioStock WHERE portfolioid = " + portfolioId
+    //                 + " AND symbol = '" + symbol + "'";
+    //         ResultSet rs = stmt.executeQuery(checkSQL);
+
+    //         if (rs.next()) {
+    //             Double existingAmount = rs.getDouble("stockamount");
+    //             Double existingboughtValue = rs.getDouble("boughtvalue");
+    //             Double existingCurrentValue = rs.getDouble("currentvalue");
+    //             Double newAmount = existingAmount + stockAmount;
+    //             Double newBoughtValue = existingboughtValue + totalPrice;
+    //             Double newCurrentValue = existingCurrentValue + totalPrice;
+
+    //             String updatePortfolioStockSQL = "UPDATE group12portfolioStock SET " +
+    //                     "stockamount = " + newAmount + ", " +
+    //                     "boughtvalue = " + newBoughtValue + ", " +
+    //                     "currentvalue = " + newCurrentValue + " " +
+    //                     "WHERE portfolioid = " + portfolioId + " AND symbol = '" + symbol + "'";
+    //             stmt.executeUpdate(updatePortfolioStockSQL);
+    //             Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock updated successfully.");
+
+    //         } else {
+    //             String insertPortfolioStockSQL = "INSERT INTO group12portfolioStock (portfolioid, symbol, stockamount, boughtvalue, currentvalue) VALUES ("
+    //                     +
+    //                     portfolioId + ", '" +
+    //                     symbol + "', " +
+    //                     stockAmount + ", " +
+    //                     totalPrice + ", " +
+    //                     totalPrice + ")";
+    //             stmt.executeUpdate(insertPortfolioStockSQL);
+    //             Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Stock added successfully.");
+    //         }
+    //         rs.close();
+    //     } catch (SQLException e) {
+    //         Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE, "Error when increasing a portfolio stock.",
+    //                 e);
+    //         e.printStackTrace();
+    //     } finally {
+    //         try {
+    //             if (stmt != null)
+    //                 stmt.close();
+    //             if (connection != null)
+    //                 connection.close();
+    //         } catch (SQLException e) {
+    //             Logger.getLogger("AddPortfolioStockLogger").log(Level.SEVERE,
+    //                     "Error when closing the resource. Error: {0}", e);
+    //             e.printStackTrace();
+    //         }
+    //     }
+    // }
 
     // Get all portfolio stocks of an user sorted by the parameter sortby
     public List<PortfolioStock> getAllPortfolioStocks(String email, String sortby) {
