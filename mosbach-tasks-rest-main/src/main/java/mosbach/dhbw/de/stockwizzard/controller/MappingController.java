@@ -227,6 +227,8 @@ public class MappingController {
 
     ////////////////////////////////////////////////////////////// Stock
     ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
+    
+    //VLT IN Buy/SELL stock
     @GetMapping("/stock")
     public ResponseEntity<?> getStock(
             @RequestParam(value = "email", defaultValue = "") String email,
@@ -253,6 +255,7 @@ public class MappingController {
         }
     }
 
+    //VLT in Buy/Sell stock
     @PostMapping(path = "/stock", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createStock(@RequestBody AddStockRequest addStockRequest) {
         try {
@@ -321,6 +324,8 @@ public class MappingController {
         }
     }
 
+
+    //VLT IN BUY ORDER
     @PutMapping(path = "/portfolioStocks/currentValue", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> editCurrentValue(@RequestBody EditCurrentValueRequest editCurrentValueRequest) {
         try {

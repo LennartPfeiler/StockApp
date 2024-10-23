@@ -4,10 +4,10 @@
 
 function displayAllDatabaseData(){
     console.log("DatabaseMethode");
-    displayUserBudget(); 
+    displayUserBudget();
+    setTotalPortoflioValue(); 
     displayTotalPortfolioValue();
     getAllTransactions();
-    setTotalPortoflioValue();
     //getAllPortfolioStocks();
 }
 
