@@ -30,6 +30,10 @@ import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.EditCurrentValueRequest;
+import com.mosbach.demo.model.alexa.AlexaRO;
+import com.mosbach.demo.model.alexa.IntentRO;
+import com.mosbach.demo.model.alexa.OutputSpeechRO;
+import com.mosbach.demo.model.alexa.ResponseRO;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -676,5 +680,38 @@ public class MappingController {
                     .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
         }
     }
-
 }
+//////////////////////////////////////////////////////Alexa
+
+////////////////////////////////////////////////////////////// ALEXA
+
+@PostMapping(path = "/alexa", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+    public AlexaRO sendEventsToAlexa(@RequestBody AlexaRO alexaRO) throws Exception {
+        IntentRO intent = alexaRO.getRequest().getIntent();
+        // Initialize the logger for this class (better to have this as a private static
+        // final member)
+        Logger logger = Logger.getLogger("MappingController");
+
+        // Log the beginning of the request handling
+        logger.log(Level.INFO, "Received POST request on /alexa endpoint");
+
+        // Variable to store the response text
+        String outText = "";
+
+        // Handle LaunchRequest
+        if (alexaRO.getRequest().getType().equalsIgnoreCase("LaunchRequest")) {
+            outText += "Willkommen zu The Wallstreet Wizzard ";
+            logger.log(Level.INFO, "Handling LaunchRequest");
+        }
+
+        // Handle IntentRequest
+        if (alexaRO.getRequest().getType().equalsIgnoreCase("IntentRequest")
+                &&
+                (alexaRO.getRequest().getIntent().getName().equalsIgnoreCase("AktienpreisIntent"))) {
+
+            logger.log(Level.INFO, "Handling IntentRequest for AktienpreisIntent");
+            String name = intent.getSlots().get("name").getValue();
+
+            outText += "Der Aktienpreis der Aktie " + name + "beträgt" + name.getStock().getStockPrice() ;
+        }
+    }
