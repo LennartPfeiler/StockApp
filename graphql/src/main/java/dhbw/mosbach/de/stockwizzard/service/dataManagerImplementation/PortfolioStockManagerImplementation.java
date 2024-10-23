@@ -323,4 +323,5 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             }
         }
     }
+
 }

@@ -53,12 +53,12 @@ public class EditRequest {
     }
 
     @JsonProperty("currentmail")
-    public String getCurrentmail() {
+    public String getCurrentMail() {
         return currentmail;
     }
 
     @JsonProperty("currentmail")
-    public void setCurrentmail(String currentmail) {
+    public void setCurrentMail(String currentmail) {
         this.currentmail = currentmail;
     }
 

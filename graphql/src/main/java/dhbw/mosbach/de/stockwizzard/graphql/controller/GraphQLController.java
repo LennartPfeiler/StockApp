@@ -6,6 +6,8 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
+import java.util.List;
+
 
 import dhbw.mosbach.de.stockwizzard.model.*;
 import dhbw.mosbach.de.stockwizzard.service.dataManager.*;
@@ -42,17 +44,61 @@ public class GraphQLController {
         }
     }
 
+    @QueryMapping
+    public Object getStock(@Argument String email, @Argument String token, @Argument String symbol) {
+        try {
+            Boolean isValid = sessionService.validToken(token, email);
+            if (isValid) {
+                Stock stock = stockService.getStock(symbol);
+                if (stock != null) {
+                    return stock;
+                } else {
+                    return new StringAnswer("Stock is not in the database.");
+                }
+            } else {
+                return new StringAnswer("Unauthorized for this transaction!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new StringAnswer("An unexpected error occurred during getting stock data.");
+        }
+    }
+
+    @QueryMapping
+    public Object getAllPortfolioStocks(@Argument String email, @Argument String token, @Argument String sortby) {
+        try {
+            Boolean isValid = sessionService.validToken(token, email);
+            if (isValid) {
+                List<PortfolioStock> portfolioStocks = portfolioStockService.getAllPortfolioStocks(email, sortby);
+                return portfolioStocks;
+            } else {
+                throw new RuntimeException("Unauthorized for this transaction!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("An unexpected error occurred during getting portfolioStocks.");
+        }
+    }
+
+
+
 
     @MutationMapping
-    public StringAnswer createUser(@Argument User input) {
+    public StringAnswer createUser(@Argument String firstname, @Argument String lastname, @Argument String email, @Argument String password, @Argument Float budget) {
         try {
-            Boolean isRegistered = userService.isEmailAlreadyRegistered(input.getEmail());
+            User user = new User();
+            user.setFirstName(firstname);
+            user.setLastName(lastname);
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setBudget(budget.doubleValue());
+            Boolean isRegistered = userService.isEmailAlreadyRegistered(user.getEmail());
             if (isRegistered) {
                 return new StringAnswer("You are already registered!");
             } else {
-                userService.addUser(input);
+                userService.addUser(user);
             
-                Portfolio portfolio = new Portfolio(null, input.getBudget(), input.getBudget(), input.getEmail());
+                Portfolio portfolio = new Portfolio(null, user.getBudget(), user.getBudget(), user.getEmail());
                 portfolioService.addPortfolio(portfolio);
 
                 return new StringAnswer("User successfully registered!");
@@ -61,6 +107,125 @@ public class GraphQLController {
             return new StringAnswer("An unexpected error occurred while creating the profile.");
         }
     }
+
+    @MutationMapping
+    public Object editProfile(@Argument String currentMail, @Argument String currentToken, @Argument String firstname, @Argument String lastname, @Argument String email, @Argument String password, @Argument Float budget) {
+        try{
+            EditRequest editRequest = new EditRequest();
+            User user = new User();
+            user.setFirstName(firstname);
+            user.setLastName(lastname);
+            user.setEmail(email);
+            user.setPassword(password);
+            user.setBudget(budget.doubleValue());
+
+            editRequest.setCurrentMail(currentMail);
+            editRequest.setToken(currentToken);
+            editRequest.setUser(user);
+
+            String token = editRequest.getToken();
+            User currentUser = userService.getUserProfile(editRequest.getCurrentMail());
+            User newUserData = editRequest.getUser();
+
+            Boolean isValid = sessionService.validToken(token, currentUser.getEmail());
+            if (isValid) {
+                Boolean emailChanged = !newUserData.getEmail().equals(currentUser.getEmail());
+                Portfolio userPortfolio = portfolioService.getUserPortfolio(currentUser.getEmail());
+
+                if (!emailChanged) {
+                    userService.editProfile(currentUser, newUserData);
+                    portfolioService.editAllPortfolioValues(currentUser.getEmail(), newUserData.getEmail(),
+                            (userPortfolio.getStartValue() + newUserData.getBudget()),
+                            (userPortfolio.getValue() + newUserData.getBudget()));
+                    return userService.getUserProfile(newUserData.getEmail());
+                } else {
+                    Boolean isRegistered = userService.isEmailAlreadyRegistered(newUserData.getEmail());
+                    if (!isRegistered) {
+                        userService.addUser(new User(newUserData.getFirstName(), newUserData.getLastName(),
+                                newUserData.getEmail(), currentUser.getPassword(),
+                                (newUserData.getBudget() + currentUser.getBudget())));
+                        sessionService.editSession(currentUser.getEmail(), newUserData.getEmail());
+                        transactionService.editTransactionEmail(currentUser.getEmail(), newUserData.getEmail());
+                        portfolioService.editAllPortfolioValues(currentUser.getEmail(), newUserData.getEmail(),
+                                (userPortfolio.getStartValue() + newUserData.getBudget()),
+                                (userPortfolio.getValue() + newUserData.getBudget()));
+                        userService.deleteUser(currentUser.getEmail());
+                        return userService.getUserProfile(newUserData.getEmail());
+                    } else {
+                        return new StringAnswer("This email is already registered");
+                    }
+                }
+            } else {
+                return new StringAnswer("Unauthorized for this transaction");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new StringAnswer("An unexpected error occurred during editing user.");
+        }
+    }
+
+    @MutationMapping
+    public StringAnswer resetProfile(@Argument String token, @Argument String tokenEmail) {
+        try {
+            Boolean isValid = sessionService.validToken(token, tokenEmail);
+            if (isValid) {
+                portfolioStockService.deleteAllPortfolioStocks(tokenEmail);
+                transactionService.deleteAllTransactions(tokenEmail);
+                portfolioService.resetPortfolio(tokenEmail);
+                userService.resetProfile(tokenEmail);
+                return new StringAnswer("User successfully resetted!");
+            } else {
+                return new StringAnswer("Unauthorized for this transaction!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new StringAnswer("An unexpected error occurred during resetting.");
+        }
+    }
+
+    @MutationMapping
+    public StringAnswer deleteProfile(@Argument String token, @Argument String tokenEmail) {
+        try {
+            boolean isValid = sessionService.validToken(token, tokenEmail);
+            if (isValid) {
+                userService.deleteUser(tokenEmail);
+                return new StringAnswer("Profile successfully deleted");
+            } else {
+                return new StringAnswer("Unauthorized for this transaction!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new StringAnswer("An unexpected error occurred during resetting the profile.");
+        }
+    }
+
+    @MutationMapping
+    public StringAnswer createStock(@Argument String token, @Argument String email, @Argument String symbol, @Argument Float stockPrice, @Argument String name) {
+        try {
+            Boolean isValid = sessionService.validToken(token, email);
+            if (isValid) {
+                Stock stock = new Stock();
+                stock.setSymbol(symbol);
+                stock.setStockPrice(stockPrice.doubleValue());
+                stock.setName(name);
+                stockService.addStock(stock);
+                return new StringAnswer("Stock got added to Database");
+            } else {
+                return new StringAnswer("Unauthorized for this transaction!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new StringAnswer("An unexpected error occurred during adding Stock to Database.");
+        }
+    }
+
+
+
+
+
+
+
+
 }   
     // @MutationMapping
     // public StringAnswer createUser(@Argument User user) {
