@@ -10,7 +10,7 @@ public interface IPortfolioManager {
 
     public Portfolio getUserPortfolio(String email);
 
-    public void editPortfolioValue(Integer portfolioId, Double oldValue, Double addition);
+    public void editPortfolioValue(String email, Double newValue);
 
     public void editAllPortfolioValues(String email, String newEmail, Double newStartValue, Double newValue);
 
