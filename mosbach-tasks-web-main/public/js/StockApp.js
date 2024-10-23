@@ -7,6 +7,7 @@ function displayAllDatabaseData(){
     displayUserBudget(); 
     displayTotalPortfolioValue();
     getAllTransactions();
+    setTotalPortoflioValue();
     //getAllPortfolioStocks();
 }
 
@@ -1008,7 +1009,7 @@ function displayUserBudget(){
 
 //Display the total portfolio value
 function displayTotalPortfolioValue(value){
-    $(".portfolio-value").text(value);
+    $(".portfolio-value").text(value + " $");
 }
 
 //Check after logout

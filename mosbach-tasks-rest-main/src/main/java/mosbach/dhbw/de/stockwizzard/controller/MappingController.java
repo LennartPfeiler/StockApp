@@ -30,7 +30,6 @@ import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.EditCurrentValueRequest;
-import mosbach.dhbw.de.stockwizzard.model.EditPortfolioValueRequest;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -406,21 +405,21 @@ public class MappingController {
     }
 
     @PutMapping(path = "/portfolio/value", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> editPortfolioValue(@RequestBody TokenUser tokenUser) {
+    public ResponseEntity<?> editPortfolioValue(@RequestBody TokenEmail tokenEmail) {
         try {
-            Boolean isValid = sessionManager.validToken(tokenUser.getToken(),
-                    tokenUser.getEmail());
+            Boolean isValid = sessionManager.validToken(tokenEmail.getToken(),
+            tokenEmail.getEmail());
             if (isValid) {
-                Double portfolioValue = 0;
+                Double portfolioValue = 0.0;
                 List<PortfolioStock> portfolioStocks = portfolioStockManager
-                        .getAllPortfolioStocks(tokenUser.getEmail(), "symbol");
+                        .getAllPortfolioStocks(tokenEmail.getEmail(), "symbol");
                 for (PortfolioStock portfolioStock : portfolioStocks) {
                     portfolioValue += portfolioStock.getCurrentValue();
                 }
-                        
-                portfolioManager.editPortfolioValue(tokenUser.getEmail(),
-                        portfolioValue);
-                return ResponseEntity.ok(portfolioValue);
+                User user = userManager.getUserProfile(tokenEmail.getEmail());     
+                portfolioManager.editPortfolioValue(tokenEmail.getEmail(),
+                        portfolioValue+user.getBudget());
+                return ResponseEntity.ok(portfolioValue+user.getBudget());
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new StringAnswer("Unauthorized for this transaction!"));
