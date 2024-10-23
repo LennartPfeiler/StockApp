@@ -1007,29 +1007,8 @@ function displayUserBudget(){
 }
 
 //Display the total portfolio value
-function displayTotalPortfolioValue(){
-    event.preventDefault();
-    const settingsGetPortfolioValue = {
-        "async": false,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolio?email=" + getCookie("email") + "&token=" + getCookie("token"),
-        "method": "GET",
-        "headers": {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        "success": function(data) {
-            $(".portfolio-value").text(data.value  + " $");
-        },
-        "error": function(xhr) {
-            if (xhr.status === 401 || xhr.status === 500) {
-                $(".portfolio-value").text(JSON.parse(xhr.responseText).answer);
-            } else{
-                $(".portfolio-value").text("An unexpected error occured");
-                
-            }
-        }
-    }
-    $.ajax(settingsGetPortfolioValue);
+function displayTotalPortfolioValue(value){
+    $(".portfolio-value").text(value);
 }
 
 //Check after logout
@@ -1041,6 +1020,36 @@ function disableGoBackFunction(){
     }
 }
 
+function setTotalPortoflioValue(){
+    const editPortfolioValueRegister = {
+        "async": true,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolio/value",
+        "method": "PUT",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "email": getCookie("email")
+        }),
+        "success": function(data) {
+            console.log(data);
+            displayTotalPortfolioValue(data);
+        }
+        ,
+        "error": function(xhr) {
+            console.log(xhr);
+            if (xhr.status === 401 || xhr.status === 500) {
+                alert(JSON.parse(xhr.responseText).answer);
+            } else {
+                alert("An unexpected error occurred. Status: " + xhr.status);
+            }
+        }
+    };
+
+    $.ajax(editPortfolioValueRegister); 
+}
 
 document.addEventListener("DOMContentLoaded", function() {
     if (document.getElementById("tradingview_1dcca")) {
