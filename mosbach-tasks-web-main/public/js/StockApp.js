@@ -1385,3 +1385,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+function initializeResizeHandler() {
+    // Überwacht, wenn die Fenstergröße geändert wird
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            window.scrollTo(0, 0);
+        }
+    });
+}
