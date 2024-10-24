@@ -30,7 +30,10 @@ import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.EditCurrentValueRequest;
-import mosbach.dhbw.de.stockwizzard.model.alexa.*;
+import com.mosbach.demo.model.alexa.AlexaRO;
+import com.mosbach.demo.model.alexa.IntentRO;
+import com.mosbach.demo.model.alexa.OutputSpeechRO;
+import com.mosbach.demo.model.alexa.ResponseRO;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -228,8 +231,8 @@ public class MappingController {
 
     ////////////////////////////////////////////////////////////// Stock
     ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
-
-    // VLT IN Buy/SELL stock
+    
+    //VLT IN Buy/SELL stock
     @GetMapping("/stock")
     public ResponseEntity<?> getStock(
             @RequestParam(value = "email", defaultValue = "") String email,
@@ -256,7 +259,7 @@ public class MappingController {
         }
     }
 
-    // VLT in Buy/Sell stock
+    //VLT in Buy/Sell stock
     @PostMapping(path = "/stock", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createStock(@RequestBody AddStockRequest addStockRequest) {
         try {
@@ -325,7 +328,8 @@ public class MappingController {
         }
     }
 
-    // VLT IN BUY ORDER
+
+    //VLT IN BUY ORDER
     @PutMapping(path = "/portfolioStocks/currentValue", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> editCurrentValue(@RequestBody EditCurrentValueRequest editCurrentValueRequest) {
         try {
@@ -413,7 +417,7 @@ public class MappingController {
     public ResponseEntity<?> editPortfolioValue(@RequestBody TokenEmail tokenEmail) {
         try {
             Boolean isValid = sessionManager.validToken(tokenEmail.getToken(),
-                    tokenEmail.getEmail());
+            tokenEmail.getEmail());
             if (isValid) {
                 Double portfolioValue = 0.0;
                 List<PortfolioStock> portfolioStocks = portfolioStockManager
@@ -421,10 +425,10 @@ public class MappingController {
                 for (PortfolioStock portfolioStock : portfolioStocks) {
                     portfolioValue += portfolioStock.getCurrentValue();
                 }
-                User user = userManager.getUserProfile(tokenEmail.getEmail());
+                User user = userManager.getUserProfile(tokenEmail.getEmail());     
                 portfolioManager.editPortfolioValue(tokenEmail.getEmail(),
-                        portfolioValue + user.getBudget());
-                return ResponseEntity.ok(portfolioValue + user.getBudget());
+                        portfolioValue+user.getBudget());
+                return ResponseEntity.ok(portfolioValue+user.getBudget());
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new StringAnswer("Unauthorized for this transaction!"));
@@ -438,8 +442,8 @@ public class MappingController {
     ////////////////////////////////////////////////////////////// Order
     ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
 
-    @PostMapping(path = "/order", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> addPortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
+    @PostMapping(path = "/order/buy", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<?> createBuyOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
         try {
             String token = tokenTransactionContent.getToken();
             TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
@@ -451,7 +455,7 @@ public class MappingController {
                 if (enoughBudget == true) {
                     transactionManager.addTransaction(transactionContent);
                     Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                    portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(),
+                    portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
                             transactionContent.getSymbol(), transactionContent.getStockAmount(),
                             transactionContent.getTotalPrice());
                     userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
@@ -470,129 +474,6 @@ public class MappingController {
                     .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
         }
     }
-
-    @PutMapping(path = "/order/buy", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> increasePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
-        try {
-            String token = tokenTransactionContent.getToken();
-            TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
-            Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
-            if (isValid) {
-                User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-                Boolean enoughBudget = userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(),
-                        currentUser);
-                if (enoughBudget == true) {
-                    transactionManager.addTransaction(transactionContent);
-                    Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                    portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
-                            transactionContent.getSymbol(), transactionContent.getStockAmount(),
-                            transactionContent.getTotalPrice(), currentUser.getEmail());
-                    userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
-                            transactionContent.getTotalPrice(), transactionContent.getTransactionType());
-                    return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(new StringAnswer("Not enough budget for this transaction!"));
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new StringAnswer("Unauthorized for this transaction!"));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
-        }
-    }
-
-    @PutMapping(path = "/order/sell", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> decreasePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
-        return null;
-    }
-
-    @DeleteMapping(path = "/order", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> deletePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
-        try {
-            String token = tokenTransactionContent.getToken();
-            TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
-            Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
-            if (isValid) {
-                User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-                Logger.getLogger("GetPortfolioStockValuesLogger").log(Level.INFO, "Start sellStock{0}",
-                        transactionContent.getTotalPrice());
-                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(
-                        transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
-                if (portfolioStockValues == null) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new StringAnswer("You don't own a position with the selected stock!"));
-                } else {
-                    if (portfolioStockValues.getCurrentValue() == -1) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body(new StringAnswer("Your stock position is not that high!"));
-                    } else {
-                        transactionManager.addTransaction(transactionContent);
-                        Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                        List<Transaction> transactionsInPortfolio = transactionManager
-                                .getAllTransactionsInPortfolioStock(transactionContent.getEmail());
-                        portfolioStockManager.deletePortfolioStock(transactionContent.getSymbol(),
-                                userPortfolio.getPortfolioID());
-                        for (Transaction transaction : transactionsInPortfolio) {
-                            transactionManager.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
-                        }
-                        userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
-                                transactionContent.getTotalPrice(), transactionContent.getTransactionType());
-                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
-                    }
-                }
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new StringAnswer("Unauthorized for this transaction!"));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
-        }
-    }
-
-    // @PostMapping(path = "/order/buy", consumes = {
-    // MediaType.APPLICATION_JSON_VALUE })
-    // public ResponseEntity<?> createBuyOrder(@RequestBody TokenTransactionContent
-    // tokenTransactionContent) {
-    // try {
-    // String token = tokenTransactionContent.getToken();
-    // TransactionContent transactionContent =
-    // tokenTransactionContent.getTransactionContent();
-    // Boolean isValid = sessionManager.validToken(token,
-    // transactionContent.getEmail());
-    // if (isValid) {
-    // User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-    // Boolean enoughBudget =
-    // userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(),
-    // currentUser);
-    // if (enoughBudget == true) {
-    // transactionManager.addTransaction(transactionContent);
-    // Portfolio userPortfolio =
-    // portfolioManager.getUserPortfolio(transactionContent.getEmail());
-    // portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
-    // transactionContent.getSymbol(), transactionContent.getStockAmount(),
-    // transactionContent.getTotalPrice());
-    // userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
-    // transactionContent.getTotalPrice(), transactionContent.getTransactionType());
-    // return ResponseEntity.ok(new StringAnswer("Transaction was successfully
-    // completed"));
-    // } else {
-    // return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-    // .body(new StringAnswer("Not enough budget for this transaction!"));
-    // }
-    // } else {
-    // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-    // .body(new StringAnswer("Unauthorized for this transaction!"));
-    // }
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    // .body(new StringAnswer("An unexpected error occurred while getting the user
-    // portfolio."));
-    // }
-    // }
 
     @PostMapping(path = "/order/sell", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createSellOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
@@ -692,40 +573,69 @@ public class MappingController {
                     .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
         }
     }
+}
+//////////////////////////////////////////////////////Alexa
 
+////////////////////////////////////////////////////////////// ALEXA
 
-    ////////////////////////////////////////////////////////////// ALEXA //////////////////////////////////////////////////////////
+@PostMapping(path = "/alexa", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) throws Exception {
+    IntentRO intent = alexaRO.getRequest().getIntent();
+    Logger logger = Logger.getLogger("MappingController");
 
-    @PostMapping(path = "/alexa", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-    public AlexaRO sendEventsToAlexa(@RequestBody AlexaRO alexaRO) throws Exception {
-        IntentRO intent = alexaRO.getRequest().getIntent();
-        // Initialize the logger for this class (better to have this as a private static
-        // final member)
-        Logger logger = Logger.getLogger("MappingController");
+    String outText = "";
 
-        // Log the beginning of the request handling
-        logger.log(Level.INFO, "Received POST request on /alexa endpoint");
-
-        // Variable to store the response text
-        String outText = "";
-
-        // Handle LaunchRequest
-        if (alexaRO.getRequest().getType().equalsIgnoreCase("LaunchRequest")) {
-            outText += "Willkommen zu The Wallstreet Wizzard ";
-            logger.log(Level.INFO, "Handling LaunchRequest");
-        }
-
-        // Handle IntentRequest
-        if (alexaRO.getRequest().getType().equalsIgnoreCase("IntentRequest")
-                &&
-                (alexaRO.getRequest().getIntent().getName().equalsIgnoreCase("AktienpreisIntent"))) {
-
-            logger.log(Level.INFO, "Handling IntentRequest for AktienpreisIntent");
-            String name = intent.getSlots().get("name").getValue();
-
-            // outText += "Der Aktienpreis der Aktie " + name + "beträgt" + name.getStock().getStockPrice();
-        }
-        return null;
+    // Handle LaunchRequest
+    if (alexaRO.getRequest().getType().equalsIgnoreCase("LaunchRequest")) {
+        outText += "Willkommen bei The Wallstreet Wizzard. Du kannst dich registrieren lassen.";
+        logger.log(Level.INFO, "Handling LaunchRequest");
     }
 
+    // Handle SignupIntent (Nutzer-Registrierung)
+    if (alexaRO.getRequest().getType().equalsIgnoreCase("IntentRequest")
+        && intent.getName().equalsIgnoreCase("SignupIntent")) {
+
+        logger.log(Level.INFO, "Handling IntentRequest for SignupIntent");
+
+        // Erfasse die Slot-Werte
+        String firstName = intent.getSlots().get("firstName").getValue();
+        String lastName = intent.getSlots().get("lastName").getValue();
+        String email = intent.getSlots().get("email").getValue();
+        String password = intent.getSlots().get("password").getValue();
+
+        // Validierung der Eingaben (optional)
+        if (firstName == null || lastName == null || email == null || password == null) {
+            outText += "Fehler: Bitte stelle sicher, dass du alle benötigten Informationen angegeben hast.";
+        } else {
+            // Erstelle einen neuen Benutzer
+            User user = new User();
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setEmail(email);
+            user.setPassword(password);  // Stelle sicher, dass du das Passwort sicher speicherst, z.B. gehasht
+            user.setBudget(0.0);  // Standard-Budget beim Erstellen eines Benutzers
+
+            // Rufe die vorhandene createUser-Methode auf
+            ResponseEntity<?> response = createUser(user);
+
+            // Überprüfe das Ergebnis der Registrierung
+            if (response.getStatusCode().equals(HttpStatus.OK)) {
+                outText += "Vielen Dank, " + firstName + ". Du wurdest erfolgreich registriert.";
+            } else if (response.getStatusCode().equals(HttpStatus.CONFLICT)) {
+                outText += "Es sieht so aus, als wärst du bereits registriert.";
+            } else {
+                outText += "Es gab einen Fehler bei der Registrierung. Bitte versuche es später erneut.";
+            }
+        }
+    }
+
+    // Rückgabe der Alexa-Antwort
+    AlexaRO response = new AlexaRO();
+    response.setVersion("1.0");
+    AlexaResponse outputSpeech = new AlexaResponse();
+    outputSpeech.setType("PlainText");
+    outputSpeech.setText(outText);
+
+    response.setOutputSpeech(outputSpeech);
+    return response;
 }
