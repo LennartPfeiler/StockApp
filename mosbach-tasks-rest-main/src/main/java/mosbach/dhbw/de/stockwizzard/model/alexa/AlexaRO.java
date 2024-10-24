@@ -6,16 +6,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlRootElement;
+// import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.*;
-import com.mosbach.demo.data.api.EventManager;
-import com.mosbach.demo.data.api.UserManager;
-import com.mosbach.demo.data.impl.PostgresDBEventManagerImpl;
-import com.mosbach.demo.data.impl.PostgresDBUserManagerImpl;
-import com.mosbach.demo.model.auth.TokenUser;
-import com.mosbach.demo.model.auth.User;
-import com.mosbach.demo.model.event.Event;
+// import com.mosbach.demo.data.api.EventManager;
+// import com.mosbach.demo.data.api.UserManager;
+// import com.mosbach.demo.data.impl.PostgresDBEventManagerImpl;
+// import com.mosbach.demo.data.impl.PostgresDBUserManagerImpl;
+// import com.mosbach.demo.model.auth.TokenUser;
+// import com.mosbach.demo.model.auth.User;
+// import com.mosbach.demo.model.event.Event;
 
 // This class represents the response object (RO) structure for interactions with Alexa.
 @JsonRootName(value = "TaskListRO")

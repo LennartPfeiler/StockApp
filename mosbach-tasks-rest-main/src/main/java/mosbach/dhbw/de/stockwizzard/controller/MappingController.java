@@ -723,8 +723,9 @@ public class MappingController {
             logger.log(Level.INFO, "Handling IntentRequest for AktienpreisIntent");
             String name = intent.getSlots().get("name").getValue();
 
-            outText += "Der Aktienpreis der Aktie " + name + "beträgt" + name.getStock().getStockPrice();
+            // outText += "Der Aktienpreis der Aktie " + name + "beträgt" + name.getStock().getStockPrice();
         }
+        return null;
     }
 
 }
