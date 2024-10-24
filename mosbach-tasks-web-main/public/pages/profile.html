@@ -3,37 +3,37 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Profile</title>
         <link rel="icon" type="image/x-icon" sizes="32x32" href="../../ressources/candles-regular-24.ico">
         <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
         <link rel="stylesheet" href="../css/profile.css">
         <script src="../js/StockApp.js"></script>
         <script src="../js/jquery-3.6.0.min.js"></script>
-        <title>Profile</title>
     </head>
     <body onload="disableGoBackFunction();setProfileValues()">
-         <!-- Brauchst eig keine id weil alles über den tag in css geamcht werden könnte. Außerdem ists hier id und in anderen html files ne klasse -->
-        <header id="header">
-            <!-- ne id -->
-            <a href="#" class="logo">
+        <!-- ID entfernt, da Styling über das Tag möglich ist -->
+        <header>
+            <!-- Neue ID hinzugefügt -->
+            <a href="#" id="logo">
                 <img src="../../ressources/Logo.png">
             </a>
 
-             <!-- Brauchst eig keine klasse weil alles über den tag in css geamcht werden könnte -->
-            <nav class="navbar">
+            <!-- Klassennamen entfernt, Styling über das Tag -->
+            <nav>
                 <a href="home.html" class="nav-link" data-index="1">Home </a>
                 <a href="tracker.html" class="nav-link" data-index="2">Stock tracker</a>
                 <a href="portfolio.html" class="nav-link" data-index="3">Portfolio</a>
                 <a href="profile.html" class="nav-link active" data-index="4">Profile</a>
             </nav>
-            <!-- sollte ne id sein -->
-            <div class="login">
+            <!-- Klasse zu ID geändert -->
+            <div id="login">
                 <a href="vorHome.html" class="login-text" onclick="logout()">Logout</a>
                 <a href="vorHome.html" onclick="logout()"><i class='bx bx-log-out-circle'></i></a>
             </div>
         </header>
         <main>
-            <!-- ne id -->
-            <section class="profile">
+            <!-- Neue ID hinzugefügt -->
+            <section class="profile" id="profile-section">
                 <h2>Edit Profile</h2>
                 
                 <label for="first-name">First name:</label>
@@ -45,9 +45,9 @@
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" placeholder="Enter your email">
 
-                <!-- ne id  -->
-                <div class="input-box">
-                    <!-- ne id -->
+                <!-- Neue ID hinzugefügt -->
+                <div class="input-box" id="budget-input-box">
+                    <!-- Neue ID hinzugefügt -->
                     <select class="input-field" id="amount-selection" required>
                         <option value="" disabled selected>Add budget</option>
                         <option value="500">$500</option>

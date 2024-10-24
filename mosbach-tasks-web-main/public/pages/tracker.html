@@ -7,8 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aktien-Tracker</title>
     <link rel="icon" type="image/x-icon" sizes="32x32" href="../../ressources/candles-regular-24.ico">
+    <!-- Einbindung des CSS-Stilsheets -->
     <link rel="stylesheet" href="../css/tracker.css">
+    <!-- Einbindung von Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Einbindung von JavaScript-Dateien -->
     <script src="../js/StockApp.js"></script>
     <script src="../js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -16,34 +19,34 @@
 </head>
 <body onload="disableGoBackFunction();">
     <header id="header">
-        <!-- ne id -->
-        <a href="#" class="logo">
+        <!-- Neue ID hinzugefügt -->
+        <a href="#" id="logo">
             <img src="../../ressources/Logo.png">
         </a>
-        <!-- wieder über html tag in css möglic, class überflüssig  -->
-        <nav class="navbar">
+        <!-- Klassennamen entfernt, Styling über das HTML-Tag -->
+        <nav>
             <a href="home.html" class="nav-link" data-index="1">Home</a>
             <a href="tracker.html" class="nav-link active" data-index="2">Stock tracker</a>
             <a href="portfolio.html" class="nav-link" data-index="3">Portfolio</a>
             <a href="profile.html" class="nav-link" data-index="4">Profile</a>
         </nav>
-        <!-- ne id -->
-        <div class="login">
-            <!-- ne id  -->
-            <a href="vorHome.html" class="login-text" onclick="logout()">Logout</a>
+        <!-- Neue ID hinzugefügt -->
+        <div id="login">
+            <!-- Neue ID hinzugefügt -->
+            <a href="vorHome.html" id="logout-link" onclick="logout()">Logout</a>
             <a href="vorHome.html" onclick="logout()"><i class='bx bx-log-out-circle'></i></a>
         </div>
     </header>
 
     <main>
-        <!-- ne id -->
-        <div class="tradingview-widget-container">
+        <!-- Neue ID hinzugefügt -->
+        <div id="tradingview-container">
             <div id="tradingview_1dcca"></div>
-            <!-- ne id  -->
-            <div class="tradingview-widget-copyright">
+            <!-- Neue ID hinzugefügt -->
+            <div id="tradingview-copyright">
                 <a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank">
-                    <!-- ne id  -->
-                    <span class="blue-text">Track all markets on TradingView</span>
+                    <!-- Neue ID hinzugefügt -->
+                    <span id="tradingview-link">Track all markets on TradingView</span>
                 </a>
             </div>
         </div>
