@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up WALL STREET WIZZARD</title>
     <link rel="icon" type="image/x-icon" sizes="32x32" href="../../ressources/candles-regular-24.ico">
     <link rel="stylesheet" href="../css/signup.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <!-- muss in body -->
-    <img src="../../ressources/Logo.png" class="Logo-Bild">
-    <title>Sign up WALL STREET WIZZARD</title>
-    <!-- darf auch hier net in den header -->
-    <div class="login">
-        <a href="vorHome.html" class="login-text">Back</a>
-    </div>
     <script src="../js/StockApp.js"></script>
     <script src="../js/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <!-- ne id  -->
-    <div class="login-box">
-        <!-- ne id  -->
-        <div class="login-header">
+    <!-- Bild ins Body verschoben -->
+    <img src="../../ressources/Logo.png" class="Logo-Bild">
+    <!-- "login"-Div ins Body verschoben -->
+    <div class="login">
+        <a href="vorHome.html" class="login-text">Back</a>
+    </div>
+
+    <!-- Neue ID hinzugefügt -->
+    <div class="login-box" id="login-box">
+        <!-- Neue ID hinzugefügt -->
+        <div class="login-header" id="login-header">
             <header>Sign up</header>
         </div>
         <form id="loginForm" onsubmit="register(this)">
@@ -37,9 +38,9 @@
             <div class="input-box">
                 <input type="password" class="input-field" name="password" placeholder="Password" autocomplete="off" required>
             </div>
-            <!-- ne id -->
-            <div class="input-box">
-                <!-- class und id  -->
+            <!-- Neue ID hinzugefügt -->
+            <div class="input-box" id="budget-input-box">
+                <!-- Klasse und ID hinzugefügt -->
                 <select class="input-field" name="budget" id="amount-selection" required>
                     <option value="" disabled selected>Select starting budget</option>
                     <option value="5000">$5,000</option>
@@ -48,16 +49,14 @@
                     <option value="20000">$20,000</option>
                 </select>
             </div>
-            <!-- ne id -->
-            <div class="input-submit">
-                <!-- class und id -->
-                <button class="submit-btn" id="submit"></button>
-                <!-- auch hier kannst den sign up text eig in den button direkt einfügen. label eig überflüssig, muss dann nur css vom button noch angepasst werden -->
-                <label for="submit">Sign Up</label>
+            <!-- Neue ID hinzugefügt -->
+            <div class="input-submit" id="input-submit">
+                <!-- Klasse und ID hinzugefügt, Text direkt in den Button eingefügt -->
+                <button class="submit-btn" id="submit">Sign Up</button>
             </div>
         </form>
-        <!-- ne id -->
-        <div class="login-link">
+        <!-- Neue ID hinzugefügt -->
+        <div class="login-link" id="login-link">
             <p>Already have an account? <a href="Login.html">Back to Login</a></p>
         </div>
     </div>

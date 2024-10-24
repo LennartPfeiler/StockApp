@@ -4,21 +4,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login WALL STREET WIZARD</title>
     <link rel="icon" type="image/x-icon" sizes="32x32" href="../../ressources/candles-regular-24.ico">
     <link rel="stylesheet" href="../css/login.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <!-- muss in body -->
-    <img src="../../ressources/Logo.png" class="Logo-Bild">
-    <title>Login WALL STREET WIZZARD</title>
-    <!-- Muss eigentlich in den body, head ist nur für Metainformationen -->
-    <div class="login">
-        <a href="vorHome.html" class="login-text">Back</a>
-    </div>
     <script src="../js/StockApp.js"></script>
     <script src="../js/jquery-3.6.0.min.js"></script>
 </head>
-
 <body>
+    <!-- Logo und Back-Button in den Body verschoben -->
+    <img src="../../ressources/Logo.png" class="Logo-Bild">
+    <div class="login">
+        <a href="vorHome.html" class="login-text">Back</a>
+    </div>
+
     <div class="login-box">
         <div class="login-header">
             <header>Login</header>
@@ -30,18 +29,14 @@
             <div class="input-box">
                 <input type="password" class="input-field" name="password" placeholder="Password" autocomplete="off" required>
             </div>
-            <!-- Forget Funktion haben wir net, sollte umbennant werden -->
-            <div class="forgot">
-            </div>
+            <!-- Unnötige "forgot" Div entfernt -->
             <div class="input-submit">
-                <!-- Id und class -->
-                <button class="submit-btn" id="submit"></button>
-                <!-- Braucht man eig net, weil man kann den button namen ja einfach ins innerHTML ändern. Falls dus änderst geb mir Bescheid geben, weil ich dann was im js code ändern muss -->
-                <label for="submit">Sign In</label>
+                <!-- Button mit Text aktualisiert -->
+                <button class="submit-btn" id="submit">Sign In</button>
             </div>
         </form>
         <div class="sign-up-link">
-            <p>Don't have account? <a href="Signup.html">Sign Up</a></p>
+            <p>Don't have an account? <a href="Signup.html">Sign Up</a></p>
         </div>
     </div>
 </body>
