@@ -506,7 +506,103 @@ public class MappingController {
 
     @PutMapping(path = "/order/sell", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> decreasePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
-        return null;
+        try {
+            String token = tokenTransactionContent.getToken();
+            TransactionContent transactionContent = tokenTransactionContent.getTransactionContent();
+            Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
+            if (isValid) {
+                //GET USER
+                User currentUser = userManager.getUserProfile(transactionContent.getEmail());
+                //GET BOUGHT AND CURRENT VALUE OF PORTFOLIOSTOCK
+                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
+                if (portfolioStockValues == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new StringAnswer("You don't own a position with the selected stock!"));
+                } else {
+                    if (portfolioStockValues.getCurrentValue() == -1) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(new StringAnswer("Your stock position is not that high!"));
+                    }
+                    else{
+                        //ADD SELL TRANSACTION
+                        transactionManager.addTransaction(transactionContent);
+                        //GET user portfolio
+                        Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+                        //GET all transaction of an user
+                        List<Transaction> transactionsInPortfolio = transactionManager.getAllTransactionsInPortfolioStock(transactionContent.getEmail());
+                        Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "Im else");
+                        // SO viel muss abgezogen werden von den transaktionen
+                        Double remainingAmount = transactionContent.getTotalPrice();
+                        Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "remainingAmount {0}",
+                                remainingAmount);
+                        Double totalBoughtValueReduction = 0.0; // Ensure this is reset for each call
+                        for (Transaction transaction : transactionsInPortfolio) {
+                            //Wenn der remaining amount verbraucht ist, kann aufgehört werden
+                            if (remainingAmount <= 0) {
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "In break if");
+                                break;
+                            }
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "nach break if");
+                            Double leftInTransaction = transaction.getLeftInPortfolio();
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "leftInTransaction {0}",
+                                    leftInTransaction);
+                            //Wert aufrufen, für wie viel die aktuelle TRansaktion gekauft wurde
+                            Double transactionBoughtValue = transaction.getTotalPrice();
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,
+                                    "transactionBoughtValue {0}", transactionBoughtValue);
+                            //Get transaktionsid von der Transaktion
+                            Integer transactionId = transaction.getTransactionID();
+
+                            //Überprüfe, ob der erstliche Wert größer gleich dem transaktions left wert ist 
+                            if (remainingAmount >= leftInTransaction) {
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "In 2. edit 0.0");
+                                //Left abziehen vom remainingAmount
+                                remainingAmount -= leftInTransaction;
+                                //Kompletter Bought Price wird hinzugefügt, was später verkauft werden soll
+                                totalBoughtValueReduction += transactionBoughtValue;
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,
+                                        "totalBoughtValueReduction {0}", totalBoughtValueReduction);
+                                //Editiere den wert im portfolio
+                                transactionManager.editLeftinPortfolio(transactionId, 0.0);
+                            } else {
+                                //berechne wie viel prozent remaining amount vom left in transaction ist
+                                Double proportion = remainingAmount / leftInTransaction;
+                                //berechne wie viel vom bought Value denn abgezogen werden muss
+                                Double reductionInBoughtValue = transactionBoughtValue * proportion;
+                                totalBoughtValueReduction += reductionInBoughtValue;
+                                Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO,
+                                        "totalBoughtValueReduction {0}", totalBoughtValueReduction);
+
+                                Double newLeftInTransaction = leftInTransaction - remainingAmount;
+                                remainingAmount = 0.0;
+                                transactionManager.editLeftinPortfolio(transactionId, newLeftInTransaction);
+                            }
+                        }
+                        Double newCurrentValue = portfolioStockValues.getCurrentValue()
+                                - transactionContent.getTotalPrice();
+                        Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "newCurrentValue {0}",
+                                newCurrentValue);
+                        Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
+                        Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "newBoughtValue {0}",
+                                newBoughtValue);
+                        portfolioStockManager.decreasePortfolioStock(newCurrentValue, newBoughtValue,
+                                transactionContent.getStockAmount(), userPortfolio.getPortfolioID(),
+                                transactionContent.getSymbol());
+                        userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
+                        transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                        
+                    }
+                }
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));    
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
+        } 
     }
 
     @DeleteMapping(path = "/order", consumes = { MediaType.APPLICATION_JSON_VALUE })
