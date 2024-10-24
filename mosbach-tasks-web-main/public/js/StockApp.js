@@ -174,6 +174,39 @@ function getCurrentDateTime() {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
+//Returns the price and stockAmount of an order
+function getOrderInformations() {
+    let stockAmount;
+    const priceDisplay = $("#price-display").text().trim();
+    const price = parseFloat(priceDisplay.replace('$', '').trim());
+
+    if (isNaN(price) || price <= 0) {
+        alert("Enter a valid stock price!");
+        return null;
+    }
+
+    if ($("#quantity-label").text() === "Quantity in $:") {
+        const quantity = parseFloat($('#quantity').val());
+        if (isNaN(quantity) || quantity <= 0) {
+            alert("Enter a valid quantity in $!");
+            return null;
+        }
+        stockAmount = quantity / price;
+    } else {
+        stockAmount = parseFloat($('#quantity').val());
+        if (isNaN(stockAmount) || stockAmount <= 0) {
+            alert("Enter a valid stock amount!");
+            return null;
+        }
+    }
+
+    return {
+        amount: stockAmount,
+        price: price,
+        totalPrice: roundToTwoDecimalPlaces(price * stockAmount)
+    };
+}
+
 //Checks if a user buys a new portfoliostock or increase an excisting one 
 function checkBuyStock(){
     const orderData = getOrderInformations();
@@ -183,7 +216,7 @@ function checkBuyStock(){
             //addPortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
             console.log("buy");
         } else{
-            if(data === 0.0) {
+            if(data === 0) {
                 alert("An error occurred when trying to create order. Please try later again.");
             } else {
                 if(orderData.totalPrice > parseFloat($('.remaining-budget').val().trim())){
@@ -201,11 +234,11 @@ function checkBuyStock(){
 function checkSellStock(){
     const orderData = getOrderInformations();
     getPortfolioStockData($('#stock-name').val(), function(data) {
-        if (data === -1.0) {
+        if (data === -1) {
             //NOT POSSIBLE
             alert("An error occurred when trying to create order. Please try later again.");
         } else{
-            if(data === 0.0) {
+            if(data === 0) {
                 // Ein Fehler ist aufgetreten
                 alert("An error occurred when trying to create order. Please try later again.");
             } else {
@@ -254,39 +287,6 @@ function getPortfolioStockData(symbol, callback){
         }
     };
     $.ajax(settingsGetPortfolioStock);    
-}
-
-//Returns the price and stockAmount of an order
-function getOrderInformations() {
-    let stockAmount;
-    const priceDisplay = $("#price-display").val().trim();
-    const price = parseFloat(priceDisplay.replace('$', '').trim());
-
-    if (isNaN(price) || price <= 0) {
-        alert("Enter a valid stock price!");
-        return null;
-    }
-
-    if ($("#quantity-label").text() === "Quantity in $:") {
-        const quantity = parseFloat($('#quantity').val());
-        if (isNaN(quantity) || quantity <= 0) {
-            alert("Enter a valid quantity in $!");
-            return null;
-        }
-        stockAmount = quantity / price;
-    } else {
-        stockAmount = parseFloat($('#quantity').val());
-        if (isNaN(stockAmount) || stockAmount <= 0) {
-            alert("Enter a valid stock amount!");
-            return null;
-        }
-    }
-
-    return {
-        amount: stockAmount,
-        price: price,
-        totalPrice: roundToTwoDecimalPlaces(price * stockAmount)
-    };
 }
 
 function addPortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
@@ -1261,9 +1261,6 @@ function displayPortfolioStocks(portfolioStocks) {
     let totalBoughtPortfolioValue = 0; 
 
     portfolioStocks.forEach(stock => {
-        totalCurrentPortfolioValue += stock.currentvalue;
-        totalBoughtPortfolioValue += stock.boughtvalue;
-
         // Use the displayPortfolioStock function to display each stock
         displayPortfolioStock(stock.symbol);
     });
@@ -1388,3 +1385,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+function initializeResizeHandler() {
+    // Überwacht, wenn die Fenstergröße geändert wird
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            window.scrollTo(0, 0);
+        }
+    });
+}
