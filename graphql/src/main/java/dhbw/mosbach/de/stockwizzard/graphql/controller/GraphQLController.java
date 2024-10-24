@@ -80,6 +80,55 @@ public class GraphQLController {
         }
     }
 
+    @QueryMapping
+        public PortfolioStock getPortfolioStock(@Argument String email, @Argument String token, @Argument String symbol) {
+
+            try {
+                Boolean isValid = sessionService.validToken(token, email);
+                if (isValid) {
+                    PortfolioStock portfolioStock = portfolioStockService.getPortfolioStock(email, symbol);
+                    if (portfolioStock != null) {
+                        return portfolioStock;
+                    } else {
+                        throw new RuntimeException("PortfolioStock is not in the database.");
+                    }
+                } else {
+                    throw new RuntimeException("Unauthorized for this transaction!");
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("An unexpected error occurred during getting portfolioStocks: " + e.getMessage());
+            }
+        }
+
+        @QueryMapping
+            public List<Transaction> getAllTransactions(@Argument String email, @Argument String token, @Argument String sortby) {
+                try {
+                    Boolean isValid = sessionService.validToken(token, email);
+                    if (isValid) {
+                        return transactionService.getAllTransactions(email, sortby);
+                    } else {
+                        throw new RuntimeException("Unauthorized for this transaction!");
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("An unexpected error occurred during getting transactions: " + e.getMessage());
+                }
+            }
+
+        @QueryMapping
+            public Portfolio getUserPortfolio(@Argument String email, @Argument String token) {
+                try {
+                    Boolean isValid = sessionService.validToken(token, email);
+                    if (isValid) {
+                        return portfolioService.getUserPortfolio(email);
+                    } else {
+                        throw new RuntimeException("Unauthorized for this transaction!");
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException("An unexpected error occurred while getting the user portfolio: " + e.getMessage());
+                }
+            }
+        
+    
 
 
 
@@ -200,33 +249,117 @@ public class GraphQLController {
     }
 
     @MutationMapping
-    public StringAnswer createStock(@Argument String token, @Argument String email, @Argument String symbol, @Argument Float stockPrice, @Argument String name) {
-        try {
-            Boolean isValid = sessionService.validToken(token, email);
-            if (isValid) {
-                Stock stock = new Stock();
-                stock.setSymbol(symbol);
-                stock.setStockPrice(stockPrice.doubleValue());
-                stock.setName(name);
-                stockService.addStock(stock);
-                return new StringAnswer("Stock got added to Database");
-            } else {
-                return new StringAnswer("Unauthorized for this transaction!");
+        public StringAnswer createStock(@Argument String token, @Argument String email, @Argument String symbol, @Argument Float stockPrice, @Argument String name) {
+            try {
+                Boolean isValid = sessionService.validToken(token, email);
+                if (isValid) {
+                    Stock stock = new Stock();
+                    stock.setSymbol(symbol);
+                    stock.setStockPrice(stockPrice.doubleValue());
+                    stock.setName(name);
+                    stockService.addStock(stock);
+                    return new StringAnswer("Stock got added to Database");
+                } else {
+                    return new StringAnswer("Unauthorized for this transaction!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new StringAnswer("An unexpected error occurred during adding Stock to Database.");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new StringAnswer("An unexpected error occurred during adding Stock to Database.");
         }
+
+    @MutationMapping
+        public String editCurrentValue(@Argument String token, @Argument String email, @Argument String symbol, @Argument Float newValue) {
+            try {
+                EditCurrentValueRequest editCurrentValueRequest = new EditCurrentValueRequest();
+                editCurrentValueRequest.setToken(token);
+                editCurrentValueRequest.setEmail(email);
+                editCurrentValueRequest.setSymbol(symbol);
+                editCurrentValueRequest.setNewValue(newValue.doubleValue());
+                Boolean isValid = sessionService.validToken(editCurrentValueRequest.getToken(),
+                        editCurrentValueRequest.getEmail());
+                if (isValid) {
+                    portfolioStockService.editCurrentValue(editCurrentValueRequest.getEmail(),
+                            editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue());
+                    return "Current Value successfully updated";
+                } else {
+                    return "Unauthorized for this transaction!";
+                }
+            } catch (Exception e) {
+                return "An unexpected error occurred during updating current value of stock.";
+            }
+        }
+
+        @MutationMapping
+            public StringAnswer editPortfolioValue(@Argument String token, @Argument String email) {
+                try {
+                    TokenEmail tokenEmail = new TokenEmail();
+                    tokenEmail.setToken(token);
+                    tokenEmail.setEmail(email);
+                    Boolean isValid = sessionService.validToken(tokenEmail.getToken(), tokenEmail.getEmail());
+                    if (isValid) {
+                        Double portfolioValue = 0.0;
+                        List<PortfolioStock> portfolioStocks = portfolioStockService.getAllPortfolioStocks(tokenEmail.getEmail(), "symbol");
+                        for (PortfolioStock portfolioStock : portfolioStocks) {
+                            portfolioValue += portfolioStock.getCurrentValue();
+                        }
+                        User user = userService.getUserProfile(tokenEmail.getEmail());
+                        Double newPortfolioValue = portfolioValue + user.getBudget();
+                        portfolioService.editPortfolioValue(tokenEmail.getEmail(), newPortfolioValue);
+                        return new StringAnswer("Portfolio value successfully updated.");
+                    } else {
+                        return new StringAnswer("Unauthorized for this transaction!");
+                    }
+                } catch (Exception e) {
+                    return new StringAnswer("An unexpected error occurred: " + e.getMessage());
+                }
+            }
+
+        @MutationMapping
+            public StringAnswer addPortfolioStockOrder(@Argument Integer transactionType, @Argument Float stockAmount, @Argument String date, @Argument Float pricePerStock, @Argument Float totalPrice, @Argument String email, @Argument String symbol, @Argument String token) {
+                try {
+                    TransactionContent transactionContent = new TransactionContent();
+                    transactionContent.setTransactionType(transactionType);
+                    transactionContent.setStockAmount(stockAmount.doubleValue());
+                    transactionContent.setDate(date);
+                    transactionContent.setPricePerStock(pricePerStock.doubleValue());
+                    transactionContent.setTotalPrice(totalPrice.doubleValue());
+                    transactionContent.setEmail(email);
+                    transactionContent.setSymbol(symbol);
+
+                    Boolean isValid = sessionService.validToken(token, transactionContent.getEmail());
+                    if (isValid) {
+                        User currentUser = userService.getUserProfile(transactionContent.getEmail());
+                        Boolean enoughBudget = userService.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
+                        if (enoughBudget) {
+                            // Transaktion hinzufügen
+                            transactionService.addTransaction(transactionContent);
+                            
+                            // Benutzerportfolio holen und aktualisieren
+                            Portfolio userPortfolio = portfolioService.getUserPortfolio(transactionContent.getEmail());
+                            portfolioStockService.addPortfolioStock(userPortfolio.getPortfolioID(),
+                                    transactionContent.getSymbol(), transactionContent.getStockAmount(),
+                                    transactionContent.getTotalPrice());
+
+                            // Benutzerbudget aktualisieren
+                            userService.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
+                                    transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+
+                            return new StringAnswer("Transaction was successfully completed");
+                        } else {
+                            return new StringAnswer("Not enough budget for this transaction!");
+                        }
+                    } else {
+                        return new StringAnswer("Unauthorized for this transaction!");
+                    }
+                } catch (Exception e) {
+                    return new StringAnswer("An unexpected error occurred while processing the transaction: " + e.getMessage());
+                }
+            }
     }
 
 
 
-
-
-
-
-
-}   
     // @MutationMapping
     // public StringAnswer createUser(@Argument User user) {
     //     return userService.createUser(user);
