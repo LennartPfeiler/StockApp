@@ -1,6 +1,8 @@
 package mosbach.dhbw.de.stockwizzard.controller;
 
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +35,7 @@ import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.EditCurrentValueRequest;
 import mosbach.dhbw.de.stockwizzard.model.alexa.*;
-import mosbach.dhbw.de.stockwizzard.model.alexa.AlexaResponse;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -800,107 +802,101 @@ public class MappingController {
 //////////////////////////////////////////////////////Alexa
 
 ////////////////////////////////////////////////////////////// ALEXA
-
-@PostMapping(path = "/alexa", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) throws Exception {
-    // Extrahiere den Intent aus der Anfrage
-    IntentRO intent = alexaRO.getRequest().getIntent();
+@PostMapping(path = "/alexa", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
     String requestType = alexaRO.getRequest().getType();
     String outText = "";
+    boolean shouldEndSession = false;
+    Map<String, Object> sessionAttributes = null;
 
-    // Session-Attribute holen oder initialisieren
-    Map<String, Object> sessionAttributes = alexaRO.getSession().getAttributes();
-    String firstName = sessionAttributes.containsKey("firstName") ? (String) sessionAttributes.get("firstName") : null;
-    String lastName = sessionAttributes.containsKey("lastName") ? (String) sessionAttributes.get("lastName") : null;
-    String email = sessionAttributes.containsKey("email") ? (String) sessionAttributes.get("email") : null;
-    String password = sessionAttributes.containsKey("password") ? (String) sessionAttributes.get("password") : null;
-
-    // Handle LaunchRequest
-    if (requestType.equalsIgnoreCase("LaunchRequest")) {
-        outText = "Willkommen bei The Wallstreet Wizzard. Du kannst dich registrieren lassen.";
-        Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Handling LaunchRequest");
-    }
-
-    // Handle SignupIntent
-    if (requestType.equalsIgnoreCase("IntentRequest") && intent.getName().equalsIgnoreCase("SignupIntent")) {
-        Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Handling SignupRequest");
-
-        // Extrahiere den aktuellen Slot-Wert und aktualisiere die Session-Attribute
-        if (intent.getSlots().containsKey("firstName") && intent.getSlots().get("firstName").getValue() != null) {
-            firstName = intent.getSlots().get("firstName").getValue();
-            sessionAttributes.put("firstName", firstName);
+    try {
+        // Initialisiere Session-Attribute
+        if (alexaRO.getSession() != null) {
+            sessionAttributes = alexaRO.getSession().getAttributes();
+        }
+        if (sessionAttributes == null) {
+            sessionAttributes = new HashMap<>();
         }
 
-        if (intent.getSlots().containsKey("lastName") && intent.getSlots().get("lastName").getValue() != null) {
-            lastName = intent.getSlots().get("lastName").getValue();
-            sessionAttributes.put("lastName", lastName);
+        if (requestType.equalsIgnoreCase("LaunchRequest")) {
+            outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
+            Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
         }
+        else if (requestType.equalsIgnoreCase("IntentRequest")) {
+            IntentRO intent = alexaRO.getRequest().getIntent();
+            String intentName = intent.getName();
+            Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " + intentName);
 
-        if (intent.getSlots().containsKey("email") && intent.getSlots().get("email").getValue() != null) {
-            email = intent.getSlots().get("email").getValue();
-            sessionAttributes.put("email", email);
-        }
-
-        if (intent.getSlots().containsKey("password") && intent.getSlots().get("password").getValue() != null) {
-            password = intent.getSlots().get("password").getValue();
-            sessionAttributes.put("password", password);
-        }
-
-        // Überprüfe, ob alle Slot-Werte vorhanden sind
-        if (firstName == null) {
-            outText = "Bitte gib deinen Vornamen an.";
-        } else if (lastName == null) {
-            outText = "Danke, " + firstName + ". Wie lautet dein Nachname?";
-        } else if (email == null) {
-            outText = "Danke, " + firstName + " " + lastName + ". Wie lautet deine E-Mail-Adresse?";
-        } else if (password == null) {
-            outText = "Danke, " + firstName + " " + lastName + ". Deine E-Mail ist " + email + ". Bitte gib dein Passwort an.";
-        } else {
-            // Alle Daten sind vorhanden, rufe die createUser-Methode auf
-            User user = new User();
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setEmail(email);
-            user.setPassword(password);
-            user.setBudget(0.0);  // Standardbudget
-
-            // Rufe die bestehende createUser-Methode auf
-            ResponseEntity<?> response = createUser(user);
-
-            // Überprüfe das Ergebnis der Registrierung
-            if (response.getStatusCode().equals(HttpStatus.OK)) {
-                outText = "Vielen Dank, " + firstName + ". Du wurdest erfolgreich registriert.";
-            } else if (response.getStatusCode().equals(HttpStatus.CONFLICT)) {
-                outText = "Es sieht so aus, als wärst du bereits registriert.";
-            } else {
-                outText = "Es gab einen Fehler bei der Registrierung. Bitte versuche es später erneut.";
+            if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
+                // Hier holen wir die Anzahl aller Benutzer
+                UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
+                int userCount = userManager.getUserCount();
+                outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
+                shouldEndSession = true;
+            }
+            else {
+                outText = "Dieser Befehl wird nicht unterstützt.";
+                shouldEndSession = true;
             }
         }
+        else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
+            Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: " + alexaRO.getRequest().getReason());
+            // Keine Antwort erforderlich
+            return null;
+        } else {
+            outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
+            shouldEndSession = true;
+        }
+    } catch (Exception e) {
+        Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Exception occurred: ", e);
+        outText = "Es gab einen Fehler bei der Verarbeitung deiner Anfrage.";
+        shouldEndSession = true;
     }
 
-    // Erstelle die Alexa-Antwort
-    AlexaRO response = new AlexaRO();
-    response.setVersion("1.0");
-
-    OutputSpeechRO outputSpeech = new OutputSpeechRO();
-    outputSpeech.setType("PlainText");
-    outputSpeech.setText(outText);
-
-    // Erstelle das Response-Objekt und füge die Sprachausgabe hinzu
-    ResponseRO responseRO = new ResponseRO();
-    responseRO.setOutputSpeech(outputSpeech);
-    responseRO.setShouldEndSession(false);  // Sitzung offen lassen, um weitere Eingaben zu ermöglichen
-
-    // Setze die aktualisierten Session-Attribute zurück
-    alexaRO.getSession().setAttributes(sessionAttributes);
-
-    // Setze die Antwort im AlexaRO-Objekt
-    response.setResponse(responseRO);
-
-    return response;
+    return prepareResponse(outText, shouldEndSession, sessionAttributes);
 }
 
 
 
+    private AlexaRO prepareResponse(String outText, boolean shouldEndSession, Map<String, Object> sessionAttributes) {
+        AlexaRO responseRO = new AlexaRO();
+        responseRO.setVersion("1.0");
+
+        // Session-Attribute setzen
+        SessionRO sessionRO = new SessionRO();
+        sessionRO.setAttributes(sessionAttributes);
+        responseRO.setSession(sessionRO);
+
+        OutputSpeechRO outputSpeechRO = new OutputSpeechRO();
+        outputSpeechRO.setType("PlainText");
+        outputSpeechRO.setText(outText);
+
+        // Reprompt hinzufügen, um die Sitzung aktiv zu halten
+        OutputSpeechRO repromptSpeech = new OutputSpeechRO();
+        repromptSpeech.setType("PlainText");
+        repromptSpeech.setText("Kannst du das bitte wiederholen?");
+
+        ResponseRO response = new ResponseRO();
+        response.setOutputSpeech(outputSpeechRO);
+        response.setShouldEndSession(shouldEndSession);
+
+        if (!shouldEndSession) {
+            // Reprompt hinzufügen
+            RepromptRO reprompt = new RepromptRO();
+            reprompt.setOutputSpeech(repromptSpeech);
+            response.setReprompt(reprompt);
+        }
+
+        responseRO.setResponse(response);
+
+        return responseRO;
+    }
 
 }
+
+
+    
+
+
+
+

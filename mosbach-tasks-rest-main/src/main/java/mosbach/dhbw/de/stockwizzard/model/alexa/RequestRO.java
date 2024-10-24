@@ -14,7 +14,8 @@ public class RequestRO {
     protected final static String TYPENAME = "RequestRO";
 
     // Various properties specific to the request.
-
+    @JsonProperty("reason")
+    private String reason;
     @JsonProperty("type")
     private String type;
     @JsonProperty("requestId")
@@ -106,5 +107,8 @@ public class RequestRO {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+    @JsonAnyGetter
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
 
 }

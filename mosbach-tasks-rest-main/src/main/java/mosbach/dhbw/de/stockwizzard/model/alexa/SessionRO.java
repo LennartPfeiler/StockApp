@@ -39,4 +39,13 @@ public class SessionRO {
         this.additionalProperties.put(name, value);
     }
 
+    // New methods to handle session attributes
+
+    public Map<String, Object> getAttributes() {
+        return this.additionalProperties;
+    }
+
+    public void setAttributes(Map<String, Object> attributes) {
+        this.additionalProperties = attributes;
+    }
 }

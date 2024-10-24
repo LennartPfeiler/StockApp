@@ -6,30 +6,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 // This class represents the response part of the Alexa request-response mechanism.
-
 @JsonTypeName(value = ResponseRO.TYPENAME)
 public class ResponseRO {
     // A constant that defines the type name for this class.
-
     protected final static String TYPENAME = "ResponseRO";
 
     // Properties specific to the response.
-
     @JsonProperty("outputSpeech")
     private OutputSpeechRO outputSpeech;
+
     @JsonProperty("shouldEndSession")
     private Boolean shouldEndSession;
+
+    @JsonProperty("reprompt") // Hinzugefügt
+    private RepromptRO reprompt; // Hinzugefügt
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
     // Default constructor.
-
     public ResponseRO() {
         super();
     }
 
     // Constructor initializing various properties.
-
     public ResponseRO(OutputSpeechRO outputSpeech, Boolean shouldEndSession) {
         super();
         this.outputSpeech = outputSpeech;
@@ -37,7 +37,6 @@ public class ResponseRO {
     }
 
     // Getters and Setters for all the properties.
-
     @JsonProperty("outputSpeech")
     public OutputSpeechRO getOutputSpeech() {
         return outputSpeech;
@@ -58,6 +57,18 @@ public class ResponseRO {
         this.shouldEndSession = shouldEndSession;
     }
 
+    // Neue Getter- und Setter-Methoden für reprompt
+    @JsonProperty("reprompt")
+    public RepromptRO getReprompt() {
+        return reprompt;
+    }
+
+    @JsonProperty("reprompt")
+    public void setReprompt(RepromptRO reprompt) {
+        this.reprompt = reprompt;
+    }
+
+    // Getter and Setter for additional properties.
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -67,5 +78,4 @@ public class ResponseRO {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
-
 }
