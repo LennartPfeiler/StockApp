@@ -1,4 +1,4 @@
-package com.mosbach.demo.model.alexa;
+package mosbach.dhbw.de.stockwizzard.model.alexa;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -7,10 +7,10 @@ import java.util.Map;
 
 // This class represents the output speech in the Alexa response object.
 @JsonTypeName(value = OutputSpeechRO.TYPENAME)
-public class OutputSpeechRO
-{
+public class OutputSpeechRO {
     // A constant that defines the type name for this class.
-    // Note: The type name seems to be mistakenly set to 'IntentRO'. It should probably be 'OutputSpeechRO'.
+    // Note: The type name seems to be mistakenly set to 'IntentRO'. It should
+    // probably be 'OutputSpeechRO'.
     protected final static String TYPENAME = "IntentRO";
 
     // Represents the type of the speech output.
@@ -21,19 +21,18 @@ public class OutputSpeechRO
     @JsonProperty("text")
     private String text;
 
-    // Additional properties that might not be mapped to the predefined fields but can be captured dynamically.
+    // Additional properties that might not be mapped to the predefined fields but
+    // can be captured dynamically.
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
     // Default constructor.
-    public OutputSpeechRO()
-    {
+    public OutputSpeechRO() {
         super();
     }
 
     // Constructor that initializes the type and text.
-    public OutputSpeechRO(String type, String text)
-    {
+    public OutputSpeechRO(String type, String text) {
         super();
         this.type = type;
         this.text = text;

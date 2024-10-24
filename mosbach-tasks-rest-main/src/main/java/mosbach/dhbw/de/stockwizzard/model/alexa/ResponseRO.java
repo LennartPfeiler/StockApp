@@ -1,4 +1,4 @@
-package com.mosbach.demo.model.alexa;
+package mosbach.dhbw.de.stockwizzard.model.alexa;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -8,13 +8,12 @@ import java.util.Map;
 // This class represents the response part of the Alexa request-response mechanism.
 
 @JsonTypeName(value = ResponseRO.TYPENAME)
-public class ResponseRO
-{
-        // A constant that defines the type name for this class.
+public class ResponseRO {
+    // A constant that defines the type name for this class.
 
     protected final static String TYPENAME = "ResponseRO";
 
-        // Properties specific to the response.
+    // Properties specific to the response.
 
     @JsonProperty("outputSpeech")
     private OutputSpeechRO outputSpeech;
@@ -23,23 +22,21 @@ public class ResponseRO
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
-        // Default constructor.
+    // Default constructor.
 
-    public ResponseRO()
-    {
+    public ResponseRO() {
         super();
     }
 
-        // Constructor initializing various properties.
+    // Constructor initializing various properties.
 
-    public ResponseRO(OutputSpeechRO outputSpeech, Boolean shouldEndSession)
-    {
+    public ResponseRO(OutputSpeechRO outputSpeech, Boolean shouldEndSession) {
         super();
         this.outputSpeech = outputSpeech;
         this.shouldEndSession = shouldEndSession;
     }
-    
-        // Getters and Setters for all the properties.
+
+    // Getters and Setters for all the properties.
 
     @JsonProperty("outputSpeech")
     public OutputSpeechRO getOutputSpeech() {

@@ -1,4 +1,4 @@
-package com.mosbach.demo.model.alexa;
+package mosbach.dhbw.de.stockwizzard.model.alexa;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -10,18 +10,17 @@ import java.util.Map;
 
 // This class represents the context in the Alexa response object.
 @JsonTypeName(value = ContextRO.TYPENAME)
-public class ContextRO
-{
+public class ContextRO {
     // A constant that defines the type name for this class.
     protected final static String TYPENAME = "ContextRO";
 
-    // Additional properties that might not be mapped to the predefined fields but can be captured dynamically.
+    // Additional properties that might not be mapped to the predefined fields but
+    // can be captured dynamically.
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
     // Default constructor.
-    public ContextRO()
-    {
+    public ContextRO() {
         super();
     }
 

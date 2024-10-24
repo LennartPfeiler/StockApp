@@ -1,4 +1,4 @@
-package com.mosbach.demo.model.alexa;
+package mosbach.dhbw.de.stockwizzard.model.alexa;
 
 import com.fasterxml.jackson.annotation.*;
 
@@ -8,13 +8,12 @@ import java.util.Map;
 // This class represents the request part of the Alexa request-response mechanism.
 
 @JsonTypeName(value = RequestRO.TYPENAME)
-public class RequestRO
-{
-        // A constant that defines the type name for this class.
+public class RequestRO {
+    // A constant that defines the type name for this class.
 
     protected final static String TYPENAME = "RequestRO";
 
-        // Various properties specific to the request.
+    // Various properties specific to the request.
 
     @JsonProperty("type")
     private String type;
@@ -29,17 +28,15 @@ public class RequestRO
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
-        // Default constructor.
+    // Default constructor.
 
-    public RequestRO()
-    {
+    public RequestRO() {
         super();
     }
 
-        // Constructor initializing various properties.
+    // Constructor initializing various properties.
 
-    public RequestRO(String type, String requestId, IntentRO intent, String locale, String timestamp)
-    {
+    public RequestRO(String type, String requestId, IntentRO intent, String locale, String timestamp) {
         super();
         this.type = type;
         this.requestId = requestId;
@@ -47,8 +44,8 @@ public class RequestRO
         this.locale = locale;
         this.timestamp = timestamp;
     }
- 
-        // Getters and Setters for all the properties.
+
+    // Getters and Setters for all the properties.
 
     @JsonProperty("type")
     public String getType() {

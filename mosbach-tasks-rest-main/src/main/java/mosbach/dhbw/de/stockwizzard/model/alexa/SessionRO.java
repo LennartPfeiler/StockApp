@@ -1,4 +1,4 @@
-package com.mosbach.demo.model.alexa;
+package mosbach.dhbw.de.stockwizzard.model.alexa;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -11,34 +11,32 @@ import java.util.Map;
 // This class represents the session in the Alexa request-response mechanism.
 
 @JsonTypeName(value = SessionRO.TYPENAME)
-public class SessionRO 
-{
-        // A constant that defines the type name for this class.
+public class SessionRO {
+    // A constant that defines the type name for this class.
 
     protected final static String TYPENAME = "SessionRO";
 
-        // Additional properties associated with the session.
+    // Additional properties associated with the session.
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<>();
 
-        // Default constructor.
+    // Default constructor.
 
-    public SessionRO()
-    {
+    public SessionRO() {
         super();
     }
 
-        // Getters and Setters for the additional properties.
+    // Getters and Setters for the additional properties.
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
+        return this.additionalProperties;
     }
 
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
+        this.additionalProperties.put(name, value);
     }
 
 }
