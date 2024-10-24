@@ -4,8 +4,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Map;
 
 
@@ -380,6 +378,27 @@ public class MappingController {
         }
     }
 
+    //Just for testing purpose
+    // @GetMapping("/Portfoliotransactions")
+    // public ResponseEntity<?> getAllPortfolioTransactions(
+    //         @RequestParam(value = "email", defaultValue = "") String email,
+    //         @RequestParam(value = "token", defaultValue = "") String token) {
+
+    //     try {
+    //         Boolean isValid = sessionManager.validToken(token, email);
+    //         if (isValid) {
+    //             List<Transaction> transactions = transactionManager.getAllTransactionsInPortfolioStock(email);
+    //             return ResponseEntity.ok(transactions);
+    //         } else {
+    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    //                     .body(new StringAnswer("Unauthorized for this transaction!"));
+    //         }
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    //                 .body(new StringAnswer("An unexpected error occurred during getting transactions."));
+    //     }
+    // }
+
     // @GetMapping("/transaction")
     // public void getTransaction(@RequestParam(value = "transactionID",
     // defaultValue = "") Integer transactionID) {
@@ -419,36 +438,20 @@ public class MappingController {
         }
     }
 
-    @PutMapping(path = "/portfolio/value", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> editPortfolioValue(@RequestBody TokenEmail tokenEmail) {
-        try {
-            Boolean isValid = sessionManager.validToken(tokenEmail.getToken(),
-            tokenEmail.getEmail());
-            if (isValid) {
-                Double portfolioValue = 0.0;
-                List<PortfolioStock> portfolioStocks = portfolioStockManager
-                        .getAllPortfolioStocks(tokenEmail.getEmail(), "symbol");
-                for (PortfolioStock portfolioStock : portfolioStocks) {
-                    portfolioValue += portfolioStock.getCurrentValue();
-                }
-                User user = userManager.getUserProfile(tokenEmail.getEmail());     
-                portfolioManager.editPortfolioValue(tokenEmail.getEmail(),
-                        portfolioValue+user.getBudget());
-                return ResponseEntity.ok(portfolioValue+user.getBudget());
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new StringAnswer("Unauthorized for this transaction!"));
+    private void editPortfolioValue(String email) {
+            Double portfolioValue = 0.0;
+            List<PortfolioStock> portfolioStocks = portfolioStockManager.getAllPortfolioStocks(email, "symbol");
+            for (PortfolioStock portfolioStock : portfolioStocks) {
+                portfolioValue += portfolioStock.getCurrentValue();
             }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred during updating current value of stock."));
-        }
+            User user = userManager.getUserProfile(email);     
+            portfolioManager.editPortfolioValue(email,portfolioValue+user.getBudget());
     }
 
     ////////////////////////////////////////////////////////////// Order
     ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
 
-    @PostMapping(path = "/order/buy", consumes = { MediaType.APPLICATION_JSON_VALUE })
+    @PostMapping(path = "/order", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createBuyOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
         try {
             String token = tokenTransactionContent.getToken();
@@ -461,11 +464,10 @@ public class MappingController {
                 if (enoughBudget == true) {
                     transactionManager.addTransaction(transactionContent);
                     Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                    portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
-                            transactionContent.getSymbol(), transactionContent.getStockAmount(),
-                            transactionContent.getTotalPrice(), currentUser.getEmail());
+                    portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getTotalPrice());
                     userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                             transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                    editPortfolioValue(currentUser.getEmail());
                     return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -499,6 +501,7 @@ public class MappingController {
                             transactionContent.getTotalPrice(), currentUser.getEmail());
                     userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                             transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                    editPortfolioValue(currentUser.getEmail());
                     return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -552,6 +555,8 @@ public class MappingController {
                                 Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "In break if");
                                 break;
                             }
+                            Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "remainingAmount {0}",
+                                transaction.getTransactionID());
                             Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "nach break if");
                             Double leftInTransaction = transaction.getLeftInPortfolio();
                             Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "leftInTransaction {0}",
@@ -576,7 +581,7 @@ public class MappingController {
                                 transactionManager.editLeftinPortfolio(transactionId, 0.0);
                             } else {
                                 //berechne wie viel prozent remaining amount vom left in transaction ist
-                                Double proportion = remainingAmount / leftInTransaction;
+                                Double proportion = remainingAmount / transactionBoughtValue;
                                 //berechne wie viel vom bought Value denn abgezogen werden muss
                                 Double reductionInBoughtValue = transactionBoughtValue * proportion;
                                 totalBoughtValueReduction += reductionInBoughtValue;
@@ -588,8 +593,7 @@ public class MappingController {
                                 transactionManager.editLeftinPortfolio(transactionId, newLeftInTransaction);
                             }
                         }
-                        Double newCurrentValue = portfolioStockValues.getCurrentValue()
-                                - transactionContent.getTotalPrice();
+                        Double newCurrentValue = portfolioStockValues.getCurrentValue() - transactionContent.getTotalPrice();
                         Logger.getLogger("GetPortfolioStocksLogger").log(Level.INFO, "newCurrentValue {0}",
                                 newCurrentValue);
                         Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
@@ -600,8 +604,8 @@ public class MappingController {
                                 transactionContent.getSymbol());
                         userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                         transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                        editPortfolioValue(currentUser.getEmail());
                         return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
-                        
                     }
                 }
             }
@@ -646,6 +650,7 @@ public class MappingController {
                         }
                         userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                                 transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                        editPortfolioValue(currentUser.getEmail());
                         return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
                     }
                 }
@@ -658,47 +663,6 @@ public class MappingController {
                     .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
         }
     }
-
-    // @PostMapping(path = "/order/buy", consumes = {
-    // MediaType.APPLICATION_JSON_VALUE })
-    // public ResponseEntity<?> createBuyOrder(@RequestBody TokenTransactionContent
-    // tokenTransactionContent) {
-    // try {
-    // String token = tokenTransactionContent.getToken();
-    // TransactionContent transactionContent =
-    // tokenTransactionContent.getTransactionContent();
-    // Boolean isValid = sessionManager.validToken(token,
-    // transactionContent.getEmail());
-    // if (isValid) {
-    // User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-    // Boolean enoughBudget =
-    // userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(),
-    // currentUser);
-    // if (enoughBudget == true) {
-    // transactionManager.addTransaction(transactionContent);
-    // Portfolio userPortfolio =
-    // portfolioManager.getUserPortfolio(transactionContent.getEmail());
-    // portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
-    // transactionContent.getSymbol(), transactionContent.getStockAmount(),
-    // transactionContent.getTotalPrice());
-    // userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
-    // transactionContent.getTotalPrice(), transactionContent.getTransactionType());
-    // return ResponseEntity.ok(new StringAnswer("Transaction was successfully
-    // completed"));
-    // } else {
-    // return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-    // .body(new StringAnswer("Not enough budget for this transaction!"));
-    // }
-    // } else {
-    // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-    // .body(new StringAnswer("Unauthorized for this transaction!"));
-    // }
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    // .body(new StringAnswer("An unexpected error occurred while getting the user
-    // portfolio."));
-    // }
-    // }
 
     @PostMapping(path = "/order/sell", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createSellOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
@@ -829,7 +793,7 @@ public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
 
             if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
                 // Hier holen wir die Anzahl aller Benutzer
-                UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
+                //UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
                 int userCount = userManager.getUserCount();
                 outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
                 shouldEndSession = true;

@@ -7,7 +7,6 @@ function displayAllDatabaseData(){
     displayUserBudget();
     displayTotalPortfolioValue();
     getAllTransactions();
-    setTotalPortoflioValue(); 
     //getAllPortfolioStocks();
 }
 
@@ -210,57 +209,58 @@ function getOrderInformations() {
 //Checks if a user buys a new portfoliostock or increase an excisting one 
 function checkBuyStock(){
     const orderData = getOrderInformations();
-    getPortfolioStockData($('#stock-name').val(), function(data) {
-        console.log(data);
-        if (data === -1) {
-            //addPortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
-            console.log("buy");
-        } else{
-            if(data === 0) {
-                alert("An error occurred when trying to create order. Please try later again.");
-            } else {
-                if(orderData.totalPrice > parseFloat($('.remaining-budget').val().trim())){
-                    alert("Your stock position is not that high!");
+    if(orderData!= null){
+        getPortfolioStockData($('#stock-name').val(), function(data) {
+            console.log(data);
+            if (data == -1) {
+                addPortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+            } else{
+                if(data == 0) {
+                    alert("An error occurred when trying to create order. Please try later again.");
+                } else {
+                    if(orderData.totalPrice > parseFloat($('.remaining-budget').text().trim())){
+                        alert("You don't have enough budget for this transaction!");
+                    }
+                    else{
+                        increasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                    }
                 }
-                else{
-                    //increasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
-                    console.log("increase");
-                }
-            }
-        } 
-    });
+            } 
+        });
+    }
 }
 
 function checkSellStock(){
     const orderData = getOrderInformations();
-    getPortfolioStockData($('#stock-name').val(), function(data) {
-        if (data === -1) {
-            //NOT POSSIBLE
-            alert("An error occurred when trying to create order. Please try later again.");
-        } else{
-            if(data === 0) {
-                // Ein Fehler ist aufgetreten
-                alert("An error occurred when trying to create order. Please try later again.");
-            } else {
-                //
-                if (orderData.totalPrice > data.currentvalue){
-                    alert("Your stock position is not that high!")
-                }
-                else{
-                    if (orderData.totalPrice == data.currentvalue){
-                        //DELETE STOCK
-                        //deletePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
-                        console.log("delete stock");
+    if(orderData!= null){
+        getPortfolioStockData($('#stock-name').val(), function(data) {
+            if (data === -1) {
+                alert("You don't have this stock in your portfolio.");
+            } else{
+                if(data === 0) {
+                    // Ein Fehler ist aufgetreten
+                    alert("An error occurred when trying to create order. Please try later again.");
+                } else {
+                    //
+                    if (orderData.totalPrice > data.currentvalue){
+                        alert("Your stock position is not that high!")
                     }
                     else{
-                        //UPDATE PORTFOLIOSTOCK
-                        //decreasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
-                        console.log("update stock");
+                        if (orderData.totalPrice == data.currentvalue){
+                            //DELETE STOCK
+                            deletePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                            console.log("delete stock");
+                        }
+                        else{
+                            //UPDATE PORTFOLIOSTOCK
+                            decreasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                            console.log("update stock");
+                        }
                     }
                 }
-            }
-        } 
-    });
+            } 
+        });
+    }
 }
 
 //Get all data of a portfolio stock
@@ -278,7 +278,6 @@ function getPortfolioStockData(symbol, callback){
         },
         "error": function(xhr) {
             if (xhr.status === 404) {
-                console.log("PortfolioStock not in Portfolio");
                 callback(-1);
             } else {
                 console.error("Error fetching bought value:", xhr);
@@ -316,11 +315,10 @@ function addPortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
         "success": function(data) {
             alert(data.answer);
             $('#quantity').val("");
-            
             displayPortfolioStock(stockSymbol);
 
-            getPortfolioStockData(stockSymbol, function(currentValue, boughtValue) {
-                updateStockDisplay(stockSymbol, currentValue, boughtValue);
+            getPortfolioStockData(stockSymbol, function(data) {
+                updateStockDisplay(stockSymbol, data.currentvalue, data.boughtvalue);
             });
             displayAllDatabaseData();
         },
@@ -365,8 +363,8 @@ function increasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
             alert(data.answer);
             $('#quantity').val("");
             
-            getPortfolioStockData(stockSymbol, function(currentValue, boughtValue) {
-                updateStockDisplay(stockSymbol, currentValue, boughtValue);
+            getPortfolioStockData(stockSymbol, function(data) {
+                updateStockDisplay(stockSymbol, data.currentvalue, data.boughtvalue);
             });
             displayAllDatabaseData();
         },
@@ -502,7 +500,7 @@ function decreasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
     const stockSymbol = $('#stock-name').val();
     const settingsAddPortfolioStock = {
         "async": true,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy",
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell",
         "method": "PUT",
         "headers": {
             'Accept': 'application/json',
@@ -526,8 +524,8 @@ function decreasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
             alert(data.answer);
             $('#quantity').val("");
 
-            getPortfolioStockData($('#stock-name').val(), function(currentValue, boughtValue) {
-                updateStockDisplay($('#stock-name').val(), currentValue, boughtValue);
+            getPortfolioStockData(stockSymbol, function(data) {
+                updateStockDisplay(stockSymbol, data.currentvalue, data.boughtvalue);
             });
             displayAllDatabaseData();
         },
@@ -549,8 +547,8 @@ function deletePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
     const stockSymbol = $('#stock-name').val();
     const settingsAddPortfolioStock = {
         "async": true,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy",
-        "method": "PUT",
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order",
+        "method": "DELETE",
         "headers": {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -572,11 +570,7 @@ function deletePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
             console.log(data);
             alert(data.answer);
             $('#quantity').val("");
-
-            getPortfolioStockData($('#stock-name').val(), function(currentValue, boughtValue) {
-                const stockDiv = document.getElementById($('#stock-name').val());
-                stockDiv.remove();
-            });
+            $(`#${$('#stock-name').val().trim()}`).remove();
             displayAllDatabaseData();
         },
         "error": function(xhr) {
@@ -1257,8 +1251,6 @@ function updateStockDisplay(symbol, currentValue, boughtValue) {
 function displayPortfolioStocks(portfolioStocks) {
     const stockListContainer = document.querySelector('.portfolio .stock-list');
     stockListContainer.innerHTML = ''; 
-    let totalCurrentPortfolioValue = 0; 
-    let totalBoughtPortfolioValue = 0; 
 
     portfolioStocks.forEach(stock => {
         // Use the displayPortfolioStock function to display each stock
@@ -1315,11 +1307,6 @@ function displayUserBudget(){
     $.ajax(settingsGetBudget);
 }
 
-//Display the total portfolio value
-function displayTotalPortfolioValue(value){
-    $(".portfolio-value").text(roundToTwoDecimalPlaces(value) + " $");
-}
-
 //Check after logout
 function disableGoBackFunction(){
     const token = getCookie("token");
@@ -1329,22 +1316,20 @@ function disableGoBackFunction(){
     }
 }
 
-function setTotalPortoflioValue(){
+function displayTotalPortfolioValue(){
     const editPortfolioValueRegister = {
         "async": true,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolio/value",
-        "method": "PUT",
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolio?email=" + getCookie("email") + "&token=" + getCookie("token"),
+        "method": "GET",
         "headers": {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        "data": JSON.stringify({
-            "token": getCookie("token"),
-            "email": getCookie("email")
-        }),
         "success": function(data) {
-            console.log(data);
-            displayTotalPortfolioValue(data);
+            console.log(data.value);
+            $(".portfolio-value").text(roundToTwoDecimalPlaces(data.value) + " $");
+            const { percentageChange, changeClass } = calculatePercentage(data.startvalue, data.value);
+            //$(".percentage positive").text(percentageChange + "%").removeClass("positive negative").addClass(changeClass);
         }
         ,
         "error": function(xhr) {
