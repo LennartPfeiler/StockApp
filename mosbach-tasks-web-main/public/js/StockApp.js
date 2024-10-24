@@ -178,17 +178,20 @@ function getCurrentDateTime() {
 function checkBuyStock(){
     const orderData = getOrderInformations();
     getPortfolioStockData($('#stock-name').val(), function(data) {
-        if (data === -1.0) {
-            addPortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+        console.log(data);
+        if (data === -1) {
+            //addPortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+            console.log("buy");
         } else{
             if(data === 0.0) {
                 alert("An error occurred when trying to create order. Please try later again.");
             } else {
-                if(orderData.totalPrice > data.currentvalue){
+                if(orderData.totalPrice > parseFloat($('.remaining-budget').val().trim())){
                     alert("Your stock position is not that high!");
                 }
                 else{
-                    increasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                    //increasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                    console.log("increase");
                 }
             }
         } 
@@ -207,16 +210,18 @@ function checkSellStock(){
                 alert("An error occurred when trying to create order. Please try later again.");
             } else {
                 //
-                if(orderData.totalPrice > data.currentvalue){
+                if (orderData.totalPrice > data.currentvalue){
                     alert("Your stock position is not that high!")
                 }
                 else{
-                    if(orderData.totalPrice = data.currentvalue){
+                    if (orderData.totalPrice == data.currentvalue){
                         //DELETE STOCK
+                        //deletePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
                         console.log("delete stock");
                     }
                     else{
                         //UPDATE PORTFOLIOSTOCK
+                        //decreasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
                         console.log("update stock");
                     }
                 }
@@ -241,10 +246,10 @@ function getPortfolioStockData(symbol, callback){
         "error": function(xhr) {
             if (xhr.status === 404) {
                 console.log("PortfolioStock not in Portfolio");
-                callback(-1.0, -1.0)
+                callback(-1);
             } else {
                 console.error("Error fetching bought value:", xhr);
-                callback(0.0,0.0)
+                callback(0);
             }
         }
     };
@@ -254,7 +259,7 @@ function getPortfolioStockData(symbol, callback){
 //Returns the price and stockAmount of an order
 function getOrderInformations() {
     let stockAmount;
-    const priceDisplay = document.getElementById("price-display").textContent.trim();
+    const priceDisplay = $("#price-display").val().trim();
     const price = parseFloat(priceDisplay.replace('$', '').trim());
 
     if (isNaN(price) || price <= 0) {
@@ -492,6 +497,100 @@ function increasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
 //     $.ajax(settingsGetPortfolioStock);    
 // }
 
+function decreasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
+    event.preventDefault();
+    const stockSymbol = $('#stock-name').val();
+    const settingsAddPortfolioStock = {
+        "async": true,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy",
+        "method": "PUT",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "transactioncontent": {
+                "transactiontype": 0,
+                "stockamount": stockAmount,
+                "date": getCurrentDateTime(),
+                "priceperstock": pricePerStock,
+                "totalprice": totalPrice,
+                "email": getCookie("email"),
+                "symbol": stockSymbol
+            }
+        })
+        ,
+        "success": function(data) {
+            console.log(data);
+            alert(data.answer);
+            $('#quantity').val("");
+
+            getPortfolioStockData($('#stock-name').val(), function(currentValue, boughtValue) {
+                updateStockDisplay($('#stock-name').val(), currentValue, boughtValue);
+            });
+            displayAllDatabaseData();
+        },
+        "error": function(xhr) {
+            if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
+                alert(JSON.parse(xhr.responseText).answer);
+                $('#quantity').val("");
+            } else {
+                alert("An unexpected error occurred. Status: " + xhr.status);
+                $('#quantity').val("");
+            }
+        }
+    };
+    $.ajax(settingsAddPortfolioStock);
+}
+
+function deletePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
+    event.preventDefault();
+    const stockSymbol = $('#stock-name').val();
+    const settingsAddPortfolioStock = {
+        "async": true,
+        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy",
+        "method": "PUT",
+        "headers": {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        "data": JSON.stringify({
+            "token": getCookie("token"),
+            "transactioncontent": {
+                "transactiontype": 0,
+                "stockamount": stockAmount,
+                "date": getCurrentDateTime(),
+                "priceperstock": pricePerStock,
+                "totalprice": totalPrice,
+                "email": getCookie("email"),
+                "symbol": stockSymbol
+            }
+        })
+        ,
+        "success": function(data) {
+            console.log(data);
+            alert(data.answer);
+            $('#quantity').val("");
+
+            getPortfolioStockData($('#stock-name').val(), function(currentValue, boughtValue) {
+                const stockDiv = document.getElementById($('#stock-name').val());
+                stockDiv.remove();
+            });
+            displayAllDatabaseData();
+        },
+        "error": function(xhr) {
+            if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
+                alert(JSON.parse(xhr.responseText).answer);
+                $('#quantity').val("");
+            } else {
+                alert("An unexpected error occurred. Status: " + xhr.status);
+                $('#quantity').val("");
+            }
+        }
+    };
+    $.ajax(settingsAddPortfolioStock);
+}
 
 //Create a sell order
 function sellStock(){
