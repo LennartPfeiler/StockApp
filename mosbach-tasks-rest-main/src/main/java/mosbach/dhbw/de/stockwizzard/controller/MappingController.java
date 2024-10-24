@@ -30,10 +30,8 @@ import mosbach.dhbw.de.stockwizzard.model.TokenTransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
 import mosbach.dhbw.de.stockwizzard.model.EditCurrentValueRequest;
-import com.mosbach.demo.model.alexa.AlexaRO;
-import com.mosbach.demo.model.alexa.IntentRO;
-import com.mosbach.demo.model.alexa.OutputSpeechRO;
-import com.mosbach.demo.model.alexa.ResponseRO;
+import mosbach.dhbw.de.stockwizzard.model.alexa.*;
+
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -457,7 +455,7 @@ public class MappingController {
                     Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
                     portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
                             transactionContent.getSymbol(), transactionContent.getStockAmount(),
-                            transactionContent.getTotalPrice());
+                            transactionContent.getTotalPrice(), currentUser.getEmail());
                     userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                             transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                     return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
@@ -475,7 +473,6 @@ public class MappingController {
         }
     }
 
-<<<<<<< HEAD
     @PutMapping(path = "/order/buy", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> increasePortfolioStockOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
         try {
@@ -695,8 +692,6 @@ public class MappingController {
     // }
     // }
 
-=======
->>>>>>> 0b25ebd86e4f7c62bf2e47eaf93c992a37921d93
     @PostMapping(path = "/order/sell", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createSellOrder(@RequestBody TokenTransactionContent tokenTransactionContent) {
         try {
@@ -795,69 +790,70 @@ public class MappingController {
                     .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
         }
     }
-}
+
 //////////////////////////////////////////////////////Alexa
 
 ////////////////////////////////////////////////////////////// ALEXA
 
-@PostMapping(path = "/alexa", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) throws Exception {
-    IntentRO intent = alexaRO.getRequest().getIntent();
-    Logger logger = Logger.getLogger("MappingController");
+    @PostMapping(path = "/alexa", consumes = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+    public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) throws Exception {
+        IntentRO intent = alexaRO.getRequest().getIntent();
+        Logger logger = Logger.getLogger("MappingController");
 
-    String outText = "";
+        String outText = "";
 
-    // Handle LaunchRequest
-    if (alexaRO.getRequest().getType().equalsIgnoreCase("LaunchRequest")) {
-        outText += "Willkommen bei The Wallstreet Wizzard. Du kannst dich registrieren lassen.";
-        logger.log(Level.INFO, "Handling LaunchRequest");
-    }
+        // Handle LaunchRequest
+        if (alexaRO.getRequest().getType().equalsIgnoreCase("LaunchRequest")) {
+            outText += "Willkommen bei The Wallstreet Wizzard. Du kannst dich registrieren lassen.";
+            logger.log(Level.INFO, "Handling LaunchRequest");
+        }
 
-    // Handle SignupIntent (Nutzer-Registrierung)
-    if (alexaRO.getRequest().getType().equalsIgnoreCase("IntentRequest")
-        && intent.getName().equalsIgnoreCase("SignupIntent")) {
+        // Handle SignupIntent (Nutzer-Registrierung)
+        if (alexaRO.getRequest().getType().equalsIgnoreCase("IntentRequest")
+            && intent.getName().equalsIgnoreCase("SignupIntent")) {
 
-        logger.log(Level.INFO, "Handling IntentRequest for SignupIntent");
+            logger.log(Level.INFO, "Handling IntentRequest for SignupIntent");
 
-        // Erfasse die Slot-Werte
-        String firstName = intent.getSlots().get("firstName").getValue();
-        String lastName = intent.getSlots().get("lastName").getValue();
-        String email = intent.getSlots().get("email").getValue();
-        String password = intent.getSlots().get("password").getValue();
+            // Erfasse die Slot-Werte
+            String firstName = intent.getSlots().get("firstName").getValue();
+            String lastName = intent.getSlots().get("lastName").getValue();
+            String email = intent.getSlots().get("email").getValue();
+            String password = intent.getSlots().get("password").getValue();
 
-        // Validierung der Eingaben (optional)
-        if (firstName == null || lastName == null || email == null || password == null) {
-            outText += "Fehler: Bitte stelle sicher, dass du alle benötigten Informationen angegeben hast.";
-        } else {
-            // Erstelle einen neuen Benutzer
-            User user = new User();
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setEmail(email);
-            user.setPassword(password);  // Stelle sicher, dass du das Passwort sicher speicherst, z.B. gehasht
-            user.setBudget(0.0);  // Standard-Budget beim Erstellen eines Benutzers
-
-            // Rufe die vorhandene createUser-Methode auf
-            ResponseEntity<?> response = createUser(user);
-
-            // Überprüfe das Ergebnis der Registrierung
-            if (response.getStatusCode().equals(HttpStatus.OK)) {
-                outText += "Vielen Dank, " + firstName + ". Du wurdest erfolgreich registriert.";
-            } else if (response.getStatusCode().equals(HttpStatus.CONFLICT)) {
-                outText += "Es sieht so aus, als wärst du bereits registriert.";
+            // Validierung der Eingaben (optional)
+            if (firstName == null || lastName == null || email == null || password == null) {
+                outText += "Fehler: Bitte stelle sicher, dass du alle benötigten Informationen angegeben hast.";
             } else {
-                outText += "Es gab einen Fehler bei der Registrierung. Bitte versuche es später erneut.";
+                // Erstelle einen neuen Benutzer
+                User user = new User();
+                user.setFirstName(firstName);
+                user.setLastName(lastName);
+                user.setEmail(email);
+                user.setPassword(password);  // Stelle sicher, dass du das Passwort sicher speicherst, z.B. gehasht
+                user.setBudget(0.0);  // Standard-Budget beim Erstellen eines Benutzers
+
+                // Rufe die vorhandene createUser-Methode auf
+                ResponseEntity<?> response = createUser(user);
+
+                // Überprüfe das Ergebnis der Registrierung
+                if (response.getStatusCode().equals(HttpStatus.OK)) {
+                    outText += "Vielen Dank, " + firstName + ". Du wurdest erfolgreich registriert.";
+                } else if (response.getStatusCode().equals(HttpStatus.CONFLICT)) {
+                    outText += "Es sieht so aus, als wärst du bereits registriert.";
+                } else {
+                    outText += "Es gab einen Fehler bei der Registrierung. Bitte versuche es später erneut.";
+                }
             }
         }
+
+        // Rückgabe der Alexa-Antwort
+        AlexaRO response = new AlexaRO();
+        response.setVersion("1.0");
+        //AlexaResponse outputSpeech = new AlexaResponse();
+        // outputSpeech.setType("PlainText");
+        // outputSpeech.setText(outText);
+
+        // response.setOutputSpeech(outputSpeech);
+        return response;
     }
-
-    // Rückgabe der Alexa-Antwort
-    AlexaRO response = new AlexaRO();
-    response.setVersion("1.0");
-    AlexaResponse outputSpeech = new AlexaResponse();
-    outputSpeech.setType("PlainText");
-    outputSpeech.setText(outText);
-
-    response.setOutputSpeech(outputSpeech);
-    return response;
 }
