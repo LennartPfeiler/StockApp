@@ -23,4 +23,6 @@ public interface IUserManager {
 
     public void deleteUser(String email);
 
+    public int getUserCount();
+
 }

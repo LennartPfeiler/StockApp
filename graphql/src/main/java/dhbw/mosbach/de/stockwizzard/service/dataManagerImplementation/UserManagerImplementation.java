@@ -293,4 +293,39 @@ public class UserManagerImplementation implements IUserManager {
         }
     }
 
+    public int getUserCount() {
+        Statement stmt = null;
+        Connection connection = null;
+        int userCount = 0;
+        Logger.getLogger("GetUserCountLogger").log(Level.INFO, "Start getUserCount method");
+    
+        try {
+            connection = DriverManager.getConnection(dbUrl, username, password);
+            stmt = connection.createStatement();
+    
+            String countUsersSQL = "SELECT COUNT(*) AS total FROM group12user";
+            ResultSet rs = stmt.executeQuery(countUsersSQL);
+    
+            if (rs.next()) {
+                userCount = rs.getInt("total");
+            }
+            rs.close();
+        } catch (SQLException e) {
+            Logger.getLogger("GetUserCountLogger").log(Level.SEVERE, "Fehler beim Zählen der Benutzer.", e);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (stmt != null)
+                    stmt.close();
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException e) {
+                Logger.getLogger("GetUserCountLogger").log(Level.SEVERE, "Fehler beim Schließen der Ressourcen.", e);
+                e.printStackTrace();
+            }
+        }
+        return userCount;
+    }
+    
+
 }

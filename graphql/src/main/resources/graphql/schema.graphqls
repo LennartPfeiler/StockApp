@@ -10,68 +10,62 @@ type Query {
 type Mutation {
     createUser(firstname: String!, lastname: String!, email: ID!, password:String!, budget: Float!): StringAnswer
     editProfile(currentToken: String!, currentMail: String!, firstname: String, lastname: String, email: String, password: String, budget: Float): UserResult
-    resetProfile(tokenEmail: ID!, token: String!): StringAnswer
-    deleteProfile(tokenEmail: ID!, token:String!): StringAnswer
+    resetProfile(SessionEmail: ID!, token: String!): StringAnswer
+    deleteProfile(SessionEmail: ID!, token:String!): StringAnswer
     createStock(email: ID!, token: String!, symbol: String!, stockPrice: Float!, name: String!): StringAnswer
     editCurrentValue(token: String!, email: String!, symbol: String!, newValue: Float!): String
-    editPortfolioValue(token: String!, email: String!): StringAnswer
     addPortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
-    # createBuyOrder(tokenTransactionContent: TokenTransactionContentInput!): StringAnswer
-    # createSellOrder(tokenTransactionContent: TokenTransactionContentInput!): StringAnswer
+    createBuyOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
+    increasePortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
+    decreasePortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
+    deletePortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
+    handleAlexaRequest(alexaRO: AlexaROInput!): AlexaRO
 }
 
 # Input Types
 
+input AlexaROInput {
+    response: ResponseInput
+    session: SessionROInput
+}
 
-input EditRequest {
+input ResponseInput {
+    outputSpeech: OutputSpeechInput
+    shouldEndSession: Boolean
+}
+
+input OutputSpeechInput {
+    type: String
+    text: String
+}
+
+input SessionROInput {
+    attributes: [SessionAttributeInput]
+}
+
+input SessionAttributeInput {
+    key: String
+    value: String
+}
+
+# Output Types
+
+type EditRequest {
     currentToken: String!
     currentMail: String!
 }
 
-input TokenEmail {
+type Session {
     token: String
-    tokenEmail: ID!
+    SessionEmail: ID!
 }
 
-input EditCurrentValue {
+type EditCurrentValue {
     token: String!
     email: String!
     symbol: String!
     newValue: Float!
 }
-
-# input TokenTransactionContentInput {
-    # token: String
-    # transactionContent: TransactionContentInput
-# }
-
-input SessionInput {
-    email: ID!
-    token: String
-}
-
-# input AddStockRequest{
-   # tokenEmailInput: TokenEmailInput
-    # stockInput: StockInput
-# }
-
-input TransactionContentInput {
-    transactionType: Int
-    stockAmount: Float
-    date: String
-    pricePerStock: Float
-    totalPrice: Float
-    email: ID!
-    symbol: String
-}
-
-input StockInput {
-    symbol: String
-    stockPrice: Float
-    name: String
-}
-
-# Output Types
 
 type User {
     firstname: String
@@ -132,6 +126,40 @@ type Portfolio {
     value: Float
     startValue: Float
     email: ID!
+}
+
+type AlexaRO {
+    response: Response
+    session: SessionRO
+}
+
+type OutputSpeech {
+    type: String
+    text: String
+}
+
+type SessionRO {
+    attributes: [SessionAttribute]
+}
+
+type SessionAttribute {
+    key: String
+    value: String
+}
+
+type IntentRO {
+    name: String
+    slots: [Slot]
+}
+
+type Slot {
+    name: String
+    value: String
+}
+
+type Response {
+    outputSpeech: OutputSpeech
+    shouldEndSession: Boolean
 }
 
 
