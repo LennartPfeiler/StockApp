@@ -802,6 +802,7 @@ public class MappingController {
 //////////////////////////////////////////////////////Alexa
 
 ////////////////////////////////////////////////////////////// ALEXA
+/*
 @PostMapping(path = "/alexa", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
     String requestType = alexaRO.getRequest().getType();
@@ -821,28 +822,46 @@ public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
         if (requestType.equalsIgnoreCase("LaunchRequest")) {
             outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
             Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
-        }
-        else if (requestType.equalsIgnoreCase("IntentRequest")) {
+        } else if (requestType.equalsIgnoreCase("IntentRequest")) {
             IntentRO intent = alexaRO.getRequest().getIntent();
             String intentName = intent.getName();
             Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " + intentName);
+        }
+            else if (intentName.equalsIgnoreCase("LoginIntent")) {
+                if (sessionAttributes.containsKey("email")) {
+                    outText = "Bitte nenne mir deine E-Mail für die Anmeldung.";
+                    Logger.getLogger("AlexaLogger").log(Level.INFO, "Login Intent initialisiert. Email wird erwartet.");
+                } else if (!sessionAttributes.containsKey("password")) {
+                    outText = "Danke. Nennen Sie bitte Ihr Passwort, um fortzufahren";
+                    Logger
 
-            if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
+
+                // Benutzerprofil abfragen und Passwort prüfen
+                User user = userManager.getUserProfile(email);
+                if (user != null && passwordManager.checkPassword(password, user.getPassword())) {
+                    // Token generieren und Sitzung erstellen
+                    String token = authManager.generateToken();
+                    sessionManager.createSession(user.getEmail(), token);
+                    outText = "Anmeldung erfolgreich. Willkommen zurück!";
+                    sessionAttributes.put("userToken", token); // Token in der Sitzung speichern
+                    shouldEndSession = false; // Sitzung bleibt aktiv
+                } else {
+                    outText = "E-Mail oder Passwort sind falsch.";
+                    shouldEndSession = true;
+                }
+            } else if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
                 // Hier holen wir die Anzahl aller Benutzer
                 UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
                 int userCount = userManager.getUserCount();
                 outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
                 shouldEndSession = true;
-            }
-            else {
+            } else {
                 outText = "Dieser Befehl wird nicht unterstützt.";
                 shouldEndSession = true;
             }
-        }
-        else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
+        } else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
             Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: " + alexaRO.getRequest().getReason());
-            // Keine Antwort erforderlich
-            return null;
+            return null; // Keine Antwort erforderlich
         } else {
             outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
             shouldEndSession = true;
@@ -855,7 +874,7 @@ public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
 
     return prepareResponse(outText, shouldEndSession, sessionAttributes);
 }
-
+*/
 
 
     private AlexaRO prepareResponse(String outText, boolean shouldEndSession, Map<String, Object> sessionAttributes) {
