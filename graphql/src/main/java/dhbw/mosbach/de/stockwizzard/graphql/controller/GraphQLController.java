@@ -7,11 +7,18 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 import dhbw.mosbach.de.stockwizzard.model.*;
 import dhbw.mosbach.de.stockwizzard.service.dataManager.*;
 import dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation.*;
+import dhbw.mosbach.de.stockwizzard.model.alexa.*;
 
 
 @Controller
@@ -24,6 +31,52 @@ public class GraphQLController {
     private IPortfolioStockManager portfolioStockService = PortfolioStockManagerImplementation.getPortfolioStockManager();
     private IPortfolioManager portfolioService = PortfolioManagerImplementation.getPortfolioManager();
     private IAuthManager authService = AuthManagerImplementation.getAuthManager();
+
+    private void editPortfolioValue(String email) {
+        Double portfolioValue = 0.0;
+        List<PortfolioStock> portfolioStocks = portfolioStockService.getAllPortfolioStocks(email, "symbol");
+        for (PortfolioStock portfolioStock : portfolioStocks) {
+            portfolioValue += portfolioStock.getCurrentValue();
+        }
+        User user = userService.getUserProfile(email);     
+        portfolioService.editPortfolioValue(email,portfolioValue+user.getBudget());
+    }
+
+    private AlexaRO prepareResponse(String outText, boolean shouldEndSession, Map<String, Object> sessionAttributes) {
+        AlexaRO responseRO = new AlexaRO();
+        responseRO.setVersion("1.0");
+
+        // Session-Attribute setzen
+        SessionRO sessionRO = new SessionRO();
+        sessionRO.setAttributes(sessionAttributes);
+        responseRO.setSession(sessionRO);
+
+        OutputSpeechRO outputSpeechRO = new OutputSpeechRO();
+        outputSpeechRO.setType("PlainText");
+        outputSpeechRO.setText(outText);
+
+        // Reprompt hinzufügen, um die Sitzung aktiv zu halten
+        OutputSpeechRO repromptSpeech = new OutputSpeechRO();
+        repromptSpeech.setType("PlainText");
+        repromptSpeech.setText("Kannst du das bitte wiederholen?");
+
+        ResponseRO response = new ResponseRO();
+        response.setOutputSpeech(outputSpeechRO);
+        response.setShouldEndSession(shouldEndSession);
+
+        if (!shouldEndSession) {
+            // Reprompt hinzufügen
+            RepromptRO reprompt = new RepromptRO();
+            reprompt.setOutputSpeech(repromptSpeech);
+            response.setReprompt(reprompt);
+        }
+
+        responseRO.setResponse(response);
+
+        return responseRO;
+    }
+
+
 
     @QueryMapping
     public User getUserProfile(@Argument String email, @Argument String token) {
@@ -70,6 +123,7 @@ public class GraphQLController {
             Boolean isValid = sessionService.validToken(token, email);
             if (isValid) {
                 List<PortfolioStock> portfolioStocks = portfolioStockService.getAllPortfolioStocks(email, sortby);
+                editPortfolioValue(email);
                 return portfolioStocks;
             } else {
                 throw new RuntimeException("Unauthorized for this transaction!");
@@ -291,31 +345,6 @@ public class GraphQLController {
         }
 
         @MutationMapping
-            public StringAnswer editPortfolioValue(@Argument String token, @Argument String email) {
-                try {
-                    TokenEmail tokenEmail = new TokenEmail();
-                    tokenEmail.setToken(token);
-                    tokenEmail.setEmail(email);
-                    Boolean isValid = sessionService.validToken(tokenEmail.getToken(), tokenEmail.getEmail());
-                    if (isValid) {
-                        Double portfolioValue = 0.0;
-                        List<PortfolioStock> portfolioStocks = portfolioStockService.getAllPortfolioStocks(tokenEmail.getEmail(), "symbol");
-                        for (PortfolioStock portfolioStock : portfolioStocks) {
-                            portfolioValue += portfolioStock.getCurrentValue();
-                        }
-                        User user = userService.getUserProfile(tokenEmail.getEmail());
-                        Double newPortfolioValue = portfolioValue + user.getBudget();
-                        portfolioService.editPortfolioValue(tokenEmail.getEmail(), newPortfolioValue);
-                        return new StringAnswer("Portfolio value successfully updated.");
-                    } else {
-                        return new StringAnswer("Unauthorized for this transaction!");
-                    }
-                } catch (Exception e) {
-                    return new StringAnswer("An unexpected error occurred: " + e.getMessage());
-                }
-            }
-
-        @MutationMapping
             public StringAnswer addPortfolioStockOrder(@Argument Integer transactionType, @Argument Float stockAmount, @Argument String date, @Argument Float pricePerStock, @Argument Float totalPrice, @Argument String email, @Argument String symbol, @Argument String token) {
                 try {
                     TransactionContent transactionContent = new TransactionContent();
@@ -356,6 +385,314 @@ public class GraphQLController {
                     return new StringAnswer("An unexpected error occurred while processing the transaction: " + e.getMessage());
                 }
             }
+
+            @MutationMapping
+                public StringAnswer createBuyOrder(@Argument Integer transactionType, @Argument Float stockAmount, @Argument String date, @Argument Float pricePerStock, @Argument Float totalPrice, @Argument String email, @Argument String symbol, @Argument String token) {
+                    try {
+                        TransactionContent transactionContent = new TransactionContent();
+                        transactionContent.setTransactionType(transactionType);
+                        transactionContent.setStockAmount(stockAmount.doubleValue());
+                        transactionContent.setDate(date);
+                        transactionContent.setPricePerStock(pricePerStock.doubleValue());
+                        transactionContent.setTotalPrice(totalPrice.doubleValue());
+                        transactionContent.setEmail(email);
+                        transactionContent.setSymbol(symbol);
+
+                        Boolean isValid = sessionService.validToken(token, transactionContent.getEmail());
+                        
+                        if (isValid) {
+                            User currentUser = userService.getUserProfile(transactionContent.getEmail());
+                            Boolean enoughBudget = userService.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
+                            
+                            if (enoughBudget) {
+                                transactionService.addTransaction(transactionContent);
+                                Portfolio userPortfolio = portfolioService.getUserPortfolio(transactionContent.getEmail());
+                                
+                                portfolioStockService.addPortfolioStock(
+                                    userPortfolio.getPortfolioID(),
+                                    transactionContent.getSymbol(),
+                                    transactionContent.getStockAmount(),
+                                    transactionContent.getTotalPrice()
+                                );
+                                
+                                userService.editUserBudget(
+                                    currentUser.getEmail(),
+                                    currentUser.getBudget(),
+                                    transactionContent.getTotalPrice(),
+                                    transactionContent.getTransactionType()
+                                );
+                                
+                                editPortfolioValue(currentUser.getEmail());
+                                
+                                return new StringAnswer("Transaction was successfully completed");
+                            } else {
+                                return new StringAnswer("Not enough budget for this transaction!");
+                            }
+                        } else {
+                            return new StringAnswer("Unauthorized for this transaction!");
+                        }
+                    } catch (Exception e) {
+                        return new StringAnswer("An unexpected error occurred while processing the transaction.");
+                    }
+                }
+
+                @MutationMapping
+                    public StringAnswer increasePortfolioStockOrder(@Argument Integer transactionType, @Argument Float stockAmount, @Argument String date, @Argument Float pricePerStock, @Argument Float totalPrice, @Argument String email, @Argument String symbol, @Argument String token) {
+                        try {
+                            TransactionContent transactionContent = new TransactionContent();
+                            transactionContent.setTransactionType(transactionType);
+                            transactionContent.setStockAmount(stockAmount.doubleValue());
+                            transactionContent.setDate(date);
+                            transactionContent.setPricePerStock(pricePerStock.doubleValue());
+                            transactionContent.setTotalPrice(totalPrice.doubleValue());
+                            transactionContent.setEmail(email);
+                            transactionContent.setSymbol(symbol);
+
+                            Boolean isValid = sessionService.validToken(token, transactionContent.getEmail());
+                            
+                            if (isValid) {
+                                User currentUser = userService.getUserProfile(transactionContent.getEmail());
+                                Boolean enoughBudget = userService.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(), currentUser);
+                                
+                                if (enoughBudget) {
+                                    transactionService.addTransaction(transactionContent);
+                                    Portfolio userPortfolio = portfolioService.getUserPortfolio(transactionContent.getEmail());
+                                    
+                                    portfolioStockService.increasePortfolioStock(
+                                        userPortfolio.getPortfolioID(),
+                                        transactionContent.getSymbol(),
+                                        transactionContent.getStockAmount(),
+                                        transactionContent.getTotalPrice(),
+                                        currentUser.getEmail()
+                                    );
+                                    
+                                    userService.editUserBudget(
+                                        currentUser.getEmail(),
+                                        currentUser.getBudget(),
+                                        transactionContent.getTotalPrice(),
+                                        transactionContent.getTransactionType()
+                                    );
+                                    
+                                    editPortfolioValue(currentUser.getEmail());
+                                    
+                                    return new StringAnswer("Transaction was successfully completed");
+                                } else {
+                                    return new StringAnswer("Not enough budget for this transaction!");
+                                }
+                            } else {
+                                return new StringAnswer("Unauthorized for this transaction!");
+                            }
+                        } catch (Exception e) {
+                            return new StringAnswer("An unexpected error occurred while processing the transaction.");
+                        }
+                    }
+
+            @MutationMapping
+            public StringAnswer decreasePortfolioStockOrder(@Argument Integer transactionType, @Argument Float stockAmount, @Argument String date, @Argument Float pricePerStock, @Argument Float totalPrice, @Argument String email, @Argument String symbol, @Argument String token) {
+                try {
+                    TransactionContent transactionContent = new TransactionContent();
+                    transactionContent.setTransactionType(transactionType);
+                    transactionContent.setStockAmount(stockAmount.doubleValue());
+                    transactionContent.setDate(date);
+                    transactionContent.setPricePerStock(pricePerStock.doubleValue());
+                    transactionContent.setTotalPrice(totalPrice.doubleValue());
+                    transactionContent.setEmail(email);
+                    transactionContent.setSymbol(symbol);
+
+                    Boolean isValid = sessionService.validToken(token, transactionContent.getEmail());
+                    
+                    if (isValid) {
+                        // GET USER
+                        User currentUser = userService.getUserProfile(transactionContent.getEmail());
+                        // GET BOUGHT AND CURRENT VALUE OF PORTFOLIO STOCK
+                        PortfolioStockValue portfolioStockValues = portfolioStockService.getPortfolioStockValues(
+                            transactionContent.getTotalPrice(), 
+                            currentUser.getEmail(), 
+                            transactionContent.getSymbol()
+                        );
+                        
+                        if (portfolioStockValues == null) {
+                            return new StringAnswer("You don't own a position with the selected stock!");
+                        } else {
+                            if (portfolioStockValues.getCurrentValue() == -1) {
+                                return new StringAnswer("Your stock position is not that high!");
+                            } else {
+                                // ADD SELL TRANSACTION
+                                transactionService.addTransaction(transactionContent);
+                                // GET USER PORTFOLIO
+                                Portfolio userPortfolio = portfolioService.getUserPortfolio(transactionContent.getEmail());
+                                // GET ALL TRANSACTIONS OF A USER
+                                List<Transaction> transactionsInPortfolio = transactionService.getAllTransactionsInPortfolioStock(
+                                    transactionContent.getEmail()
+                                );
+
+                                Double remainingAmount = transactionContent.getTotalPrice();
+                                Double totalBoughtValueReduction = 0.0;
+
+                                for (Transaction transaction : transactionsInPortfolio) {
+                                    if (remainingAmount <= 0) break;
+
+                                    Double leftInTransaction = transaction.getLeftInPortfolio();
+                                    Double transactionBoughtValue = transaction.getTotalPrice();
+                                    Integer transactionId = transaction.getTransactionID();
+
+                                    if (remainingAmount >= leftInTransaction) {
+                                        remainingAmount -= leftInTransaction;
+                                        totalBoughtValueReduction += transactionBoughtValue;
+                                        transactionService.editLeftinPortfolio(transactionId, 0.0);
+                                    } else {
+                                        Double proportion = remainingAmount / transactionBoughtValue;
+                                        Double reductionInBoughtValue = transactionBoughtValue * proportion;
+                                        totalBoughtValueReduction += reductionInBoughtValue;
+                                        Double newLeftInTransaction = leftInTransaction - remainingAmount;
+                                        remainingAmount = 0.0;
+                                        transactionService.editLeftinPortfolio(transactionId, newLeftInTransaction);
+                                    }
+                                }
+
+                                Double newCurrentValue = portfolioStockValues.getCurrentValue() - transactionContent.getTotalPrice();
+                                Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
+
+                                portfolioStockService.decreasePortfolioStock(
+                                    newCurrentValue, 
+                                    newBoughtValue, 
+                                    transactionContent.getStockAmount(), 
+                                    userPortfolio.getPortfolioID(), 
+                                    transactionContent.getSymbol()
+                                );
+                                
+                                userService.editUserBudget(
+                                    currentUser.getEmail(), 
+                                    currentUser.getBudget(),
+                                    transactionContent.getTotalPrice(), 
+                                    transactionContent.getTransactionType()
+                                );
+                                
+                                editPortfolioValue(currentUser.getEmail());
+                                
+                                return new StringAnswer("Transaction was successfully completed");
+                            }
+                        }
+                    } else {
+                        return new StringAnswer("Unauthorized for this transaction!");
+                    }
+                } catch (Exception e) {
+                    return new StringAnswer("An unexpected error occurred while processing the transaction.");
+                }
+            }
+
+        @MutationMapping
+        public StringAnswer deletePortfolioStockOrder(@Argument Integer transactionType, @Argument Float stockAmount, @Argument String date, @Argument Float pricePerStock, @Argument Float totalPrice, @Argument String email, @Argument String symbol, @Argument String token) {
+            try {
+                TransactionContent transactionContent = new TransactionContent();
+                transactionContent.setTransactionType(transactionType);
+                transactionContent.setStockAmount(stockAmount.doubleValue());
+                transactionContent.setDate(date);
+                transactionContent.setPricePerStock(pricePerStock.doubleValue());
+                transactionContent.setTotalPrice(totalPrice.doubleValue());
+                transactionContent.setEmail(email);
+                transactionContent.setSymbol(symbol);
+
+                Boolean isValid = sessionService.validToken(token, transactionContent.getEmail());
+
+                if (isValid) {
+                    User currentUser = userService.getUserProfile(transactionContent.getEmail());
+                    PortfolioStockValue portfolioStockValues = portfolioStockService.getPortfolioStockValues(
+                        transactionContent.getTotalPrice(), 
+                        currentUser.getEmail(), 
+                        transactionContent.getSymbol()
+                    );
+
+                    if (portfolioStockValues == null) {
+                        return new StringAnswer("You don't own a position with the selected stock!");
+                    } else if (portfolioStockValues.getCurrentValue() == -1) {
+                        return new StringAnswer("Your stock position is not that high!");
+                    } else {
+                        transactionService.addTransaction(transactionContent);
+                        Portfolio userPortfolio = portfolioService.getUserPortfolio(transactionContent.getEmail());
+                        List<Transaction> transactionsInPortfolio = transactionService.getAllTransactionsInPortfolioStock(
+                            transactionContent.getEmail()
+                        );
+
+                        // Delete portfolio stock
+                        portfolioStockService.deletePortfolioStock(transactionContent.getSymbol(), userPortfolio.getPortfolioID());
+
+                        // Set all remaining transaction portfolio values to zero
+                        for (Transaction transaction : transactionsInPortfolio) {
+                            transactionService.editLeftinPortfolio(transaction.getTransactionID(), 0.0);
+                        }
+
+                        userService.editUserBudget(
+                            currentUser.getEmail(),
+                            currentUser.getBudget(),
+                            transactionContent.getTotalPrice(),
+                            transactionContent.getTransactionType()
+                        );
+                        
+                        editPortfolioValue(currentUser.getEmail());
+
+                        return new StringAnswer("Transaction was successfully completed");
+                    }
+                } else {
+                    return new StringAnswer("Unauthorized for this transaction!");
+                }
+            } catch (Exception e) {
+                return new StringAnswer("An unexpected error occurred while processing the transaction.");
+            }
+        }
+
+        @MutationMapping
+        public AlexaRO handleAlexaRequest(@Argument AlexaROInput alexaRO) {
+            String requestType = alexaRO.getRequest().getType();
+            String outText = "";
+            boolean shouldEndSession = false;
+            Map<String, Object> sessionAttributes = null;
+
+            try {
+                // Initialisiere Session-Attribute
+                if (alexaRO.getSession() != null) {
+                    sessionAttributes = alexaRO.getSession().getAttributes();
+                }
+                if (sessionAttributes == null) {
+                    sessionAttributes = new HashMap<>();
+                }
+
+                if (requestType.equalsIgnoreCase("LaunchRequest")) {
+                    outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
+                    Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
+                } else if (requestType.equalsIgnoreCase("IntentRequest")) {
+                    IntentRO intent = alexaRO.getRequest().getIntent();
+                    String intentName = intent.getName();
+                    Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " + intentName);
+
+                    if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
+                        // Holen der Benutzeranzahl
+                        int userCount = userService.getUserCount();
+                        outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
+                        shouldEndSession = true;
+                    } else {
+                        outText = "Dieser Befehl wird nicht unterstützt.";
+                        shouldEndSession = true;
+                    }
+                } else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
+                    Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: " + alexaRO.getRequest().getReason());
+                    // Keine Antwort erforderlich
+                    return null;
+                } else {
+                    outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
+                    shouldEndSession = true;
+                }
+            } catch (Exception e) {
+                Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Exception occurred: ", e);
+                outText = "Es gab einen Fehler bei der Verarbeitung deiner Anfrage.";
+                shouldEndSession = true;
+            }
+
+            return prepareResponse(outText, shouldEndSession, sessionAttributes);
+        }
+
+
+
     }
 
 
