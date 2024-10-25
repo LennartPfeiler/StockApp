@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 <!--<button id="show-price" class="btn btn-primary mt-2" onclick="getStockPrice()">Show current price</button>-->
-                <span id="current-price">220$</span>
+                <span id="current-price"></span>
                 <div class="mb-3">
                     <label for="quantity" id="quantity-label" class="form-label">Quantity in $:</label>
                     <input type="number" id="quantity" placeholder="100" class="form-control" oninput="checkFields()">
@@ -67,7 +67,7 @@
             <section class="portfolio">
                 <h2>Portfolio</h2>
                 <!-- Sollte beides eine id sein -->
-                <div class="portfolio-value"><span class="percentage positive">+5%</span></div>
+                <div class="portfolio-value"><span id = "portfolio-percentage" class="percentage positive">+5%</span></div>
                 <div class="stock-list">
                 </div>
             </section>

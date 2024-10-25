@@ -84,6 +84,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
         Statement stmt = null;
         Connection connection = null;
         Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Start addPortfolioStock-method");
+        Logger.getLogger("AddPortfolioStockLogger").log(Level.INFO, "Start addPortfolioStock-method: {0}", symbol);
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
