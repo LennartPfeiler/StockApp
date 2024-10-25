@@ -10,8 +10,8 @@ type Query {
 type Mutation {
     createUser(firstname: String!, lastname: String!, email: ID!, password:String!, budget: Float!): StringAnswer
     editProfile(currentToken: String!, currentMail: String!, firstname: String, lastname: String, email: String, password: String, budget: Float): UserResult
-    resetProfile(tokenEmail: ID!, token: String!): StringAnswer
-    deleteProfile(tokenEmail: ID!, token:String!): StringAnswer
+    resetProfile(SessionEmail: ID!, token: String!): StringAnswer
+    deleteProfile(SessionEmail: ID!, token:String!): StringAnswer
     createStock(email: ID!, token: String!, symbol: String!, stockPrice: Float!, name: String!): StringAnswer
     editCurrentValue(token: String!, email: String!, symbol: String!, newValue: Float!): String
     addPortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
@@ -20,7 +20,6 @@ type Mutation {
     decreasePortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
     deletePortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
     handleAlexaRequest(alexaRO: AlexaROInput!): AlexaRO
-    # createSellOrder(tokenTransactionContent: TokenTransactionContentInput!): StringAnswer
 }
 
 # Input Types
@@ -56,9 +55,9 @@ type EditRequest {
     currentMail: String!
 }
 
-type TokenEmail {
+type Session {
     token: String
-    tokenEmail: ID!
+    SessionEmail: ID!
 }
 
 type EditCurrentValue {
@@ -66,11 +65,6 @@ type EditCurrentValue {
     email: String!
     symbol: String!
     newValue: Float!
-}
-
-type SessionInput {
-    email: ID!
-    token: String
 }
 
 type User {

@@ -268,14 +268,14 @@ public class GraphQLController {
     }
 
     @MutationMapping
-    public StringAnswer resetProfile(@Argument String token, @Argument String tokenEmail) {
+    public StringAnswer resetProfile(@Argument String token, @Argument String SessionEmail) {
         try {
-            Boolean isValid = sessionService.validToken(token, tokenEmail);
+            Boolean isValid = sessionService.validToken(token, SessionEmail);
             if (isValid) {
-                portfolioStockService.deleteAllPortfolioStocks(tokenEmail);
-                transactionService.deleteAllTransactions(tokenEmail);
-                portfolioService.resetPortfolio(tokenEmail);
-                userService.resetProfile(tokenEmail);
+                portfolioStockService.deleteAllPortfolioStocks(SessionEmail);
+                transactionService.deleteAllTransactions(SessionEmail);
+                portfolioService.resetPortfolio(SessionEmail);
+                userService.resetProfile(SessionEmail);
                 return new StringAnswer("User successfully resetted!");
             } else {
                 return new StringAnswer("Unauthorized for this transaction!");
@@ -287,11 +287,11 @@ public class GraphQLController {
     }
 
     @MutationMapping
-    public StringAnswer deleteProfile(@Argument String token, @Argument String tokenEmail) {
+    public StringAnswer deleteProfile(@Argument String token, @Argument String SessionEmail) {
         try {
-            boolean isValid = sessionService.validToken(token, tokenEmail);
+            boolean isValid = sessionService.validToken(token, SessionEmail);
             if (isValid) {
-                userService.deleteUser(tokenEmail);
+                userService.deleteUser(SessionEmail);
                 return new StringAnswer("Profile successfully deleted");
             } else {
                 return new StringAnswer("Unauthorized for this transaction!");
@@ -694,61 +694,3 @@ public class GraphQLController {
 
 
     }
-
-
-
-    // @MutationMapping
-    // public StringAnswer createUser(@Argument User user) {
-    //     return userService.createUser(user);
-    // }
-
-    // @MutationMapping
-    // public StringAnswer editProfile(@Argument EditRequest editRequest) {
-    //     return userService.editProfile(editRequest);
-    // }
-
-    // @MutationMapping
-    // public StringAnswer resetProfile(@Argument TokenEmail tokenEmail) {
-    //     return userService.resetProfile(tokenEmail);
-    // }
-
-    // @MutationMapping
-    // public StringAnswer deleteProfile(@Argument TokenEmail tokenEmail) {
-    //     return userService.deleteProfile(tokenEmail);
-    // }
-
-    // @QueryMapping
-    // public Stock getStock(@Argument String email, @Argument String token, @Argument String symbol) {
-    //     return StockService.getStock(email, token, symbol);
-    // }
-
-    // @MutationMapping
-    // public StringAnswer createStock(@Argument AddStockRequest addStockRequest) {
-    //     return StockService.createStock(addStockRequest);
-    // }
-
-    // @QueryMapping
-    // public List<PortfolioStock> getAllPortfolioStocks(@Argument String email, @Argument String token, @Argument String sortby) {
-    //     return PortfolioService.getAllPortfolioStocks(email, token, sortby);
-    // }
-
-    // @QueryMapping
-    // public List<Transaction> getAllTransactions(@Argument String email, @Argument String token, @Argument String sortby) {
-    //     return TransactionService.getAllTransactions(email, token, sortby);
-    // }
-
-    // @QueryMapping
-    // public Portfolio getUserPortfolio(@Argument String email, @Argument String token) {
-    //     return PortfolioService.getUserPortfolio(email, token);
-    // }
-
-    // @MutationMapping
-    // public StringAnswer createBuyOrder(@Argument TokenTransactionContent tokenTransactionContent) {
-    //     return OrderService.createBuyOrder(tokenTransactionContent);
-    // }
-
-    // @MutationMapping
-    // public StringAnswer createSellOrder(@Argument TokenTransactionContent tokenTransactionContent) {
-    //     return OrderService.createSellOrder(tokenTransactionContent);
-    // }
-
