@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.springframework.http.*;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.AuthManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
@@ -35,8 +34,6 @@ import mosbach.dhbw.de.stockwizzard.model.alexa.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -234,8 +231,8 @@ public class MappingController {
 
     ////////////////////////////////////////////////////////////// Stock
     ////////////////////////////////////////////////////////////// Endpoints////////////////////////////////////////////////////////////////////
-    
-    //VLT IN Buy/SELL stock
+
+    // VLT IN Buy/SELL stock
     @GetMapping("/stock")
     public ResponseEntity<?> getStock(
             @RequestParam(value = "email", defaultValue = "") String email,
@@ -331,8 +328,7 @@ public class MappingController {
         }
     }
 
-
-    //VLT IN BUY ORDER
+    // VLT IN BUY ORDER
     @PutMapping(path = "/portfolioStocks/currentValue", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> editCurrentValue(@RequestBody EditCurrentValueRequest editCurrentValueRequest) {
         try {
@@ -377,25 +373,27 @@ public class MappingController {
         }
     }
 
-    //Just for testing purpose
+    // Just for testing purpose
     // @GetMapping("/Portfoliotransactions")
     // public ResponseEntity<?> getAllPortfolioTransactions(
-    //         @RequestParam(value = "email", defaultValue = "") String email,
-    //         @RequestParam(value = "token", defaultValue = "") String token) {
+    // @RequestParam(value = "email", defaultValue = "") String email,
+    // @RequestParam(value = "token", defaultValue = "") String token) {
 
-    //     try {
-    //         Boolean isValid = sessionManager.validToken(token, email);
-    //         if (isValid) {
-    //             List<Transaction> transactions = transactionManager.getAllTransactionsInPortfolioStock(email);
-    //             return ResponseEntity.ok(transactions);
-    //         } else {
-    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-    //                     .body(new StringAnswer("Unauthorized for this transaction!"));
-    //         }
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-    //                 .body(new StringAnswer("An unexpected error occurred during getting transactions."));
-    //     }
+    // try {
+    // Boolean isValid = sessionManager.validToken(token, email);
+    // if (isValid) {
+    // List<Transaction> transactions =
+    // transactionManager.getAllTransactionsInPortfolioStock(email);
+    // return ResponseEntity.ok(transactions);
+    // } else {
+    // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+    // .body(new StringAnswer("Unauthorized for this transaction!"));
+    // }
+    // } catch (Exception e) {
+    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+    // .body(new StringAnswer("An unexpected error occurred during getting
+    // transactions."));
+    // }
     // }
 
     // @GetMapping("/transaction")
@@ -438,13 +436,13 @@ public class MappingController {
     }
 
     private void editPortfolioValue(String email) {
-            Double portfolioValue = 0.0;
-            List<PortfolioStock> portfolioStocks = portfolioStockManager.getAllPortfolioStocks(email, "symbol");
-            for (PortfolioStock portfolioStock : portfolioStocks) {
-                portfolioValue += portfolioStock.getCurrentValue();
-            }
-            User user = userManager.getUserProfile(email);     
-            portfolioManager.editPortfolioValue(email,portfolioValue+user.getBudget());
+        Double portfolioValue = 0.0;
+        List<PortfolioStock> portfolioStocks = portfolioStockManager.getAllPortfolioStocks(email, "symbol");
+        for (PortfolioStock portfolioStock : portfolioStocks) {
+            portfolioValue += portfolioStock.getCurrentValue();
+        }
+        User user = userManager.getUserProfile(email);
+        portfolioManager.editPortfolioValue(email, portfolioValue + user.getBudget());
     }
 
     ////////////////////////////////////////////////////////////// Order
@@ -463,11 +461,13 @@ public class MappingController {
                 if (enoughBudget == true) {
                     transactionManager.addTransaction(transactionContent);
                     Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                    portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(), transactionContent.getSymbol(), transactionContent.getStockAmount(), transactionContent.getTotalPrice());
+                    portfolioStockManager.addPortfolioStock(userPortfolio.getPortfolioID(),
+                            transactionContent.getSymbol(), transactionContent.getStockAmount(),
+                            transactionContent.getTotalPrice());
                     userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                             transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                     editPortfolioValue(currentUser.getEmail());
-                    return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                    return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed!"));
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(new StringAnswer("Not enough budget for this transaction!"));
@@ -478,7 +478,7 @@ public class MappingController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
+                    .body(new StringAnswer("An unexpected error occurred while adding a new stock to the portfolio."));
         }
     }
 
@@ -492,19 +492,26 @@ public class MappingController {
                 User currentUser = userManager.getUserProfile(transactionContent.getEmail());
                 Boolean enoughBudget = userManager.checkIfEnoughBudgetLeft(transactionContent.getTotalPrice(),
                         currentUser);
-                if (enoughBudget == true) {
-                    transactionManager.addTransaction(transactionContent);
-                    Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                    portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
-                            transactionContent.getSymbol(), transactionContent.getStockAmount(),
-                            transactionContent.getTotalPrice(), currentUser.getEmail());
-                    userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
-                            transactionContent.getTotalPrice(), transactionContent.getTransactionType());
-                    editPortfolioValue(currentUser.getEmail());
-                    return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                PortfolioStock portfolioStock = portfolioStockManager.getPortfolioStock(currentUser.getEmail(),
+                        transactionContent.getSymbol());
+                if (portfolioStock == null) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(new StringAnswer("You don't own a position with the selected stock!"));
                 } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(new StringAnswer("Not enough budget for this transaction!"));
+                    if (enoughBudget == true) {
+                        transactionManager.addTransaction(transactionContent);
+                        Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
+                        portfolioStockManager.increasePortfolioStock(userPortfolio.getPortfolioID(),
+                                transactionContent.getSymbol(), transactionContent.getStockAmount(),
+                                transactionContent.getTotalPrice(), currentUser.getEmail());
+                        userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
+                                transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                        editPortfolioValue(currentUser.getEmail());
+                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed!"));
+                    } else {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(new StringAnswer("Not enough budget for this transaction!"));
+                    }
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -512,7 +519,7 @@ public class MappingController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
+                    .body(new StringAnswer("An unexpected error occurred while increasing the portfolio stock."));
         }
     }
 
@@ -524,7 +531,8 @@ public class MappingController {
             Boolean isValid = sessionManager.validToken(token, transactionContent.getEmail());
             if (isValid) {
                 User currentUser = userManager.getUserProfile(transactionContent.getEmail());
-                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
+                PortfolioStockValue portfolioStockValues = portfolioStockManager.getPortfolioStockValues(
+                        transactionContent.getTotalPrice(), currentUser.getEmail(), transactionContent.getSymbol());
                 if (portfolioStockValues == null) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND)
                             .body(new StringAnswer("You don't own a position with the selected stock!"));
@@ -532,11 +540,11 @@ public class MappingController {
                     if (portfolioStockValues.getCurrentValue() == -1) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                 .body(new StringAnswer("Your stock position is not that high!"));
-                    }
-                    else{
+                    } else {
                         transactionManager.addTransaction(transactionContent);
                         Portfolio userPortfolio = portfolioManager.getUserPortfolio(transactionContent.getEmail());
-                        List<Transaction> transactionsInPortfolio = transactionManager.getAllTransactionsInPortfolioStock(transactionContent.getEmail());
+                        List<Transaction> transactionsInPortfolio = transactionManager
+                                .getAllTransactionsInPortfolioStock(transactionContent.getEmail());
                         Double remainingAmount = transactionContent.getTotalPrice();
                         Double totalBoughtValueReduction = 0.0;
                         for (Transaction transaction : transactionsInPortfolio) {
@@ -560,26 +568,27 @@ public class MappingController {
                                 transactionManager.editLeftinPortfolio(transactionId, newLeftInTransaction);
                             }
                         }
-                        Double newCurrentValue = portfolioStockValues.getCurrentValue() - transactionContent.getTotalPrice();
+                        Double newCurrentValue = portfolioStockValues.getCurrentValue()
+                                - transactionContent.getTotalPrice();
                         Double newBoughtValue = portfolioStockValues.getBoughtValue() - totalBoughtValueReduction;
                         portfolioStockManager.decreasePortfolioStock(newCurrentValue, newBoughtValue,
                                 transactionContent.getStockAmount(), userPortfolio.getPortfolioID(),
                                 transactionContent.getSymbol());
                         userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
-                        transactionContent.getTotalPrice(), transactionContent.getTransactionType());
+                                transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                         editPortfolioValue(currentUser.getEmail());
-                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed!"));
                     }
                 }
-            }
-            else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new StringAnswer("Unauthorized for this transaction!"));    
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new StringAnswer("Unauthorized for this transaction!"));
             }
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
-        } 
+                    .body(new StringAnswer("An unexpected error occurred while decreasing the portfolio stock."));
+        }
     }
 
     @DeleteMapping(path = "/order", consumes = { MediaType.APPLICATION_JSON_VALUE })
@@ -614,7 +623,7 @@ public class MappingController {
                         userManager.editUserBudget(currentUser.getEmail(), currentUser.getBudget(),
                                 transactionContent.getTotalPrice(), transactionContent.getTransactionType());
                         editPortfolioValue(currentUser.getEmail());
-                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed"));
+                        return ResponseEntity.ok(new StringAnswer("Transaction was successfully completed!"));
                     }
                 }
             } else {
@@ -623,87 +632,92 @@ public class MappingController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred while getting the user portfolio."));
+                    .body(new StringAnswer("An unexpected error occurred while deleting the portfolio stock."));
         }
     }
 
-//////////////////////////////////////////////////////Alexa
+    ////////////////////////////////////////////////////// Alexa
 
-////////////////////////////////////////////////////////////// ALEXA
-/*
-@PostMapping(path = "/alexa", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
-    String requestType = alexaRO.getRequest().getType();
-    String outText = "";
-    boolean shouldEndSession = false;
-    Map<String, Object> sessionAttributes = null;
-
-    try {
-        // Initialisiere Session-Attribute
-        if (alexaRO.getSession() != null) {
-            sessionAttributes = alexaRO.getSession().getAttributes();
-        }
-        if (sessionAttributes == null) {
-            sessionAttributes = new HashMap<>();
-        }
-
-        if (requestType.equalsIgnoreCase("LaunchRequest")) {
-            outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
-            Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
-        } else if (requestType.equalsIgnoreCase("IntentRequest")) {
-            IntentRO intent = alexaRO.getRequest().getIntent();
-            String intentName = intent.getName();
-            Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " + intentName);
-        }
-            else if (intentName.equalsIgnoreCase("LoginIntent")) {
-                if (sessionAttributes.containsKey("email")) {
-                    outText = "Bitte nenne mir deine E-Mail für die Anmeldung.";
-                    Logger.getLogger("AlexaLogger").log(Level.INFO, "Login Intent initialisiert. Email wird erwartet.");
-                } else if (!sessionAttributes.containsKey("password")) {
-                    outText = "Danke. Nennen Sie bitte Ihr Passwort, um fortzufahren";
-                    Logger
-
-
-                // Benutzerprofil abfragen und Passwort prüfen
-                User user = userManager.getUserProfile(email);
-                if (user != null && passwordManager.checkPassword(password, user.getPassword())) {
-                    // Token generieren und Sitzung erstellen
-                    String token = authManager.generateToken();
-                    sessionManager.createSession(user.getEmail(), token);
-                    outText = "Anmeldung erfolgreich. Willkommen zurück!";
-                    sessionAttributes.put("userToken", token); // Token in der Sitzung speichern
-                    shouldEndSession = false; // Sitzung bleibt aktiv
-                } else {
-                    outText = "E-Mail oder Passwort sind falsch.";
-                    shouldEndSession = true;
-                }
-            } else if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
-                // Hier holen wir die Anzahl aller Benutzer
-                //UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
-                int userCount = userManager.getUserCount();
-                outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
-                shouldEndSession = true;
-            } else {
-                outText = "Dieser Befehl wird nicht unterstützt.";
-                shouldEndSession = true;
-            }
-        } else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
-            Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: " + alexaRO.getRequest().getReason());
-            return null; // Keine Antwort erforderlich
-        } else {
-            outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
-            shouldEndSession = true;
-        }
-    } catch (Exception e) {
-        Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Exception occurred: ", e);
-        outText = "Es gab einen Fehler bei der Verarbeitung deiner Anfrage.";
-        shouldEndSession = true;
-    }
-
-    return prepareResponse(outText, shouldEndSession, sessionAttributes);
-}
-*/
-
+    ////////////////////////////////////////////////////////////// ALEXA
+    /*
+     * @PostMapping(path = "/alexa", consumes = {MediaType.APPLICATION_JSON_VALUE,
+     * MediaType.APPLICATION_XML_VALUE})
+     * public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
+     * String requestType = alexaRO.getRequest().getType();
+     * String outText = "";
+     * boolean shouldEndSession = false;
+     * Map<String, Object> sessionAttributes = null;
+     * 
+     * try {
+     * // Initialisiere Session-Attribute
+     * if (alexaRO.getSession() != null) {
+     * sessionAttributes = alexaRO.getSession().getAttributes();
+     * }
+     * if (sessionAttributes == null) {
+     * sessionAttributes = new HashMap<>();
+     * }
+     * 
+     * if (requestType.equalsIgnoreCase("LaunchRequest")) {
+     * outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
+     * Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
+     * } else if (requestType.equalsIgnoreCase("IntentRequest")) {
+     * IntentRO intent = alexaRO.getRequest().getIntent();
+     * String intentName = intent.getName();
+     * Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " +
+     * intentName);
+     * }
+     * else if (intentName.equalsIgnoreCase("LoginIntent")) {
+     * if (sessionAttributes.containsKey("email")) {
+     * outText = "Bitte nenne mir deine E-Mail für die Anmeldung.";
+     * Logger.getLogger("AlexaLogger").log(Level.INFO,
+     * "Login Intent initialisiert. Email wird erwartet.");
+     * } else if (!sessionAttributes.containsKey("password")) {
+     * outText = "Danke. Nennen Sie bitte Ihr Passwort, um fortzufahren";
+     * Logger
+     * 
+     * 
+     * // Benutzerprofil abfragen und Passwort prüfen
+     * User user = userManager.getUserProfile(email);
+     * if (user != null && passwordManager.checkPassword(password,
+     * user.getPassword())) {
+     * // Token generieren und Sitzung erstellen
+     * String token = authManager.generateToken();
+     * sessionManager.createSession(user.getEmail(), token);
+     * outText = "Anmeldung erfolgreich. Willkommen zurück!";
+     * sessionAttributes.put("userToken", token); // Token in der Sitzung speichern
+     * shouldEndSession = false; // Sitzung bleibt aktiv
+     * } else {
+     * outText = "E-Mail oder Passwort sind falsch.";
+     * shouldEndSession = true;
+     * }
+     * } else if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
+     * // Hier holen wir die Anzahl aller Benutzer
+     * //UserManagerImplementation userManager =
+     * UserManagerImplementation.getUserManager();
+     * int userCount = userManager.getUserCount();
+     * outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
+     * shouldEndSession = true;
+     * } else {
+     * outText = "Dieser Befehl wird nicht unterstützt.";
+     * shouldEndSession = true;
+     * }
+     * } else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
+     * Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: "
+     * + alexaRO.getRequest().getReason());
+     * return null; // Keine Antwort erforderlich
+     * } else {
+     * outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
+     * shouldEndSession = true;
+     * }
+     * } catch (Exception e) {
+     * Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Exception occurred: ", e);
+     * outText = "Es gab einen Fehler bei der Verarbeitung deiner Anfrage.";
+     * shouldEndSession = true;
+     * }
+     * 
+     * return prepareResponse(outText, shouldEndSession, sessionAttributes);
+     * }
+     */
 
     private AlexaRO prepareResponse(String outText, boolean shouldEndSession, Map<String, Object> sessionAttributes) {
         AlexaRO responseRO = new AlexaRO();
@@ -740,10 +754,3 @@ public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
     }
 
 }
-
-
-    
-
-
-
-
