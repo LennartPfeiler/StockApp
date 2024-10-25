@@ -18,7 +18,6 @@ import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.StockManagerImplem
 import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.TransactionManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.LoginRequest;
 import mosbach.dhbw.de.stockwizzard.model.StringAnswer;
-import mosbach.dhbw.de.stockwizzard.model.TokenEmail;
 import mosbach.dhbw.de.stockwizzard.model.TokenUser;
 import mosbach.dhbw.de.stockwizzard.model.User;
 import mosbach.dhbw.de.stockwizzard.model.Portfolio;
@@ -193,17 +192,17 @@ public class MappingController {
     }
 
     @PutMapping(path = "/user/reset", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> resetProfile(@RequestBody TokenEmail tokenEmail) {
+    public ResponseEntity<?> resetProfile(@RequestBody Session session) {
         try {
-            String token = tokenEmail.getToken();
-            String email = tokenEmail.getEmail();
+            String token = session.getToken();
+            String email = session.getEmail();
             Boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 portfolioStockManager.deleteAllPortfolioStocks(email);
                 transactionManager.deleteAllTransactions(email);
                 portfolioManager.resetPortfolio(email);
                 userManager.resetProfile(email);
-                return ResponseEntity.ok(new StringAnswer("User successfully resetted!"));
+                return ResponseEntity.ok(new StringAnswer("Profile successfully resetted!"));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(new StringAnswer("Unauthorized for this transaction!"));
@@ -215,10 +214,10 @@ public class MappingController {
     }
 
     @DeleteMapping(path = "/user", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<?> deleteProfile(@RequestBody TokenEmail tokenEmail) {
+    public ResponseEntity<?> deleteProfile(@RequestBody Session session) {
         try {
-            String token = tokenEmail.getToken();
-            String email = tokenEmail.getEmail();
+            String token = session.getToken();
+            String email = session.getEmail();
             boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 userManager.deleteUser(email);
@@ -229,7 +228,7 @@ public class MappingController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred during resetting the profile."));
+                    .body(new StringAnswer("An unexpected error occurred during deleting the profile."));
         }
     }
 
@@ -263,12 +262,11 @@ public class MappingController {
         }
     }
 
-    //VLT in Buy/Sell stock
     @PostMapping(path = "/stock", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<?> createStock(@RequestBody AddStockRequest addStockRequest) {
         try {
-            Boolean isValid = sessionManager.validToken(addStockRequest.getTokenEmail().getToken(),
-                    addStockRequest.getTokenEmail().getEmail());
+            Boolean isValid = sessionManager.validToken(addStockRequest.getSession().getToken(),
+                    addStockRequest.getSession().getEmail());
             if (isValid) {
                 stockManager.addStock(addStockRequest.getStock());
                 return ResponseEntity.ok(new StringAnswer("Stock got added to Database"));
@@ -278,7 +276,7 @@ public class MappingController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred during adding Stock to Database."));
+                    .body(new StringAnswer("An unexpected error occurred while adding Stock to Database."));
         }
     }
 
@@ -303,7 +301,7 @@ public class MappingController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new StringAnswer("An unexpected error occurred during getting portfolioStocks."));
+                    .body(new StringAnswer("An unexpected error occurred during getting all user portfolioStocks."));
         }
     }
 
@@ -321,7 +319,7 @@ public class MappingController {
                     return ResponseEntity.ok(portfolioStock);
                 } else {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                            .body(new StringAnswer("PortfolioStock is not in the database."));
+                            .body(new StringAnswer("You don't have this stock in your portfolio."));
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -767,6 +765,7 @@ public class MappingController {
 //////////////////////////////////////////////////////Alexa
 
 ////////////////////////////////////////////////////////////// ALEXA
+/*
 @PostMapping(path = "/alexa", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
     String requestType = alexaRO.getRequest().getType();
@@ -786,28 +785,46 @@ public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
         if (requestType.equalsIgnoreCase("LaunchRequest")) {
             outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
             Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
-        }
-        else if (requestType.equalsIgnoreCase("IntentRequest")) {
+        } else if (requestType.equalsIgnoreCase("IntentRequest")) {
             IntentRO intent = alexaRO.getRequest().getIntent();
             String intentName = intent.getName();
             Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " + intentName);
+        }
+            else if (intentName.equalsIgnoreCase("LoginIntent")) {
+                if (sessionAttributes.containsKey("email")) {
+                    outText = "Bitte nenne mir deine E-Mail für die Anmeldung.";
+                    Logger.getLogger("AlexaLogger").log(Level.INFO, "Login Intent initialisiert. Email wird erwartet.");
+                } else if (!sessionAttributes.containsKey("password")) {
+                    outText = "Danke. Nennen Sie bitte Ihr Passwort, um fortzufahren";
+                    Logger
 
-            if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
+
+                // Benutzerprofil abfragen und Passwort prüfen
+                User user = userManager.getUserProfile(email);
+                if (user != null && passwordManager.checkPassword(password, user.getPassword())) {
+                    // Token generieren und Sitzung erstellen
+                    String token = authManager.generateToken();
+                    sessionManager.createSession(user.getEmail(), token);
+                    outText = "Anmeldung erfolgreich. Willkommen zurück!";
+                    sessionAttributes.put("userToken", token); // Token in der Sitzung speichern
+                    shouldEndSession = false; // Sitzung bleibt aktiv
+                } else {
+                    outText = "E-Mail oder Passwort sind falsch.";
+                    shouldEndSession = true;
+                }
+            } else if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
                 // Hier holen wir die Anzahl aller Benutzer
                 //UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
                 int userCount = userManager.getUserCount();
                 outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
                 shouldEndSession = true;
-            }
-            else {
+            } else {
                 outText = "Dieser Befehl wird nicht unterstützt.";
                 shouldEndSession = true;
             }
-        }
-        else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
+        } else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
             Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: " + alexaRO.getRequest().getReason());
-            // Keine Antwort erforderlich
-            return null;
+            return null; // Keine Antwort erforderlich
         } else {
             outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
             shouldEndSession = true;
@@ -820,7 +837,7 @@ public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
 
     return prepareResponse(outText, shouldEndSession, sessionAttributes);
 }
-
+*/
 
 
     private AlexaRO prepareResponse(String outText, boolean shouldEndSession, Map<String, Object> sessionAttributes) {

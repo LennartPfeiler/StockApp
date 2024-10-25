@@ -13,8 +13,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AddStockRequest {
 
-    @JsonProperty("tokenemail")
-    private TokenEmail tokenEmail;
+    @JsonProperty("session")
+    private Session session;
     @JsonProperty("stock")
     private Stock stock;
     @JsonIgnore
@@ -29,23 +29,23 @@ public class AddStockRequest {
 
     /**
      * 
-     * @param tokenEmail
+     * @param session
      * @param stock
      */
-    public AddStockRequest(TokenEmail tokenEmail, Stock stock) {
+    public AddStockRequest(Session session, Stock stock) {
         super();
-        this.tokenEmail = tokenEmail;
+        this.session = session;
         this.stock = stock;
     }
 
-    @JsonProperty("tokenemail")
-    public TokenEmail getTokenEmail() {
-        return tokenEmail;
+    @JsonProperty("session")
+    public Session getSession() {
+        return session;
     }
 
-    @JsonProperty("tokenemail")
-    public void setTokenEmail(TokenEmail tokenEmail) {
-        this.tokenEmail = tokenEmail;
+    @JsonProperty("session")
+    public void setSession(Session session) {
+        this.session = session;
     }
 
     @JsonProperty("stock")
