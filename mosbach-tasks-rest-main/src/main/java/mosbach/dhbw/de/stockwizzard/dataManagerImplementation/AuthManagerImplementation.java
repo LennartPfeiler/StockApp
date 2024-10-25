@@ -1,9 +1,5 @@
 package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
-import java.io.*;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.UUID;
 import mosbach.dhbw.de.stockwizzard.dataManager.IAuthManager;
 

@@ -1,6 +1,5 @@
 package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
-import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;

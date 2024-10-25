@@ -1,6 +1,5 @@
 package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
-import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
@@ -175,11 +174,11 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             while (rs.next()) {
                 portfolioStocks.add(
                         new PortfolioStock(
-                                Integer.parseInt(rs.getString("portfolioid")),
+                                rs.getInt("portfolioid"),
                                 rs.getString("symbol"),
-                                Double.parseDouble(rs.getString("stockamount")),
-                                Double.parseDouble(rs.getString("boughtvalue")),
-                                Double.parseDouble(rs.getString("currentvalue"))));
+                                rs.getDouble("stockamount"),
+                                rs.getDouble("boughtvalue"),
+                                rs.getDouble("currentvalue")));
             }
             rs.close();
         } catch (Exception e) {
@@ -217,11 +216,11 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
             ResultSet rs = stmt.executeQuery(getPortfolioStockSQL);
             while (rs.next()) {
                 portfolioStock =  new PortfolioStock(
-                                Integer.parseInt(rs.getString("portfolioid")),
+                                rs.getInt("portfolioid"),
                                 rs.getString("symbol"),
-                                Double.parseDouble(rs.getString("stockamount")),
-                                Double.parseDouble(rs.getString("boughtvalue")),
-                                Double.parseDouble(rs.getString("currentvalue")));
+                                rs.getDouble("stockamount"),
+                                rs.getDouble("boughtvalue"),
+                                rs.getDouble("currentvalue"));
             }
             rs.close();
         } catch (Exception e) {
@@ -294,6 +293,7 @@ public class PortfolioStockManagerImplementation implements IPortfolioStockManag
 
             if (rs.next()) {
                 Double boughtValue = rs.getDouble("boughtvalue");
+                Double currentValue = rs.getDouble("currentvalue");
                 double epsilon = 0.0001; // Toleranzwert
                 if (currentValue - sellRequestAmount >= -epsilon) {
                     return new PortfolioStockValue(currentValue, boughtValue);

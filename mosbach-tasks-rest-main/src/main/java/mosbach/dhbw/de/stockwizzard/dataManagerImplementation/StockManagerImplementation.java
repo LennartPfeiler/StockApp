@@ -1,16 +1,13 @@
 package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
-import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.UUID;
 import mosbach.dhbw.de.stockwizzard.dataManager.IStockManager;
 import mosbach.dhbw.de.stockwizzard.model.Stock;
-import mosbach.dhbw.de.stockwizzard.model.User;
 
 public class StockManagerImplementation implements IStockManager {
 

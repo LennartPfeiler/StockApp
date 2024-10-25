@@ -1,14 +1,9 @@
 package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
-import java.io.*;
 import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
-import mosbach.dhbw.de.stockwizzard.dataManagerImplementation.PasswordManagerImplementation;
 import mosbach.dhbw.de.stockwizzard.model.User;
-import mosbach.dhbw.de.stockwizzard.model.EditRequest;
-import mosbach.dhbw.de.stockwizzard.model.Portfolio;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.hibernate.Session;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;

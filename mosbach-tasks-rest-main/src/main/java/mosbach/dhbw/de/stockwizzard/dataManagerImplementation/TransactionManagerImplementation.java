@@ -1,16 +1,12 @@
 package mosbach.dhbw.de.stockwizzard.dataManagerImplementation;
 
-import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.*;
 
 import mosbach.dhbw.de.stockwizzard.dataManager.ITransactionManager;
-import mosbach.dhbw.de.stockwizzard.dataManager.IUserManager;
-import mosbach.dhbw.de.stockwizzard.model.PortfolioStock;
 import mosbach.dhbw.de.stockwizzard.model.Transaction;
 import mosbach.dhbw.de.stockwizzard.model.TransactionContent;
-import mosbach.dhbw.de.stockwizzard.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -157,12 +153,12 @@ public class TransactionManagerImplementation implements ITransactionManager {
                         : null;
                 transactions.add(
                         new Transaction(
-                                Integer.parseInt(rs.getString("transactionid")),
-                                Integer.parseInt(rs.getString("transactiontype")),
-                                Double.parseDouble(rs.getString("stockamount")),
+                                rs.getInt("transactionid"),
+                                rs.getInt("transactiontype"),
+                                rs.getDouble("stockamount"),
                                 Timestamp.valueOf(rs.getString("date")),
-                                Double.parseDouble(rs.getString("priceperstock")),
-                                Double.parseDouble(rs.getString("totalprice")),
+                                rs.getDouble("priceperstock"),
+                                rs.getDouble("totalprice"),
                                 rs.getString("email"),
                                 rs.getString("symbol"),
                                 leftInPortfolio));
@@ -204,15 +200,16 @@ public class TransactionManagerImplementation implements ITransactionManager {
             while (rs.next()) {
                 transactions.add(
                         new Transaction(
-                                Integer.parseInt(rs.getString("transactionid")),
-                                Integer.parseInt(rs.getString("transactiontype")),
-                                Double.parseDouble(rs.getString("stockamount")),
+                                rs.getInt("transactionid"),
+                                rs.getInt("transactiontype"),
+                                rs.getDouble("stockamount"),
                                 Timestamp.valueOf(rs.getString("date")),
-                                Double.parseDouble(rs.getString("priceperstock")),
-                                Double.parseDouble(rs.getString("totalprice")),
+                                rs.getDouble("priceperstock"),
+                                rs.getDouble("totalprice"),
                                 rs.getString("email"),
                                 rs.getString("symbol"),
-                                Double.parseDouble(rs.getString("leftinportfolio"))));
+                                rs.getDouble("leftinportfolio")));
+                                
             }
             rs.close();
         } catch (Exception e) {
