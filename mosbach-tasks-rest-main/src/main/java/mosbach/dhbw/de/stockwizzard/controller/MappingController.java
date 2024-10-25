@@ -295,6 +295,7 @@ public class MappingController {
             Boolean isValid = sessionManager.validToken(token, email);
             if (isValid) {
                 List<PortfolioStock> portfolioStocks = portfolioStockManager.getAllPortfolioStocks(email, sortby);
+                editPortfolioValue(email);
                 return ResponseEntity.ok(portfolioStocks);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

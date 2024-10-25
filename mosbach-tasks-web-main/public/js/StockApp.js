@@ -3,7 +3,6 @@
 ///* Data display *//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function displayAllDatabaseData(){
-    console.log("DatabaseMethode");
     displayUserBudget();
     displayTotalPortfolioValue();
     getAllTransactions();
@@ -132,7 +131,6 @@ function register(profileSchema){
         }),
         "success": function(data) {
             console.log(data.answer);
-            alert("Erfolgreich registriert! Sie können sich nun einloggen.");
         },
         "error": function(xhr) {
             console.log(xhr);
@@ -211,7 +209,6 @@ function checkBuyStock(){
     const orderData = getOrderInformations();
     if(orderData!= null){
         getPortfolioStockData($('#stock-name').val(), function(data) {
-            console.log(data);
             if (data == -1) {
                 addPortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
             } else{
@@ -249,12 +246,10 @@ function checkSellStock(){
                         if (orderData.totalPrice == data.currentvalue){
                             //DELETE STOCK
                             deletePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
-                            console.log("delete stock");
                         }
                         else{
                             //UPDATE PORTFOLIOSTOCK
                             decreasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
-                            console.log("update stock");
                         }
                     }
                 }
@@ -381,120 +376,6 @@ function increasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
     $.ajax(settingsAddPortfolioStock);
 }
 
-
-//Create a buy Order
-// function buyStock(){
-//     event.preventDefault();
-//     const stockDiv = document.getElementById($('#stock-name').val());
-//     let stockAmount;
-//     const priceDisplay = document.getElementById("price-display").textContent.trim();
-//     const price = parseFloat(priceDisplay.replace('$', '').trim());
-//     console.log(price);
-
-//     if (isNaN(price)) {
-//         alert("Enter a valid stock!");
-//         return;
-//     }
-//     if ($("#quantity-label").text() === "Quantity in $:") {
-//         const quantity = parseFloat($('#quantity').val());
-//         console.log(quantity);
-//         if (isNaN(quantity) || quantity <= 0) {
-//             alert("Enter a valid quantity in $!");
-//             return;
-//         }
-//         stockAmount = quantity / price;
-//     } else {
-//         stockAmount = parseFloat($('#quantity').val());
-//         if (isNaN(stockAmount) || stockAmount <= 0) {
-//             alert("Enter a valid stock amount!");
-//             return;
-//         }
-//     }
-//     const settingsBuyStock = {
-//         "async": true,
-//         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy",
-//         "method": "POST",
-//         "headers": {
-//             'Accept': 'application/json',
-//             'Content-Type': 'application/json'
-//         },
-//         "data": JSON.stringify({
-//             "token": getCookie("token"),
-//             "transactioncontent": {
-//                 "transactiontype": 1,
-//                 "stockamount": stockAmount,
-//                 "date": getCurrentDateTime(),
-//                 "priceperstock": price,
-//                 "totalprice": roundToTwoDecimalPlaces(price * stockAmount),
-//                 "email": getCookie("email"),
-//                 "symbol": $('#stock-name').val()
-//             }
-//         })
-//         ,
-//         "success": function(data) {
-//             alert(data.answer);
-//             $('#quantity').val("");
-//             const stockSymbol = $('#stock-name').val();
-            
-//             // Überprüfen, ob das Div für die Aktie bereits existiert
-//             const stockDiv = document.getElementById(stockSymbol);
-//             if (!stockDiv) {
-//                 const stockListContainer = document.querySelector('.portfolio .stock-list');
-//                 let NewstockDiv = document.createElement('div');
-//                 NewstockDiv.id = stockSymbol; // Füge eine ID für die spätere Aktualisierung hinzu
-//                 NewstockDiv.innerHTML = `${stockSymbol}: Calculating Portfolio data... <span class="change"></span>`;
-//                 stockListContainer.appendChild(NewstockDiv);
-//             }
-
-//             // Portfolio-Daten abrufen und dann aktualisieren
-//             getPortfolioStockData(stockSymbol, function(currentValue, boughtValue) {
-//                 updateStockDisplay(stockSymbol, currentValue, boughtValue);
-//             });
-//             displayAllDatabaseData();
-//         },
-//         "error": function(xhr) {
-//             if (xhr.status === 400 || xhr.status === 401 || xhr.status === 500) {
-//                 alert(JSON.parse(xhr.responseText).answer);
-//                 $('#quantity').val("");
-//             } else {
-//                 alert("An unexpected error occurred. Status: " + xhr.status);
-//                 $('#quantity').val("");
-//             }
-//         }
-//     };
-//     $.ajax(settingsBuyStock);
-// }
-
-// function getPortfolioStockData(symbol, callback){
-//     console.log("Start getMethode");
-//     console.log(symbol);
-//     const settingsGetPortfolioStock = {
-//         "async": false,
-//         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock?email=" + getCookie("email") + "&token=" + getCookie("token") + "&symbol=" + symbol,
-//         "method": "GET",
-//         "headers": {
-//             'Accept': 'application/json',
-//             'Content-Type': 'application/json'
-//         },
-//         "success": function(data) {
-//             console.log(data);
-//             let boughtValue = data.boughtvalue;
-//             let currentValue = data.currentvalue;
-//             callback(currentValue, boughtValue);
-//         },
-//         "error": function(xhr) {
-//             if (xhr.status === 404) {
-//                 console.log("PortfolioStock not in Portfolio");
-//                 callback(-1.0, -1.0)
-//             } else {
-//                 console.error("Error fetching bought value:", xhr);
-//                 callback(0.0,0.0)
-//             }
-//         }
-//     };
-//     $.ajax(settingsGetPortfolioStock);    
-// }
-
 function decreasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
     event.preventDefault();
     const stockSymbol = $('#stock-name').val();
@@ -520,7 +401,6 @@ function decreasePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
         })
         ,
         "success": function(data) {
-            console.log(data);
             alert(data.answer);
             $('#quantity').val("");
 
@@ -567,8 +447,6 @@ function deletePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
         })
         ,
         "success": function(data) {
-            console.log(data);
-            alert(data.answer);
             $('#quantity').val("");
             $(`#${$('#stock-name').val().trim()}`).remove();
             displayAllDatabaseData();
@@ -584,85 +462,6 @@ function deletePortfolioStockOrder(stockAmount, totalPrice, pricePerStock){
         }
     };
     $.ajax(settingsAddPortfolioStock);
-}
-
-//Create a sell order
-function sellStock(){
-    event.preventDefault();
-    let stockAmount;
-    const priceDisplay = document.getElementById("price-display").textContent.trim();
-    const price = parseFloat(priceDisplay.replace('$', '').trim());
-    console.log(price);
-
-    if (isNaN(price)) {
-        alert("Enter a valid stock!");
-        return;
-    }
-    if ($("#quantity-label").text() === "Quantity in $:") {
-        const quantity = parseFloat($('#quantity').val());
-        console.log(quantity);
-        if (isNaN(quantity) || quantity <= 0) {
-            alert("Enter a valid quantity in $!");
-            return;
-        }
-        stockAmount = quantity / price;
-    } else {
-        stockAmount = parseFloat($('#quantity').val());
-        if (isNaN(stockAmount) || stockAmount <= 0) {
-            alert("Enter a valid stock amount!");
-            return;
-        }
-    }
-
-    console.log(stockAmount);
-    const settingsSellStock = {
-        "async": true,
-        "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell",
-        "method": "POST",
-        "headers": {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        "data": JSON.stringify({
-            "token": getCookie("token"),
-            "transactioncontent": {
-                "transactiontype": 0,
-                "stockamount": stockAmount,
-                "date": getCurrentDateTime(),
-                "priceperstock": price,
-                "totalprice": roundToTwoDecimalPlaces(price * stockAmount),
-                "email": getCookie("email"),
-                "symbol": $('#stock-name').val()
-            }
-        })
-        ,
-        "success": function(data) {
-            console.log(data);
-            alert(data.answer);
-            $('#quantity').val("");
-
-            getPortfolioStockData($('#stock-name').val(), function(currentValue, boughtValue) {
-                if(currentValue == -1.0){
-                    const stockDiv = document.getElementById($('#stock-name').val());
-                    stockDiv.remove();
-                }
-                else{
-                    updateStockDisplay($('#stock-name').val(), currentValue, boughtValue);
-                }
-            });
-            displayAllDatabaseData();
-        },
-        "error": function(xhr) {
-            if (xhr.status === 400 || xhr.status === 401 || xhr.status === 404 || xhr.status === 500) {
-                alert(JSON.parse(xhr.responseText).answer);
-                $('#quantity').val("");
-            } else{
-                alert("An unexpected error occurred. Status: " + xhr.status);
-                $('#quantity').val("");
-            }
-        }
-    };
-    $.ajax(settingsSellStock);
 }
 
 // Change Label text for buy quantity
@@ -733,7 +532,6 @@ function editUser(){
             }
         }),
         "success": function(data) {
-            console.log("Antwort vom Server:", data);
             setCookie("firstname", data.firstname);
             setCookie("lastname", data.lastname);
             setCookie("email", data.email);
@@ -1174,8 +972,6 @@ function getAllPortfolioStocks(){
 
 
 function getNewCurrentValue(stockName, callback) {
-    console.log("GetCurrentValue");
-    console.log(stockName);
     const getStockPriceAPIRegister = {
         "async": true, 
         "url": `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D`,
@@ -1197,9 +993,6 @@ function getNewCurrentValue(stockName, callback) {
 
 
 function setNewCurrentValue(currentValue, symbol){
-    console.log("SetCurrentValue");
-    console.log(currentValue);
-    console.log(symbol);
     //Set new value
     const editCurrentValueRegister = {
         "async": true,
@@ -1233,10 +1026,6 @@ function setNewCurrentValue(currentValue, symbol){
 }
 
 function updateStockDisplay(symbol, currentValue, boughtValue) {
-    console.log("updateStockDisplay");
-    console.log(symbol);
-    console.log(currentValue);
-    console.log(boughtValue);
     const stockElement = document.getElementById(symbol);
     const stockValue = roundToTwoDecimalPlaces(currentValue);
 
@@ -1326,10 +1115,12 @@ function displayTotalPortfolioValue(){
             'Content-Type': 'application/json'
         },
         "success": function(data) {
-            console.log(data.value);
-            $(".portfolio-value").text(roundToTwoDecimalPlaces(data.value) + " $");
+            const stockElement = document.querySelector('.portfolio-value');
+            const stockValue = roundToTwoDecimalPlaces(data.value);
+
             const { percentageChange, changeClass } = calculatePercentage(data.startvalue, data.value);
-            //$(".percentage positive").text(percentageChange + "%").removeClass("positive negative").addClass(changeClass);
+
+            stockElement.innerHTML = `${stockValue}$ <span class="change ${changeClass}">${percentageChange}</span>`;
         }
         ,
         "error": function(xhr) {

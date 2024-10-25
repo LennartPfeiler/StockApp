@@ -1,46 +1,46 @@
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\controller\MappingController.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\controller\PersonController.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IAuthManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPasswordManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioStockManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\ISessionManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IStockManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\ITransactionManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IUserManager.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PasswordManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PortfolioManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PortfolioStockManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\SessionManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\StockManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\TransactionManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\AddStockRequest.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\AlexaResponse.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\AlexaRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\ContextRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\IntentRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\OutputSpeechRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\RepromptRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\RequestRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\ResponseRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\SessionRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\SlotsRO.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditCurrentValueRequest.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditRequest.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LoginRequest.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LogoutRequest.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Portfolio.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\PortfolioStock.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\PortfolioStockValue.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Session.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Stock.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\StringAnswer.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TokenEmail.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TokenTransactionContent.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TokenUser.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Transaction.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TransactionContent.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\User.java
-C:\Users\azureadmin\Desktop\Web Prog\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\StockWizzardBackendApplication.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\controller\MappingController.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\controller\PersonController.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IAuthManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPasswordManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IPortfolioStockManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\ISessionManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IStockManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\ITransactionManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManager\IUserManager.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\AuthManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PasswordManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PortfolioManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\PortfolioStockManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\SessionManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\StockManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\TransactionManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\dataManagerImplementation\UserManagerImplementation.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\AddStockRequest.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\AlexaResponse.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\AlexaRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\ContextRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\IntentRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\OutputSpeechRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\RepromptRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\RequestRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\ResponseRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\SessionRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\alexa\SlotsRO.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditCurrentValueRequest.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\EditRequest.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LoginRequest.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\LogoutRequest.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Portfolio.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\PortfolioStock.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\PortfolioStockValue.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Session.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Stock.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\StringAnswer.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TokenEmail.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TokenTransactionContent.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TokenUser.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\Transaction.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\TransactionContent.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\model\User.java
+C:\Users\azureadmin\Documents\StockApp\mosbach-tasks-rest-main\src\main\java\mosbach\dhbw\de\stockwizzard\StockWizzardBackendApplication.java
