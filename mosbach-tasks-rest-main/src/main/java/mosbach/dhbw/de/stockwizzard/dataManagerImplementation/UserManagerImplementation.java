@@ -175,17 +175,26 @@ public class UserManagerImplementation implements IUserManager {
         Connection connection = null;
         String updateUserBudgetSQL = "";
         Logger.getLogger("UpdateUserBudgetLogger").log(Level.INFO, "Start editUserBudget method");
-
+    
         try {
             connection = DriverManager.getConnection(dbUrl, username, password);
             stmt = connection.createStatement();
+            double newValue;
+    
             if (transactionType == 1) {
-                updateUserBudgetSQL = "UPDATE group12user SET budget = " + (oldValue - bougthValue) +
-                        " WHERE email = '" + email + "'";
+                // Subtracting the bought value from the old value
+                newValue = oldValue - bougthValue;
             } else {
-                updateUserBudgetSQL = "UPDATE group12user SET budget = " + (oldValue + bougthValue) +
-                        " WHERE email = '" + email + "'";
+                // Adding the bought value to the old value
+                newValue = oldValue + bougthValue;
             }
+    
+            // Round the result to 2 decimal places
+            newValue = Math.round(newValue * 100.0) / 100.0;
+    
+            updateUserBudgetSQL = "UPDATE group12user SET budget = " + newValue +
+                    " WHERE email = '" + email + "'";
+    
             stmt.executeUpdate(updateUserBudgetSQL);
         } catch (SQLException e) {
             Logger.getLogger("UpdateUserBudgetLogger").log(Level.SEVERE, "Error updating user budget.", e);
@@ -202,6 +211,7 @@ public class UserManagerImplementation implements IUserManager {
             }
         }
     }
+    
 
     // Edit an user profile
     public void editProfile(User currentUser, User newUserData) {

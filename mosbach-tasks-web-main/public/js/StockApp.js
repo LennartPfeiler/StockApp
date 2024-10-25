@@ -130,13 +130,11 @@ function register(profileSchema){
             "budget": profileSchema.budget.value
         }),
         "success": function(data) {
-            console.log(data.answer);
+            alert(data.answer);
         },
         "error": function(xhr) {
-            console.log(xhr);
             if (xhr.status === 409 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
-                console.log(xhr);
             } else{
                 alert("An unexpected error occurred. Status: " + xhr.status);
             }
@@ -158,15 +156,13 @@ function roundToTwoDecimalPlaces(value) {
 
 //Get todays date
 function getCurrentDateTime() {
-    const now = new Date(); // Aktuelles Datum und Uhrzeit
-
-    // Formatieren der einzelnen Teile
-    const year = now.getFullYear(); // Jahr
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Monat 
-    const day = String(now.getDate()).padStart(2, '0'); // Tag
-    const hours = String(now.getHours()).padStart(2, '0'); // Stunden
-    const minutes = String(now.getMinutes()).padStart(2, '0'); // Minuten
-    const seconds = String(now.getSeconds()).padStart(2, '0'); // Sekunden
+    const now = new Date();
+    const year = now.getFullYear(); 
+    const month = String(now.getMonth() + 1).padStart(2, '0'); 
+    const day = String(now.getDate()).padStart(2, '0'); 
+    const hours = String(now.getHours()).padStart(2, '0'); 
+    const minutes = String(now.getMinutes()).padStart(2, '0'); 
+    const seconds = String(now.getSeconds()).padStart(2, '0'); 
 
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
@@ -183,7 +179,7 @@ function getOrderInformations() {
     }
 
     if ($("#quantity-label").text() === "Quantity in $:") {
-        const quantity = parseFloat($('#quantity').val());
+        const quantity = roundToTwoDecimalPlaces(parseFloat($('#quantity').val()));
         if (isNaN(quantity) || quantity <= 0) {
             alert("Enter a valid quantity in $!");
             return null;
@@ -196,7 +192,6 @@ function getOrderInformations() {
             return null;
         }
     }
-
     return {
         amount: stockAmount,
         price: price,
@@ -235,20 +230,16 @@ function checkSellStock(){
                 alert("You don't have this stock in your portfolio.");
             } else{
                 if(data === 0) {
-                    // Ein Fehler ist aufgetreten
                     alert("An error occurred when trying to create order. Please try later again.");
                 } else {
-                    //
                     if (orderData.totalPrice > data.currentvalue){
                         alert("Your stock position is not that high!")
                     }
                     else{
                         if (orderData.totalPrice == data.currentvalue){
-                            //DELETE STOCK
                             deletePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
                         }
                         else{
-                            //UPDATE PORTFOLIOSTOCK
                             decreasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
                         }
                     }
@@ -539,7 +530,6 @@ function editUser(){
         }
         ,
         "error": function(xhr) {
-            console.log(xhr);
             if (xhr.status === 401 || xhr.status === 409 || xhr.status === 500) {
                 alert(JSON.parse(xhr.responseText).answer);
             } else {
@@ -677,7 +667,7 @@ function getCompanyValueFromAPI(stockName, callback) {
 // Insert new stock only if it doesn't exist in the database
 function addNewStockIfNotExists(stockName, stockPrice) {
     checkStockInDB(stockName, function(stockExists) {
-        if (!stockExists) { // If stock does not exist
+        if (!stockExists) {
             getCompanyValueFromAPI(stockName, function(companyName) {
                 const settingsInsertStock = {
                     "async": true, 
@@ -688,7 +678,7 @@ function addNewStockIfNotExists(stockName, stockPrice) {
                         'Content-Type': 'application/json'
                     },
                     "data": JSON.stringify({
-                        "tokenemail": {
+                        "session": {
                             "token": getCookie("token"),
                             "email": getCookie("email")
                         },
@@ -702,7 +692,6 @@ function addNewStockIfNotExists(stockName, stockPrice) {
                         console.log("Stock inserted successfully:", response);
                     },
                     "error": function(xhr) {
-                        console.error("Error inserting stock:", xhr);
                         if (xhr.status === 401 || xhr.status === 500) {
                             console.log(JSON.parse(xhr.responseText).answer);
                         } else {
@@ -731,7 +720,7 @@ function getStockPriceFromAPI(stockName) {
             addNewStockIfNotExists(stockName, 0.0);
             if (data.status === 'OK' && data.results && data.results.length > 0) {
                 const closeValue = parseFloat(data.results[0].c); 
-                const roundedCloseValue = closeValue.toFixed(2);
+                const roundedCloseValue = roundToTwoDecimalPlaces(closeValue);
                 displayStockPrice(roundedCloseValue);
             } else if (!data.results) {
                 displayStockPrice('Stock not found or no data available.');
@@ -750,7 +739,6 @@ function getStockPriceFromAPI(stockName) {
             }
         }
     };
-    
     $.ajax(getStockPriceAPIRegister);
 }
 
@@ -899,7 +887,6 @@ function getAllTransactions() {
     $.ajax(settingsGetAllTransactions)
         .done(function (transactions) {
             displayTransactionHistory(transactions);
-
         })
         .fail(function (xhr, textStatus, errorThrown) {
             if (xhr.status === 401 || xhr.status === 500) {
@@ -952,7 +939,7 @@ function getAllPortfolioStocks(){
         portfolioStocks.forEach(portfolioStock => {
             let positionAmount = portfolioStock.stockamount;
             getNewCurrentValue(portfolioStock.symbol, function(price) {
-                let totalValue = price * positionAmount;
+                let totalValue = roundDownToTwoDecimalPlaces(price * positionAmount);
                 setNewCurrentValue(totalValue, portfolioStock.symbol);
                 updateStockDisplay(portfolioStock.symbol, totalValue, portfolioStock.boughtvalue);
             });
@@ -978,7 +965,7 @@ function getNewCurrentValue(stockName, callback) {
         "method": "GET",
         "dataType": 'json',
         "success": function(data) {
-            callback(data.results[0].c); // Preis zurückgeben
+            callback(roundToTwoDecimalPlaces(data.results[0].c)); // Preis zurückgeben
         },
         "error": function(jqXHR, textStatus, errorThrown) {
             console.log("Error fetching stock price, retrying...");
@@ -1163,7 +1150,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function initializeResizeHandler() {
-    // Überwacht, wenn die Fenstergröße geändert wird
     window.addEventListener('resize', function() {
         if (window.innerWidth > 768) {
             window.scrollTo(0, 0);
