@@ -10,8 +10,7 @@ import { AuthComponent } from './auth/auth.component';
 import { ContentComponent } from './content/content.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'vor-home', pathMatch: 'full' },
-  { path: 'vor-home', component: VorHomeComponent },
+  { path: '', redirectTo: 'content/vor-home', pathMatch: 'full' },
   {
     path: 'auth', component: AuthComponent,
     children: [
