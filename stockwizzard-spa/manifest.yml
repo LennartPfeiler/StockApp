@@ -1,0 +1,11 @@
+---
+applications:
+- name: StockWizzardSingleFrontend
+  instances: 1
+  host: StockWizzardSingleFrontend{random-word}
+  path: ./dist/stockwizzard-spa/browser
+  buildpacks:
+    - https://github.com/cloudfoundry/staticfile-buildpack.git
+  random-route: true
+  memory: 1G
+# buildpack: https://github.com/dmikusa-pivotal/cf-php-apache-buildpack.git
