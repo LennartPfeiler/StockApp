@@ -11,29 +11,29 @@
         <script src="../js/jquery-3.6.0.min.js"></script>
     </head>
     <body onload="disableGoBackFunction();setProfileValues()">
-        <!-- ID entfernt, da Styling über das Tag möglich ist -->
+        
         <header>
-            <!-- Neue ID hinzugefügt -->
-            <a href="#" id="logo">
+           
+            <a id="logo">
                 <img src="../../ressources/Logo.png">
             </a>
 
-            <!-- Klassennamen entfernt, Styling über das Tag -->
+          
             <nav>
                 <a href="home.html" class="nav-link" data-index="1">Home </a>
                 <a href="tracker.html" class="nav-link" data-index="2">Stock tracker</a>
                 <a href="portfolio.html" class="nav-link" data-index="3">Portfolio</a>
                 <a href="profile.html" class="nav-link active" data-index="4">Profile</a>
             </nav>
-            <!-- Klasse zu ID geändert -->
+          
             <div id="login">
                 <a href="vorHome.html" class="login-text" onclick="logout()">Logout</a>
                 <a href="vorHome.html" onclick="logout()"><i class='bx bx-log-out-circle'></i></a>
             </div>
         </header>
         <main>
-            <!-- Neue ID hinzugefügt -->
-            <section class="profile" id="profile-section">
+        
+            <section  id="profile">
                 <h2>Edit Profile</h2>
                 
                 <label for="first-name">First name:</label>
@@ -46,9 +46,9 @@
                 <input type="email" id="email" name="email" placeholder="Enter your email">
 
                 <!-- Neue ID hinzugefügt -->
-                <div class="input-box" id="budget-input-box">
+                <div>
                     <!-- Neue ID hinzugefügt -->
-                    <select class="input-field" id="amount-selection" required>
+                    <select id="amount-selection" required>
                         <option value="" disabled selected>Add budget</option>
                         <option value="500">$500</option>
                         <option value="1000">$1,000</option>

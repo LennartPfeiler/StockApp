@@ -97,7 +97,7 @@ body {
     position: relative;
 }
 
-.submit-btn {
+#submit-btn {
     width: 100%;
     height: 60px;
     background: #222;
@@ -110,20 +110,20 @@ body {
     font-weight: 600;
 }
 
-.submit-btn:hover {
+#submit-btn:hover {
     background: #094d00;
     transform: scale(1.05, 1);
 }
 
 /* ----------------- Sign Up / Login Links ----------------- */
-.sign-up-link, #login-link {
+#sign-up-link, #login-link {
     color: #ffffff;
     text-align: center;
     font-size: 15px;
     margin-top: 20px;
 }
 
-.sign-up-link a, #login-link a {
+#sign-up-link a, #login-link a {
     color: #ffffff;
     font-weight: 600;
 }
