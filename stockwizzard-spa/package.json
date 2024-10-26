@@ -1,5 +1,5 @@
 {
-  "name": "spaweb",
+  "name": "stockwizzard-spa",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:SPAWEB": "node dist/spaweb/server/server.mjs"
+    "serve:ssr:SPAWEB": "node dist/stockwizzard-spa/server/server.mjs"
   },
   "private": true,
   "dependencies": {

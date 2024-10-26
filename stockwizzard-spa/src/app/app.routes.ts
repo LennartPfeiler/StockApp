@@ -11,6 +11,7 @@ import { ContentComponent } from './content/content.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'vor-home', pathMatch: 'full' },
+  { path: 'vor-home', component: VorHomeComponent },
   {
     path: 'auth', component: AuthComponent,
     children: [

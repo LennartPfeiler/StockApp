@@ -21,6 +21,6 @@ export class AppComponent {
   constructor(private router: Router) {}
 
   isVorHomePage(): boolean {
-    return this.router.url.includes('/content/vor-home');
+    return this.router.url.includes('/vor-home');
   }
 }

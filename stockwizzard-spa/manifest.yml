@@ -3,7 +3,7 @@ applications:
 - name: StockWizzardSingleFrontend
   instances: 1
   host: StockWizzardSingleFrontend{random-word}
-  path: ./dist/spaweb/browser
+  path: ./dist/stockwizzard-spa/browser
   buildpacks:
     - https://github.com/cloudfoundry/staticfile-buildpack.git
   random-route: true
