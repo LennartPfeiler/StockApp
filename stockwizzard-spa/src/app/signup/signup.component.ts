@@ -10,5 +10,5 @@ import { RouterModule } from '@angular/router';
   styleUrl: './signup.component.css'
 })
 export class SignupComponent {
-
+  showNavbar = false;
 }

@@ -7,22 +7,29 @@
     font-family: 'Poppins', sans-serif;
 }
 
-body {
+.main-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     background: #000000;
-    opacity: 0;
-    animation: slideRight 1s ease forwards;
 }
 
-/* Back-Button */
+.container, .text-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.Logo-Bild {
+    max-width: 100%;
+    height: auto;
+}
+
 .login {
-    position: absolute;
-    top: 30px;
-    right: 40px;
-    z-index: 10;
+    margin-top: 20px;
 }
 
 .login-text {
@@ -40,17 +47,12 @@ body {
     text-shadow: 0px 6px 12px black;
 }
 
-/* Login-Box */
 .login-box {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    width: 440px;
-    height: 480px;
+    width: 100%;
+    max-width: 440px;
     padding: 30px;
-    opacity: 0;
-    animation: slideBottom 1s ease forwards;
-    animation-delay: 0.5s;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 .login-header {
@@ -75,9 +77,6 @@ body {
     box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
     outline: none;
     transition: .3s;
-    opacity: 0;
-    animation: slideBottom 1s ease forwards;
-    animation-delay: 0.5s;
 }
 
 ::placeholder {
@@ -119,7 +118,6 @@ a:hover {
     transform: scale(1.05, 1);
 }
 
-/* Sign-Up-Link */
 #sign-up-link {
     color: #ffffff;
     text-align: center;
@@ -133,45 +131,15 @@ a:hover {
     font-weight: 600;
 }
 
-/* Logo-Bild */
-.Logo-Bild {
-    width: 50%;
-    height: auto;
-}
-
-/* Keyframes */
-@keyframes slideRight {
-    0% {
-        transform: translateX(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideBottom {
-    0% {
-        transform: translateY(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
 /* Media Queries */
 @media (max-width: 862px) {
-    .Logo-Bild {
-        position: absolute;
-        top: 50px;
-        align-items: center;
-        z-index: 2;
+    .main-container {
+        flex-direction: column;
     }
-    
+    .Logo-Bild {
+        max-width: 80%;
+    }
     .login-box {
-        margin-top: 400px;
+        margin-top: 20px;
     }
 }

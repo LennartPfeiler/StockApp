@@ -1,207 +1,212 @@
+/* ----------------- Global Styles ----------------- */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
 
-/* ----------------- Global Styles ----------------- */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-    text-decoration: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
 }
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: #000000;
-    opacity: 0;
-    animation: slideRight 1s ease forwards;
+/* ----------------- Hauptcontainer ----------------- */
+.main-container {
+  display: flex;
+  min-height: 100vh;
+  background: #000000;
 }
 
-/* ----------------- Login Section ----------------- */
+/* ----------------- Linke Seite (Bild und Back-Button) ----------------- */
+.left-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.Logo-Bild {
+  max-width: 80%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
 .login {
-    position: absolute;
-    top: 30px;
-    right: 40px;
-    z-index: 10;
+  margin-top: 20px;
 }
 
 .login-text {
-    font-size: 20px;
-    color: white;
-    padding: 10px 20px;
-    font-weight: bold;
-    text-shadow: 0px 4px 6px rgba(255, 255, 255, 0.2);
-    transition: transform 0.3s ease;
+  font-size: 20px;
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  text-shadow: 0px 4px 6px rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease;
 }
 
 .login-text:hover {
-    transform: scale(1.3);
-    color: #900808;
-    text-shadow: 0px 6px 12px black;
+  transform: scale(1.3);
+  color: #900808;
+  text-shadow: 0px 6px 12px black;
 }
 
-/* ----------------- Login Box ----------------- */
+/* ----------------- Rechte Seite (Anmeldeformular) ----------------- */
+.right-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #login-box {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    width: 440px;
-    height: 480px;
-    padding: 30px;
-    opacity: 0;
-    animation: slideBottom 1s ease forwards;
-    animation-delay: 0.5s;
+  width: 100%;
+  max-width: 440px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 
+/* ----------------- Login Header ----------------- */
 #login-header {
-    text-align: center;
-    margin: 20px 0 40px 0;
+  text-align: center;
+  margin: 20px 0 40px 0;
 }
 
 #login-header header {
-    color: #ffffff;
-    font-size: 30px;
-    font-weight: 600;
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 600;
 }
 
 /* ----------------- Input Fields ----------------- */
 .input-box .input-field {
-    width: 100%;
-    height: 60px;
-    font-size: 17px;
-    padding: 0 25px;
-    margin-bottom: 15px;
-    border-radius: 30px;
-    border: none;
-    box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
-    outline: none;
-    transition: .3s;
-    opacity: 0;
-    animation: slideBottom 1s ease forwards;
-    animation-delay: 0.5s;
+  width: 100%;
+  height: 60px;
+  font-size: 17px;
+  padding: 0 25px;
+  margin-bottom: 15px;
+  border-radius: 30px;
+  border: none;
+  box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
+  outline: none;
+  transition: .3s;
 }
 
 ::placeholder {
-    font-weight: 500;
-    color: black;
+  font-weight: 500;
+  color: black;
 }
 
 .input-field:focus {
-    width: 105%;
-}
-
-/* ----------------- Submit Button ----------------- */
-#input-submit {
-    position: relative;
-}
-
-#submit-btn {
-    width: 100%;
-    height: 60px;
-    background: #222;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: .3s;
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-#submit-btn:hover {
-    background: #094d00;
-    transform: scale(1.05, 1);
-}
-
-/* ----------------- Sign Up / Login Links ----------------- */
-#sign-up-link, #login-link {
-    color: #ffffff;
-    text-align: center;
-    font-size: 15px;
-    margin-top: 20px;
-}
-
-#sign-up-link a, #login-link a {
-    color: #ffffff;
-    font-weight: 600;
-}
-
-/* ----------------- Logo ----------------- */
-.Logo-Bild {
-    width: 50%;
-    height: auto;
+  width: 105%;
 }
 
 /* ----------------- Dropdown Field ----------------- */
 #budget-input-box select {
-    width: 100%;
-    height: 60px;
-    font-size: 17px;
-    color: black;
-    padding: 0 25px;
-    margin-bottom: 15px;
-    border-radius: 30px;
-    border: none;
-    box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
-    outline: none;
-    transition: .3s;
-    opacity: 0;
-    animation: slideBottom 1s ease forwards;
-    animation-delay: 0.5s;
-    appearance: none;
-    background: #fff url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMUwxIDIuNUw2IDcgMTAgMi41TDEyIDFsLTYgNkwwIDF6IiBmaWxsPSIjMDAwIi8+PC9zdmc+') no-repeat right 20px center;
-    background-color: #fff;
-    font-weight: 500;
+  width: 100%;
+  height: 60px;
+  font-size: 17px;
+  color: black;
+  padding: 0 25px;
+  margin-bottom: 15px;
+  border-radius: 30px;
+  border: none;
+  box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
+  outline: none;
+  transition: .3s;
+  appearance: none;
+  background: #fff url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTAgMUwxIDIuNUw2IDcgMTAgMi41TDEyIDFsLTYgNkwwIDF6IiBmaWxsPSIjMDAwIi8+PC9zdmc+') no-repeat right 20px center;
+  background-color: #fff;
+  font-weight: 500;
 }
 
 #budget-input-box select option[value=""][disabled] {
-    color: black;
-    font-weight: 500;
+  color: black;
+  font-weight: 500;
 }
 
 #budget-input-box select:focus {
-    width: 105%;
+  width: 105%;
 }
 
 #budget-input-box select option {
-    color: black;
+  color: black;
+}
+
+/* ----------------- Submit Button ----------------- */
+#input-submit {
+  position: relative;
+}
+
+#submit-btn {
+  width: 100%;
+  height: 60px;
+  background: #222;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: .3s;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+#submit-btn:hover {
+  background: #094d00;
+  transform: scale(1.05, 1);
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* ----------------- Sign Up / Login Links ----------------- */
+#sign-up-link, #login-link {
+  color: #ffffff;
+  text-align: center;
+  font-size: 15px;
+  margin-top: 20px;
+}
+
+#sign-up-link a, #login-link a {
+  color: #ffffff;
+  font-weight: 600;
 }
 
 /* ----------------- Keyframes ----------------- */
 @keyframes slideRight {
-    0% {
-        transform: translateX(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0);
-        opacity: 1;
-    }
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideBottom {
-    0% {
-        transform: translateY(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* ----------------- Media Queries ----------------- */
 @media (max-width: 862px) {
-    .Logo-Bild {
-        position: absolute;
-        top: 50px;
-        align-items: center;
-        z-index: 2;
-    }
-    
-    #login-box {
-        margin-top: 400px;
-    }
+  .main-container {
+    flex-direction: column;
+  }
+
+  .left-container, .right-container {
+    width: 100%;
+  }
+
+  .Logo-Bild {
+    max-width: 60%;
+    margin-bottom: 20px;
+  }
 }

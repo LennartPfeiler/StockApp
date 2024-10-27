@@ -23,4 +23,9 @@ export class AppComponent {
   isVorHomePage(): boolean {
     return this.router.url.includes('/vor-home');
   }
+
+  isAuth(): boolean {
+    return this.router.url.includes('/auth');
+  }
 }
+

@@ -1,59 +1,48 @@
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- <body onload="disableGoBackFunction(); showStockPriceViaEvent(); displayAllDatabaseData(); getAllPortfolioStocks();"></body> -->
-        <header>
-            <a id="logo">
-                <img src="../../ressources/Logo.png">
-            </a>
 
-            <nav class="navbar">
-                <a href="home.html" style="--i:1;">Home </a>
-                <a href="tracker.html" style="--i:2;">Stock tracker</a>
-                <a href="portfolio.html"  style="--i:3;"class="active">Portfolio</a>
-                <a href="profile.html" style="--i:4;">Profile</a>
-            </nav>
-            <div id="Login">
-                <a href="vorHome.html" style="--i:1;" class="logintxt" onclick="logout()">Logout</a>
-                <a href="vorHome.html" style="--i:2;" onclick="logout()"><i class='bx bx-log-out-circle'></i></a>
+<main>
+    
+    <section class="buy-sell">
+        <h3>Remaining budget</h3>
+        <div class="remaining-budget"></div>
+        <h2>Stock Orders</h2>
+        <div class="d-flex align-items-center mb-3">
+            <div class="me-2">
+                <label for="stock-name" class="form-label">Stock name:</label>
+                <input type="text" id="stock-name" value="AAPL" class="form-control">
             </div>
-        </header>
-        <br>
-        <main>
-            <section class="buy-sell">
-                <h3>Remaining budget</h3>
-                <div class="remaining-budget"></div>
-                <h2>Stock Orders</h2>
-                <div class="d-flex align-items-center mb-3">
-                    <div class="me-2">
-                        <label for="stock-name" class="form-label">Stock name:</label>
-                        <input type="text" id="stock-name" placeholder="AAPL" class="form-control" oninput="checkFields()">
-                    </div>
-                    <div class="price-container"> <br/>
-                        <div id="price-display"></div>
-                    </div>
-                </div>
-                <!--<button id="show-price" class="btn btn-primary mt-2" onclick="getStockPrice()">Show current price</button>-->
-                <span id="current-price"></span>
-                <div class="mb-3">
-                    <label for="quantity" id="quantity-label" class="form-label">Quantity in $:</label>
-                    <input type="number" id="quantity" placeholder="100" class="form-control" oninput="checkFields()">
-                </div>
-                <div class="mb-4">
-                    <button id="toggle-label" class="btn btn-secondary mt-2" onclick="toggleLabel()">Switch to Stocks</button>
-                </div>
-                <button id="buy-stock" class="btn btn-success mt-2" onclick="checkBuyStock()">Buy stock</button>
-                <button id="sell-stock" class="btn btn-danger mt-2" onclick ="checkSellStock()">Sell stock</button>
-            </section>
-            <!-- sollte id sein -->
-            <section id="portfolio">
-                <h2>Portfolio</h2>
-                <!-- Sollte beides eine id sein -->
-                <div id="portfolio-value"><span id = "portfolio-percentage" class="percentage positive">+5%</span></div>
-                <div class="stock-list">
-                </div>
-            </section>
-            <!-- sollte id sein -->
-            <section class="transaction-history">
-                <h2>Transaction History</h2>
-            </section>
-        </main>
-    <!-- </body> -->
+            <div class="price-container">
+                <div id="price-display" class="price-display"></div>
+            </div>
+        </div>
+        <span id="current-price">220$</span>
+        <div class="mb-3">
+            <label for="quantity" id="quantity-label" class="form-label">Quantity in $:</label>
+            <input type="number" id="quantity" value="8000" class="form-control">
+        </div>
+        <div class="mb-4">
+            <button id="toggle-label" class="btn btn-secondary mt-2">Switch to Stocks</button>
+        </div>
+        <button id="buy-stock" class="btn btn-success mt-2">Buy stock</button>
+        <button id="sell-stock" class="btn btn-danger mt-2">Sell stock</button>
+    </section>
+    
+    <section class="portfolio">
+        <h2>Portfolio</h2>
+        <div class="portfolio-value">28.450 $ <span class="percentage positive">+5%</span></div>
+        <div class="stock-list">
+            <div>AAPL: 13.000$ <span class="change positive">+2%</span></div>
+            <div>MSFT: 9.000$ <span class="change negative">-8%</span></div>
+            <div>AMZN: 4.200$ <span class="change positive">+1%</span></div>
+            <div>TSLA: 1.800$ <span class="change negative">-12%</span></div>
+            <div>GOOGL: 550$ <span class="change positive">+16%</span></div>
+        </div>
+    </section>
+    
+    <section class="transaction-history">
+        <h2>Transaction History</h2>
+        <div>Bought AAPL at price of 220$ for 8000$</div>
+        <div>Bought GOOGL at price of 80$ for 200$</div>
+        <div>Sold GOOGL at price of 100$ for 200$</div>
+        <div>Bought AAPL at price of 220$ for 8000$</div>
+    </section>
+</main>
