@@ -744,7 +744,6 @@ function getStockPriceFromAPI(stockName) {
 
 //Create event for displaying the stock price
 function showStockPriceViaEvent() {
-    const inputField = document.getElementById('stock-name');
     inputField.addEventListener('keypress', handleInputKeypress);
     inputField.addEventListener('blur', () => getStockPriceFromAPI(getStockName()));
 }
