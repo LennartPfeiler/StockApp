@@ -717,8 +717,8 @@ function getStockPriceFromAPI(stockName) {
         "dataType": 'json',
         "success": function(data) {
             //Only temporarily as the price in the database is not retrieved and updated in the db anyway. However, the database column exists if the call is changed to the commented-out code in the future 
-            addNewStockIfNotExists(stockName, 0.0);
             if (data.status === 'OK' && data.results && data.results.length > 0) {
+                addNewStockIfNotExists(stockName, 0.0);
                 const closeValue = parseFloat(data.results[0].c); 
                 const roundedCloseValue = roundToTwoDecimalPlaces(closeValue);
                 displayStockPrice(roundedCloseValue);
