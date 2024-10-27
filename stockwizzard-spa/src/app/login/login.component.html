@@ -1,5 +1,9 @@
+<body>
+    <img src="assets/Logo.png" class="Logo-Bild">
+    <div class="login">
+        <a href="vorHome.html" class="login-text">Back</a>
+    </div>
 
-    
     <div class="login-box">
         <div class="login-header">
             <header>Login</header>
@@ -11,14 +15,13 @@
             <div class="input-box">
                 <input type="password" class="input-field" name="password" placeholder="Password" autocomplete="off" required>
             </div>
-            <div class="forgot">
-            </div>
-            <div class="input-submit">
-                <button class="submit-btn" id="submit"></button>
-                <label for="submit">Sign In</label>
+            <div id="input-submit">
+                <button class="submit-btn" id="submit">Sign In</button>
             </div>
         </form>
-        <div class="sign-up-link">
-            <p>Don't have account? <a href="Signup.html">Sign Up</a></p>
+        <div id="sign-up-link">
+            <p>Don't have an account? </p>
+            <a routerLink="/auth/sign-up">Sign up!</a>
         </div>
     </div>
+</body>

@@ -7,35 +7,33 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Body Background */
 body {
-    background-color: black; /* Dark background for entire page */
-    color: #eaeaea; /* Light text color for contrast */
+    background-color: black;
+    color: #eaeaea;
 }
 
 /* Header Styling */
-.header {
-    position: absolute; /* absolute position to keep the navbar at the top */
+header {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     padding: 20px 8%;
-    background-color: black; /* Dark background for dark mode */
+    background-color: black;
     display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Shadow for better separation */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-.logo img {
+#logo img {
     width: 150px;
     height: 150px;
     opacity: 0;
     animation: slideRight 1s ease forwards;
 }
 
-/* Logo Animation */
 @keyframes slideRight {
     0% {
         opacity: 0;
@@ -48,33 +46,23 @@ body {
 }
 
 /* Login Styling */
-.logintxt {
-    font-size: 25px;
-    color: #900808;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.Login {
+#login {
     display: flex;
     justify-content: space-between;
     width: 180px;
     height: 60px;
     transition: transform 0.7s ease;
-    animation: slideSci 1s ease forwards;
-    animation-delay: calc(.2s * var(--i));
 }
 
-.Login:hover {
+#login:hover {
     transform: scale(1.10);
 }
 
-/* Stil für das <a>-Element */
-.Login a {
+#login a {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 600px;
+    width: 60px;
     height: 60px;
     background: transparent;
     text-decoration: none;
@@ -85,34 +73,30 @@ body {
     transition: color 0.3s ease;
 }
 
-/* Stil für das <i>-Element */
-.Login a i {
+#login a i {
     font-size: 50px;
     color: rgb(255, 255, 255);
     transition: color 0.3s ease;
 }
 
-/* Wenn über das <a> oder <i> gehovert wird, färbe sowohl <a> als auch <i> */
-.Login:hover a, .Login:hover a i {
+#login:hover a, #login:hover a i {
     color: #900808;
     text-shadow: 0px 0px 10px black;
 }
 
 /* Navbar Styling */
-.navbar a {
+nav a {
     display: inline-block;
     font-size: 18px;
-    color: #eaeaea; /* Light text color for contrast */
+    color: #eaeaea;
     text-decoration: none;
     font-weight: 500;
     margin: 0 20px;
     transition: .5s;
     text-shadow: 0px 5px 10px grey;
     animation: slideTop 1s ease forwards;
-    animation-delay: calc(.2s * var(--i));
 }
 
-/* Navbar Animation */
 @keyframes slideTop {
     0% {
         opacity: 0;
@@ -124,42 +108,40 @@ body {
     }
 }
 
-.navbar a:hover,
-.navbar a.active {
-    color: #33e39a; /* Highlight active or hovered links */
+nav a:hover,
+nav a.active {
+    color: #33e39a;
 }
 
 /* Profile Section Styling */
-.profile {
-    background-color: #2c2c2c; /* Grauer Hintergrund für das Profilfenster */
-    color: #eaeaea; /* Helle Schriftfarbe */
+#profile {
+    background-color: #2c2c2c;
+    color: #eaeaea;
     padding: 20px;
     border-radius: 8px;
     width: 350px;
-    margin: 50px auto; /* Zentriert die Section */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Leichter Schatten für Tiefe */
+    margin: 50px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* Input Felder Styling */
-.profile input {
+input {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    background-color: #424242; /* Dunkleres Grau für Input-Felder */
-    border: 1px solid #555; /* Leichter Rand */
+    background-color: #424242;
+    border: 1px solid #555;
     border-radius: 4px;
     color: #eaeaea;
 }
 
-.profile input::placeholder {
-    color: #b0b0b0; /* Platzhalterfarbe etwas heller */
+input::placeholder {
+    color: #b0b0b0;
 }
 
-/* Button Styling */
-.profile button {
-    width: 48%; /* Beide Buttons nehmen jeweils 48% des verfügbaren Platzes ein */
+button {
+    width: 48%;
     padding: 10px;
-    background-color: #33e39a; /* Grüne Farbe für den Apply-Button */
+    background-color: #33e39a;
     border: none;
     border-radius: 4px;
     color: #121212;
@@ -168,51 +150,44 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.profile button:hover {
-    background-color: #28c883; /* Dunklere Farbe beim Hover */
+button:hover {
+    background-color: #28c883;
 }
 
-/* Spezifisch für den "Delete Profile"-Button */
-.profile .delete-btn {
-    background-color: #d9534f; /* Rote Farbe für Löschen */
+#delete-btn {
+    background-color: #d9534f;
 }
 
-.profile .delete-btn:hover {
-    background-color: #c9302c; /* Dunkleres Rot beim Hover */
+#delete-btn:hover {
+    background-color: #c9302c;
 }
-.profile .reset-btn{
-    width: 98%; /* Beide Buttons nehmen jeweils 48% des verfügbaren Platzes ein */
+
+#reset-btn {
+    width: 98%;
     margin-top: 10px;
     padding: 10px;
-    background-color: grey; /* Grüne Farbe für den Apply-Button */
+    background-color: grey;
     border: none;
     border-radius: 4px;
-    color:whitesmoke;
+    color: whitesmoke;
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.3s ease;
-
 }
 
-.profile .reset-btn:hover{
-    background-color: #fbcf04 ;
+#reset-btn:hover {
+    background-color: #fbcf04;
 }
 
-/* Section Title Styling */
-.profile h2 {
+h2 {
     text-align: center;
     margin-bottom: 20px;
     font-weight: 700;
     color: #eaeaea;
 }
 
-.profile-icon {
-    width: 35px;
-    height: 35px;
-}
-
 main {
-    padding-top: 200px; /* Abstand nach oben, damit das Editorfeld unterhalb der Navbar beginnt */
+    padding-top: 200px;
     display: flex;
     justify-content: center;
 }
