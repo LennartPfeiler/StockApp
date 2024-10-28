@@ -641,165 +641,93 @@ public class MappingController {
     ////////////////////////////////////////////////////////////// ALEXA
     
     @PostMapping(path = "/alexa", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
-        String requestType = alexaRO.getRequest().getType();
-        String outText = "";
-        boolean shouldEndSession = false;
-        Map<String, Object> sessionAttributes = null;
-    
-        try {
-            // Initialisiere Session-Attribute
-            if (alexaRO.getSession() != null) {
-                sessionAttributes = alexaRO.getSession().getAttributes();
-            }
-            if (sessionAttributes == null) {
-                sessionAttributes = new HashMap<>();
-            }
-            Logger.getLogger("AlexaLogger").log(Level.INFO, "Session attributes at start: " + sessionAttributes);
-    
-            if (requestType.equalsIgnoreCase("LaunchRequest")) {
-                outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
-                Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
-            } else if (requestType.equalsIgnoreCase("IntentRequest")) {
-                IntentRO intent = alexaRO.getRequest().getIntent();
-                String intentName = intent.getName();
-                Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " + intentName);
-    
-                if (intentName.equalsIgnoreCase("Login")) {
-                    // Überprüfen, ob Slots für Benutzername und Passwort gesetzt sind
-                    String email = intent.getSlots().get("email") != null ? intent.getSlots().get("email").getValue() : null;
-                    String password = intent.getSlots().get("password") != null ? intent.getSlots().get("password").getValue() : null;
-                
-                    if (email != null) {
-                        // Benutzername wurde erkannt und gespeichert
-                        sessionAttributes.put("partialUsername", email);
-                        Logger.getLogger("AlexaLogger").log(Level.INFO, "Username received and stored: " + email);
-                
-                        if (password == null) {
-                            outText = "Benutzername erkannt. Bitte gib nun dein Passwort an.";
-                        } else {
-                            // Passwort ist ebenfalls vorhanden, Login kann abgeschlossen werden
-                            LoginRequest loginRequest = new LoginRequest();
-                            loginRequest.setEmail(email);
-                            loginRequest.setPassword(password);
-                            login(loginRequest);
-                            outText = "Test";
-                            // if (user != null && user.getPassword().equals(password)) {
-                            //     sessionAttributes.put("userID", userId);
-                            //     sessionAttributes.put("loggedIn", true);
-                            //     outText = "Die Anmeldung war erfolgreich. Du bist nun angemeldet.";
-                            //     Logger.getLogger("AlexaLogger").log(Level.INFO, "Login successful for user: " + userId);
-                            // } else {
-                            //     outText = "Anmeldung fehlgeschlagen. Überprüfe deine Benutzer-ID und dein Passwort.";
-                            // }
-                        }
-                    } else if (password != null) {
-                        // Passwort wurde angegeben, Benutzername jedoch nicht
-                        if (sessionAttributes.get("partialUsername") != null) {
-                            email = (String) sessionAttributes.get("partialUsername");
-                            User user = UserManagerImplementation.getUserManager().getUserProfile(email);
-                            if (user != null && user.getPassword().equals(password)) {
-                                sessionAttributes.put("userID", email);
-                                sessionAttributes.put("loggedIn", true);
-                                outText = "Die Anmeldung war erfolgreich. Du bist nun angemeldet.";
-                                Logger.getLogger("AlexaLogger").log(Level.INFO, "Login successful for user: " + email);
-                                sessionAttributes.remove("partialUsername");
-                            } else {
-                                outText = "Anmeldung fehlgeschlagen. Überprüfe deine Benutzer-ID und dein Passwort.";
-                            }
-                        } else {
-                            outText = "Bitte gib zuerst deinen Benutzernamen an.";
-                        }
-                    } else {
-                        // Weder Benutzername noch Passwort wurden angegeben
-                        outText = "Benutzername und Passwort wurden nicht erkannt. Bitte gib deinen Benutzernamen an.";
-                    }
-                    Logger.getLogger("AlexaLogger").log(Level.INFO, "Session attributes after login: " + sessionAttributes);
-                    
-                // } else if (intentName.equalsIgnoreCase("GetPortfolioValueIntent")) {
-                //     // Überprüfen, ob der Benutzer angemeldet ist
-                //     Logger.getLogger("AlexaLogger").log(Level.INFO, "Checking login status for GetPortfolioValueIntent");
-                //     if (sessionAttributes.get("loggedIn") != null && (boolean) sessionAttributes.get("loggedIn")) {
-                //         String userId = (String) sessionAttributes.get("userID");
-                //         PortfolioManagerImplementation portfolioManager = PortfolioManagerImplementation.getPortfolioManager();
-                //         Portfolio userPortfolio = portfolioManager.getUserPortfolio(userId);
-    
-                //         if (userPortfolio != null) {
-                //             double portfolioValue = userPortfolio.getValue();
-                //             outText = "Dein aktueller Portfoliowert beträgt " + portfolioValue + " Euro.";
-                //         } else {
-                //             outText = "Es konnte kein Portfolio für dich gefunden werden.";
-                //         }
-                //     } else {
-                //         outText = "Bitte melde dich zuerst an, um deinen Portfoliowert zu erfahren.";
-                //         Logger.getLogger("AlexaLogger").log(Level.INFO, "User is not logged in.");
-                //     }
-                //     shouldEndSession = false;
-                } else if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
-                    // Benutzeranzahl abrufen
-                    UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
-                    int userCount = userManager.getUserCount();
-                    outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
-                    shouldEndSession = false;
-                } else {
-                    outText = "Dieser Befehl wird nicht unterstützt.";
-                    shouldEndSession = false;
-                }
-            } else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
-                Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: " + alexaRO.getRequest().getReason());
-                // Keine Antwort erforderlich
-                return null;
-            } else {
-                outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
-                shouldEndSession = false;
-            }
-        } catch (Exception e) {
-            Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Exception occurred: ", e);
-            outText = "Es gab einen Fehler bei der Verarbeitung deiner Anfrage.";
-            shouldEndSession = false;
+public AlexaRO handleAlexaRequest(@RequestBody AlexaRO alexaRO) {
+    String requestType = alexaRO.getRequest().getType();
+    String outText = "";
+    boolean shouldEndSession = false;
+    Map<String, Object> sessionAttributes = null;
+
+    try {
+        // Initialisiere Session-Attribute
+        if (alexaRO.getSession() != null) {
+            sessionAttributes = alexaRO.getSession().getAttributes();
         }
-    
-        return prepareResponse(outText, shouldEndSession, sessionAttributes);
+        if (sessionAttributes == null) {
+            sessionAttributes = new HashMap<>();
+        }
+
+        if (requestType.equalsIgnoreCase("LaunchRequest")) {
+            outText = "Willkommen zu The Wallstreet Wizzard. Wie kann ich dir helfen?";
+            Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling LaunchRequest");
+        }
+        else if (requestType.equalsIgnoreCase("IntentRequest")) {
+            IntentRO intent = alexaRO.getRequest().getIntent();
+            String intentName = intent.getName();
+            Logger.getLogger("AlexaLogger").log(Level.INFO, "Handling IntentRequest: " + intentName);
+
+            if (intentName.equalsIgnoreCase("GetUserCountIntent")) {
+                // Hier holen wir die Anzahl aller Benutzer
+                UserManagerImplementation userManager = UserManagerImplementation.getUserManager();
+                int userCount = userManager.getUserCount();
+                outText = "Die Gesamtzahl der Benutzer beträgt " + userCount + ".";
+                shouldEndSession = true;
+            }
+            else {
+                outText = "Dieser Befehl wird nicht unterstützt.";
+                shouldEndSession = true;
+            }
+        }
+        else if (requestType.equalsIgnoreCase("SessionEndedRequest")) {
+            Logger.getLogger("AlexaLogger").log(Level.INFO, "Session ended with reason: " + alexaRO.getRequest().getReason());
+            // Keine Antwort erforderlich
+            return null;
+        } else {
+            outText = "Entschuldigung, ich konnte deine Anfrage nicht verarbeiten.";
+            shouldEndSession = true;
+        }
+    } catch (Exception e) {
+        Logger.getLogger("AlexaLogger").log(Level.SEVERE, "Exception occurred: ", e);
+        outText = "Es gab einen Fehler bei der Verarbeitung deiner Anfrage.";
+        shouldEndSession = true;
     }
 
+    return prepareResponse(outText, shouldEndSession, sessionAttributes);
+}
 
-    
-     
+
+
     private AlexaRO prepareResponse(String outText, boolean shouldEndSession, Map<String, Object> sessionAttributes) {
         AlexaRO responseRO = new AlexaRO();
         responseRO.setVersion("1.0");
-    
-        // Setzen der Session-Attribute, falls vorhanden
-        if (sessionAttributes != null) {
-            SessionRO sessionRO = new SessionRO();
-            sessionRO.setAttributes(sessionAttributes);
-            responseRO.setSession(sessionRO);
-        }
-    
-        // Hauptausgabe der Sprachausgabe festlegen
+
+        // Session-Attribute setzen
+        SessionRO sessionRO = new SessionRO();
+        sessionRO.setAttributes(sessionAttributes);
+        responseRO.setSession(sessionRO);
+
         OutputSpeechRO outputSpeechRO = new OutputSpeechRO();
         outputSpeechRO.setType("PlainText");
         outputSpeechRO.setText(outText);
-    
-        // Antwort-Objekt konfigurieren und mit der Sprachausgabe und Sitzungsstatus befüllen
+
+        // Reprompt hinzufügen, um die Sitzung aktiv zu halten
+        OutputSpeechRO repromptSpeech = new OutputSpeechRO();
+        repromptSpeech.setType("PlainText");
+        repromptSpeech.setText("Kannst du das bitte wiederholen?");
+
         ResponseRO response = new ResponseRO();
         response.setOutputSpeech(outputSpeechRO);
         response.setShouldEndSession(shouldEndSession);
-    
-        // Falls Sitzung offen bleiben soll, Reprompt hinzufügen
+
         if (!shouldEndSession) {
-            OutputSpeechRO repromptSpeech = new OutputSpeechRO();
-            repromptSpeech.setType("PlainText");
-            repromptSpeech.setText("Kannst du das bitte wiederholen?");
-            
+            // Reprompt hinzufügen
             RepromptRO reprompt = new RepromptRO();
             reprompt.setOutputSpeech(repromptSpeech);
             response.setReprompt(reprompt);
         }
-    
-        // Antwort-Objekt in die Hauptantwort einfügen
+
         responseRO.setResponse(response);
-    
+
         return responseRO;
     }
+
 }
