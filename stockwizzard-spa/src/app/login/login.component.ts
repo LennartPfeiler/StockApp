@@ -18,11 +18,6 @@ export class LoginComponent {
     this.authComponent = new AuthComponent();
   }
 
-  onSubmit() {
-    console.log('Form submitted!');
-    this.router.navigate(['/content/home']);
-    // Hier kannst du deine Logik hinzufügen
-  }
 
   onLogin(form: any): void {
     const email = form.value.email;
