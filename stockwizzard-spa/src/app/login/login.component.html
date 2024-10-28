@@ -10,12 +10,12 @@
             <div class="login-header">
                 <header>Login</header>
             </div>
-            <form id="loginForm" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+            <form id="loginForm" (ngSubmit)="onLogin(loginForm)" #loginForm="ngForm">
                 <div class="input-box">
-                    <input type="text" class="input-field" name="email" placeholder="Email" autocomplete="off" required>
+                    <input type="text" class="input-field" ngModel name="email" placeholder="Email" autocomplete="off" required>
                 </div>
                 <div class="input-box">
-                    <input type="password" class="input-field" name="password" placeholder="Password" autocomplete="off" required>
+                    <input type="password" class="input-field" ngModel  name="password" placeholder="Password" autocomplete="off" required>
                 </div>
                 <div id="input-submit">
                     <button class="submit-btn" type="submit">Sign In</button>
