@@ -9,7 +9,8 @@
         <a routerLink="/content/profile" routerLinkActive="active" style="--i:4;">Profile</a>
     </nav>
     <div class="Login">
-        <a routerLink="/content/vor-home" class="logintxt" style="--i:1;">Logout</a>
-        <a routerLink="/content/vor-home" style="--i:2;"><i class='bx bx-log-out-circle'></i></a>
-    </div>
+  <a (click)="logout(); $event.preventDefault();" class="logintxt" style="--i:1;">Logout</a>
+  <a (click)="logout(); $event.preventDefault();" style="--i:2;"><i class='bx bx-log-out-circle'></i></a>
+</div>
+
 </header>

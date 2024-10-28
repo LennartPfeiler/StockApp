@@ -40,7 +40,7 @@ export class LoginComponent {
         password: password
       })
     };
-
+    
     this.http.post(settingsLogin.url, settingsLogin.body, { headers: settingsLogin.headers })
       .subscribe(
         (data: any) => {
