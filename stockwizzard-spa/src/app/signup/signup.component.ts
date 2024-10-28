@@ -16,7 +16,7 @@ export class SignupComponent {
   showNavbar = false;
   private authComponent: AuthComponent;
   constructor(public router: Router, private http: HttpClient) {
-    this.authComponent = new AuthComponent();
+    this.authComponent = new AuthComponent(router);
   }
 
   onRegister(form: any): void {

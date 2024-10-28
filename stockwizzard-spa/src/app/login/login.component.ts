@@ -15,7 +15,7 @@ import { AuthComponent } from '../auth/auth.component';
 export class LoginComponent {
   private authComponent: AuthComponent;
   constructor(public router: Router, private http: HttpClient) {
-    this.authComponent = new AuthComponent();
+    this.authComponent = new AuthComponent(router);
   }
 
 
