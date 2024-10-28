@@ -1,5 +1,5 @@
 package dhbw.mosbach.de.stockwizzard.graphql.controller;
-
+import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -20,7 +20,7 @@ import dhbw.mosbach.de.stockwizzard.service.dataManager.*;
 import dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation.*;
 import dhbw.mosbach.de.stockwizzard.model.alexa.*;
 
-
+@CrossOrigin(origins = "http://StockWizzardSingleFrontend-grumpy-oribi-ia.apps.01.cf.eu01.stackit.cloud", allowedHeaders = "*")
 @Controller
 public class GraphQLController {
 

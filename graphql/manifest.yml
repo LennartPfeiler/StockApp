@@ -4,7 +4,7 @@ applications:
   instances: 1
   host: StockWizzardGraphQL{random-word}
   # create JAR with "mvn package" and use the path to the JAR file:
-  path: target/stockWizzardBackend-0.0.1-SNAPSHOT.jar
+  path: target/stockWizzard.graphql-0.0.1-SNAPSHOT.jar
   # Necessary:
   random-route: true
   memory: 1G
