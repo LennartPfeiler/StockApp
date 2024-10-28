@@ -77,36 +77,36 @@ export class PortfolioComponent implements OnInit {
         transactionHistoryContainer.appendChild(transactionDiv);
     });
   }
-    getAllTransactions(): void {
-      const settingsGetAllTransactions = {
-        url: "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/transactions?email=" + this.authComponent.getCookie("email") + "&token=" + this.authComponent.getCookie("token") + "&sortby=date",
-        method: "GET",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      };
+    // getAllTransactions(): void {
+    //   const settingsGetAllTransactions = {
+    //     url: "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/transactions?email=" + this.authComponent.getCookie("email") + "&token=" + this.authComponent.getCookie("token") + "&sortby=date",
+    //     method: "GET",
+    //     headers: {
+    //       'Accept': 'application/json',
+    //       'Content-Type': 'application/json'
+    //     }
+    //   };
       
-      this.http.post(settingsLogin.url, settingsLogin.body, { headers: settingsLogin.headers })
-        .subscribe(
-          (data: any) => {
-            // Setze die Cookies
-            this.authComponent.setCookie("token", data.token);
-            this.authComponent.setCookie("firstname", data.user.firstname);
-            this.authComponent.setCookie("lastname", data.user.lastname);
-            this.authComponent.setCookie("email", data.user.email);
-            alert("Login successfully");
-            this.router.navigate(['/content/home']); // Navigiere zur Home-Seite
-          },
-          (error) => {
-            if (error.status === 400 || error.status === 401 || error.status === 500) {
-              alert(error.error.answer);
-            } else {
-              alert("An unexpected error occurred. Status: " + error.status);
-            }
-          }
-        );
-    }
+    //   this.http.post(settingsLogin.url, settingsLogin.body, { headers: settingsLogin.headers })
+    //     .subscribe(
+    //       (data: any) => {
+    //         // Setze die Cookies
+    //         this.authComponent.setCookie("token", data.token);
+    //         this.authComponent.setCookie("firstname", data.user.firstname);
+    //         this.authComponent.setCookie("lastname", data.user.lastname);
+    //         this.authComponent.setCookie("email", data.user.email);
+    //         alert("Login successfully");
+    //         this.router.navigate(['/content/home']); // Navigiere zur Home-Seite
+    //       },
+    //       (error) => {
+    //         if (error.status === 400 || error.status === 401 || error.status === 500) {
+    //           alert(error.error.answer);
+    //         } else {
+    //           alert("An unexpected error occurred. Status: " + error.status);
+    //         }
+    //       }
+    //     );
+    // }
 }
 
 const GET_ALL_TRANSACTIONS = gql`
