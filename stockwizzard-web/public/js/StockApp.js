@@ -93,7 +93,7 @@ function logout(){
         }),
         "success": function(data) {
             alert(data.answer);
-            document.location="vorhome.html";
+            document.location="vorHome.html";
             document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "firstname=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -744,6 +744,7 @@ function getStockPriceFromAPI(stockName) {
 
 //Create event for displaying the stock price
 function showStockPriceViaEvent() {
+    const inputField = document.getElementById('stock-name');
     inputField.addEventListener('keypress', handleInputKeypress);
     inputField.addEventListener('blur', () => getStockPriceFromAPI(getStockName()));
 }
@@ -899,7 +900,7 @@ function getAllTransactions() {
 
 //Display all transactions of an user
 function displayTransactionHistory(transactions) {
-    const transactionHistoryContainer = document.querySelector('.transaction-history');
+    const transactionHistoryContainer = document.querySelector('#transaction-history');
     transactionHistoryContainer.innerHTML = ''; 
     let type;
     const heading = document.createElement('h2');
@@ -1024,7 +1025,7 @@ function updateStockDisplay(symbol, currentValue, boughtValue) {
 
 // Display alle portfolio stocks
 function displayPortfolioStocks(portfolioStocks) {
-    const stockListContainer = document.querySelector('.portfolio .stock-list');
+    const stockListContainer = document.querySelector('#portfolio .stock-list');
     stockListContainer.innerHTML = ''; 
 
     portfolioStocks.forEach(stock => {
@@ -1035,7 +1036,7 @@ function displayPortfolioStocks(portfolioStocks) {
 
 //Display a single portfolioStock
 function displayPortfolioStock(symbol) {
-    const stockListContainer = document.querySelector('.portfolio .stock-list');
+    const stockListContainer = document.querySelector('#portfolio .stock-list');
     const stockDiv = document.createElement('div');
     stockDiv.id = symbol; // Füge eine ID für die spätere Aktualisierung hinzu
     stockDiv.innerHTML = `${symbol}: Calculating Portfolio data... <span class="change"></span>`;
@@ -1101,12 +1102,13 @@ function displayTotalPortfolioValue(){
             'Content-Type': 'application/json'
         },
         "success": function(data) {
-            const stockElement = document.querySelector('.portfolio-value');
+            const stockElement = document.querySelector('#portfolio-value');
             const stockValue = roundToTwoDecimalPlaces(data.value);
 
             const { percentageChange, changeClass } = calculatePercentage(data.startvalue, data.value);
 
             stockElement.innerHTML = `${stockValue}$ <span class="change ${changeClass}">${percentageChange}</span>`;
+
         }
         ,
         "error": function(xhr) {

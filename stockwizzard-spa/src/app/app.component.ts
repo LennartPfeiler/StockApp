@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './navbar/navbar.component'; // Importiere die Navbar
 import { VorHomeNavbarComponent } from './navbar-vorhome/navbar-vorhome.component'; // Importiere die VorHomeNavbar
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +13,8 @@ import { VorHomeNavbarComponent } from './navbar-vorhome/navbar-vorhome.componen
     CommonModule,
     RouterModule,
     NavbarComponent, // Binde die Navbar hier ein
-    VorHomeNavbarComponent // Binde die VorHomeNavbar hier ein
+    VorHomeNavbarComponent, // Binde die VorHomeNavbar hier ein
+    HttpClientModule
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
