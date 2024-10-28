@@ -900,7 +900,7 @@ function getAllTransactions() {
 
 //Display all transactions of an user
 function displayTransactionHistory(transactions) {
-    const transactionHistoryContainer = document.querySelector('.transaction-history');
+    const transactionHistoryContainer = document.querySelector('#transaction-history');
     transactionHistoryContainer.innerHTML = ''; 
     let type;
     const heading = document.createElement('h2');
