@@ -10,7 +10,7 @@
             <div class="login-header">
                 <header>Login</header>
             </div>
-            <form id="loginForm" onsubmit="login(this)">
+            <form id="loginForm" (ngSubmit)="onSubmit()" #loginForm="ngForm">
                 <div class="input-box">
                     <input type="text" class="input-field" name="email" placeholder="Email" autocomplete="off" required>
                 </div>
@@ -18,7 +18,7 @@
                     <input type="password" class="input-field" name="password" placeholder="Password" autocomplete="off" required>
                 </div>
                 <div id="input-submit">
-                    <button class="submit-btn" id="submit">Sign In</button>
+                    <button class="submit-btn" type="submit">Sign In</button>
                 </div>
             </form>
             <div id="sign-up-link">
