@@ -79,7 +79,7 @@ function login(profileSchema){
 //Get the Profile for an user of the Website
 function logout(){
     event.preventDefault();
-    const settingsLogin = {
+    const settingsLogout = {
         "async": true, 
         "url": "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/auth",
         "method": "DELETE",
@@ -108,7 +108,7 @@ function logout(){
         }
     };
 
-    $.ajax(settingsLogin);
+    $.ajax(settingsLogout);
 }
 
 // Create a new user
