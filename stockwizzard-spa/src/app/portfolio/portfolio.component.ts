@@ -41,10 +41,11 @@ export class PortfolioComponent implements OnInit {
       })
       .valueChanges
       .pipe(
-        tap(({ data } : any) => console.log("data")
-        //   {
-        //   this.transactions = data.transactions || [];
-        // }
+        tap(({ data } : any) => 
+          {
+          this.transactions = data.transactions || [];
+          this.displayTransactionHistory(this.transactions)
+        }
       )
       )
       .subscribe({
@@ -61,9 +62,32 @@ export class PortfolioComponent implements OnInit {
         },
       });
   }
+
+  // loadTransactions(): void {
+  //   const email = this.authComponent.getCookie("email"); // Hole die E-Mail aus dem Cookie
+  //   const token = this.authComponent.getCookie("token"); // Hole das Token aus dem Cookie
+  //   const sortby = "date"; // Beispielwert für die Sortierung
+
+  //   const url = `https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/transactions?email=${email}&token=${token}&sortby=${sortby}`;
+
+  //   this.http.get<any[]>(url).subscribe({
+  //     next: (transactions) => {
+  //       this.transactions = transactions || [];
+  //       this.loading = false;
+  //       console.log(transactions);
+  //       this.displayTransactionHistory(this.transactions); // Aufruf der Funktion zur Anzeige
+  //     },
+  //     error: (error) => {
+  //       this.error = error;
+  //       this.loading = false;
+  //       alert('An unexpected error occurred: ' + error.message);
+  //     },
+  //   });
+  // }
+
   displayTransactionHistory(transactions: any[]): void {
-    const transactionHistoryContainer = document.querySelector('#transaction-history') as HTMLElement; // Typensicherheit
-    if (!transactionHistoryContainer) return; // Sicherheitsüberprüfung
+    const transactionHistoryContainer = document.querySelector('#transaction-history') as HTMLElement;
+    if (!transactionHistoryContainer) console.log("KLLLLLLLLLLLW");
 
     transactionHistoryContainer.innerHTML = ''; 
     const heading = document.createElement('h2');
@@ -72,41 +96,11 @@ export class PortfolioComponent implements OnInit {
 
     transactions.forEach(transaction => {
         const transactionDiv = document.createElement('div');
-        const type = transaction.transactionType === 1 ? 'Bought' : 'Sold'; // Verwende eine ternäre Bedingung
+        const type = transaction.transactionType === 1 ? 'Bought' : 'Sold'; // Ternäre Bedingung
         transactionDiv.textContent = `${type} ${transaction.stockAmount} ${transaction.symbol} at price of ${transaction.pricePerStock}$ for ${transaction.totalPrice}$`;
         transactionHistoryContainer.appendChild(transactionDiv);
     });
   }
-    getAllTransactions(): void {
-      const settingsGetAllTransactions = {
-        url: "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/transactions?email=" + this.authComponent.getCookie("email") + "&token=" + this.authComponent.getCookie("token") + "&sortby=date",
-        method: "GET",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      };
-      
-      this.http.post(settingsLogin.url, settingsLogin.body, { headers: settingsLogin.headers })
-        .subscribe(
-          (data: any) => {
-            // Setze die Cookies
-            this.authComponent.setCookie("token", data.token);
-            this.authComponent.setCookie("firstname", data.user.firstname);
-            this.authComponent.setCookie("lastname", data.user.lastname);
-            this.authComponent.setCookie("email", data.user.email);
-            alert("Login successfully");
-            this.router.navigate(['/content/home']); // Navigiere zur Home-Seite
-          },
-          (error) => {
-            if (error.status === 400 || error.status === 401 || error.status === 500) {
-              alert(error.error.answer);
-            } else {
-              alert("An unexpected error occurred. Status: " + error.status);
-            }
-          }
-        );
-    }
 }
 
 const GET_ALL_TRANSACTIONS = gql`
