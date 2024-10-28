@@ -7,62 +7,52 @@
     font-family: 'Poppins', sans-serif;
 }
 
-body {
+.main-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     background: #000000;
-    opacity: 0;
-    animation: slideRight 1s ease forwards;
 }
 
-.header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 30px 8%;
-    background: transparent;
+.container, .text-container {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    z-index: 100;
+    flex-direction: column;
 }
 
-.Login {
-    position: absolute;
-    top: 30px;
-    right: 40px; /* Positioniere den Link oben rechts */
-    z-index: 10; /* Stelle sicher, dass es über anderen Elementen steht */
+.Logo-Bild {
+    max-width: 100%;
+    height: auto;
 }
 
-.logintxt {
+.login {
+    margin-top: 20px;
+}
+
+.login-text {
     font-size: 20px;
-    color: white; 
-   
-    padding: 10px 20px; 
+    color: white;
+    padding: 10px 20px;
     font-weight: bold;
-    text-shadow: 0px 4px 6px rgba(255, 255, 255, 0.2); 
-    transition: transform 0.3s ease; 
+    text-shadow: 0px 4px 6px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease;
 }
 
-.Login .logintxt:hover {
-    transform: scale(1.3); 
-    color: #900808; 
+.login-text:hover {
+    transform: scale(1.3);
+    color: #900808;
     text-shadow: 0px 6px 12px black;
 }
 
 .login-box {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    width: 440px;
-    height: 480px;
+    width: 100%;
+    max-width: 440px;
     padding: 30px;
-    opacity: 0;
-    animation: slideBottom 1s ease forwards;
-    animation-delay: 0.5s;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 .login-header {
@@ -87,9 +77,6 @@ body {
     box-shadow: 0px 5px 10px 1px rgba(0, 0, 0, 0.05);
     outline: none;
     transition: .3s;
-    opacity: 0;
-    animation: slideBottom 1s ease forwards;
-    animation-delay: 0.5s;
 }
 
 ::placeholder {
@@ -101,23 +88,6 @@ body {
     width: 105%;
 }
 
-.forgot {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
-}
-
-section {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    color: #555;
-}
-
-#check {
-    margin-right: 10px;
-}
-
 a {
     text-decoration: none;
 }
@@ -126,11 +96,7 @@ a:hover {
     text-decoration: underline;
 }
 
-section a {
-    color: #555;
-}
-
-.input-submit {
+#input-submit {
     position: relative;
 }
 
@@ -140,19 +106,11 @@ section a {
     background: #222;
     border: none;
     border-radius: 30px;
+    color: #fff;
+    font-size: 17px;
+    font-weight: bold;
     cursor: pointer;
     transition: .3s;
-}
-
-.input-submit label {
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    color: #fff;
-    -webkit-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    cursor: pointer;
 }
 
 .submit-btn:hover {
@@ -160,55 +118,28 @@ section a {
     transform: scale(1.05, 1);
 }
 
-.sign-up-link {
+#sign-up-link {
     color: #ffffff;
     text-align: center;
     font-size: 15px;
     margin-top: 20px;
 }
 
-.sign-up-link a {
+#sign-up-link a {
     text-align: center;
     color: #ffffff;
     font-weight: 600;
 }
 
-.Logo-Bild {
-    width: 50%;
-    height: auto;
-}
-
-@keyframes slideRight {
-    0% {
-        transform: translateX(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideBottom {
-    0% {
-        transform: translateY(-100px);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
+/* Media Queries */
 @media (max-width: 862px) {
-    .Logo-Bild {
-        position: absolute;
-        top: 50px;
-        align-items: center;
-        z-index: 2;
+    .main-container {
+        flex-direction: column;
     }
-    
+    .Logo-Bild {
+        max-width: 80%;
+    }
     .login-box {
-        margin-top: 400px;
+        margin-top: 20px;
     }
 }

@@ -1,5 +1,5 @@
 <!-- Standard-Navigation vor dem Login -->
-<nav *ngIf="!isVorHomePage()"> 
+<nav *ngIf="!isAuth() && !isVorHomePage()"> 
   <a routerLink="/content/vor-home">Vor Home</a>
   <a routerLink="/content/home">Home</a>
   <a routerLink="/content/portfolio">Portfolio</a>
@@ -7,19 +7,19 @@
   <a routerLink="/content/tracker">Tracker</a>
 </nav>
 
-<!-- Navigation für Vor Home Seite -->
-<ng-container *ngIf="isVorHomePage(); else defaultNavbar">
-  <app-vorhome-navbar></app-vorhome-navbar> <!-- Zeigt diese Navbar nur auf Vor Home Seite -->
+<!-- Navigation für die Vor Home-Seite -->
+<ng-container *ngIf="isVorHomePage() && !isAuth(); else defaultNavbar">
+  <app-vorhome-navbar></app-vorhome-navbar> <!-- Zeigt diese Navbar nur auf der Vor Home-Seite, außer wenn auf Auth-Seiten -->
 </ng-container>
 
-<!-- Lila Navbar für andere Seiten, NICHT auf der Vor Home Seite -->
-<ng-container *ngIf="!isVorHomePage()"> 
+<!-- Lila Navbar für andere Seiten, NICHT auf der Vor Home Seite und NICHT auf Auth-Seiten -->
+<ng-container *ngIf="!isVorHomePage() && !isAuth()"> 
   <app-navbar></app-navbar> <!-- Zeigt diese Navbar nur für andere Seiten -->
 </ng-container>
 
 <!-- Standard Navbar für alle anderen Seiten -->
 <ng-template #defaultNavbar>
-  <app-navbar></app-navbar>
+  <app-navbar *ngIf="!isAuth()"></app-navbar> <!-- Stellt sicher, dass die Navbar nur angezeigt wird, wenn man nicht auf einer Auth-Seite ist -->
 </ng-template>
 
 <router-outlet></router-outlet>

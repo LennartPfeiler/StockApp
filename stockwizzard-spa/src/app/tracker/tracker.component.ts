@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthComponent } from '../auth/auth.component';
 
 @Component({
   selector: 'app-tracker',
@@ -10,9 +11,14 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./tracker.component.css']
 })
 export class TrackerComponent implements OnInit {
+  private authComponent: AuthComponent;
+  constructor(public router: Router) {
+    this.authComponent = new AuthComponent(router);
+  }
 
   ngOnInit(): void {
     this.loadTradingViewWidget();
+    this.authComponent.disableGoBackFunction();
   }
 
   loadTradingViewWidget(): void {
