@@ -20,7 +20,7 @@ import dhbw.mosbach.de.stockwizzard.service.dataManager.*;
 import dhbw.mosbach.de.stockwizzard.service.dataManagerImplementation.*;
 import dhbw.mosbach.de.stockwizzard.model.alexa.*;
 
-@CrossOrigin(origins = "http://StockWizzardSingleFrontend-grumpy-oribi-ia.apps.01.cf.eu01.stackit.cloud", allowedHeaders = "*")
+// @CrossOrigin(origins = "https://StockWizzardSingleFrontend-grumpy-oribi-ia.apps.01.cf.eu01.stackit.cloud/", allowedHeaders = "*")
 @Controller
 public class GraphQLController {
 
