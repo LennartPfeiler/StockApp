@@ -71,8 +71,6 @@ export class ProfileComponent implements OnInit {
     this.http.put(editRegister.url, editRegister.body, { headers: editRegister.headers })
       .subscribe(
         (data: any) => {
-          // Setze die Cookies
-          console.log(data);
           this.authComponent.setCookie("firstname", data.firstname);
           this.authComponent.setCookie("lastname", data.lastname);
           this.authComponent.setCookie("email", data.email);
@@ -80,6 +78,79 @@ export class ProfileComponent implements OnInit {
         },
         (error) => {
           if (error.status === 401 || error.status === 409 || error.status === 500) {
+            alert(error.error.answer);
+          } else {
+            alert("An unexpected error occurred. Status: " + error.status);
+          }
+        }
+      );
+  }
+
+  resetUser(): void {
+
+    const resetRegister = {
+      url: "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user/reset",
+      method: "PUT",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        token: this.authComponent.getCookie("token"),
+        email: this.authComponent.getCookie("email")
+      })
+    };
+    
+    this.http.put(resetRegister.url, resetRegister.body, { headers: resetRegister.headers })
+      .subscribe(
+        (data: any) => {
+          // Setze die Cookies
+          const confirmation = confirm("Are you sure you want to reset your profile?");
+            if (confirmation) {
+                alert(data.answer);
+            } 
+        },
+        (error) => {
+          if (error.status === 401 || error.status === 500) {
+            alert(error.error.answer);
+          } else {
+            alert("An unexpected error occurred. Status: " + error.status);
+          }
+        }
+      );
+  }
+
+  deleteUser(): void {
+
+    const deleteRegister = {
+      url: "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/user",
+      method: "DELETE",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        token: this.authComponent.getCookie("token"),
+        email: this.authComponent.getCookie("email")
+      })
+    };
+    const options = {
+      headers: deleteRegister.headers,
+      body: deleteRegister.body
+    };
+
+    this.http.delete(deleteRegister.url, options)
+      .subscribe(
+        (data: any) => {
+          // Setze die Cookies
+          const confirmation = confirm("Are you sure you want to delete your profile?");
+            if (confirmation) {
+                alert(data.answer);
+                this.router.navigate(['/content/vor-home']);
+            } 
+        },
+        (error) => {
+          if (error.status === 401 || error.status === 500) {
             alert(error.error.answer);
           } else {
             alert("An unexpected error occurred. Status: " + error.status);
