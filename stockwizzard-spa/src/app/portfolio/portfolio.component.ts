@@ -39,10 +39,11 @@ export class PortfolioComponent implements OnInit {
     console.log("test");
   }
 
-  displayAllDatabaseData(){
-    this.getUserBudget();
-    this.getPortfolioValue();
-    this.loadTransactions();
+  async displayAllDatabaseData(){
+    console.log("ALLE DATEN ANZEIGEN");
+    await this.getUserBudget();
+    await this.getPortfolioValue();
+    await this.loadTransactions();
   }
 
   getCurrentDateTime(): string {
@@ -102,8 +103,7 @@ export class PortfolioComponent implements OnInit {
   }
 
   checkBuyStock(): void {
-    const orderData = this.getOrderInformations(); // Assuming this method exists in the same class
-
+    const orderData = this.getOrderInformations();
     if (orderData != null) {
         const stockName = (document.getElementById('stock-name') as HTMLInputElement).value;
 
@@ -115,7 +115,6 @@ export class PortfolioComponent implements OnInit {
                     alert("An error occurred when trying to create order. Please try later again.");
                 } else {
                     const remainingBudget = parseFloat((document.querySelector('.remaining-budget') as HTMLElement).innerText.trim());
-
                     if (orderData.totalPrice > remainingBudget) {
                         alert("You don't have enough budget for this transaction!");
                     } else {
@@ -173,7 +172,7 @@ export class PortfolioComponent implements OnInit {
         },
         error: (error) => {
             if (error.status === 404) {
-                callback(-1); // Symbol nicht gefunden
+              callback(-1); // Symbol nicht gefunden
             } else {
                 console.error("Error fetching bought value:", error);
                 callback(0); // Allgemeiner Fehler
@@ -184,28 +183,32 @@ export class PortfolioComponent implements OnInit {
 
   addPortfolioStockOrder(stockAmount: number, totalPrice: number, pricePerStock: number): void {
     const stockSymbol = (document.getElementById('stock-name') as HTMLInputElement).value;
-    const orderData = {
+    const addOrderRegister = {
+      url: "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order",
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
         token: this.authComponent.getCookie("token"),
         transactioncontent: {
             transactiontype: 1,
             stockamount: stockAmount,
-            date: this.getCurrentDateTime(), // Methode, um das aktuelle Datum zu holen
+            date: this.getCurrentDateTime(),
             priceperstock: pricePerStock,
             totalprice: totalPrice,
             email: this.authComponent.getCookie("email"),
             symbol: stockSymbol
         }
+      })
     };
 
-    this.http.post<any>("https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order", orderData, { observe: 'response' })
-        .subscribe({
-            next: (response) => {
+    this.http.post(addOrderRegister.url, addOrderRegister.body, { headers: addOrderRegister.headers })
+        .subscribe(
+          (response: any ) => {
                 // Überprüfen, ob die Antwort erfolgreich war
-                if (response.status === 200) {
-                    alert("Order successfully added!"); // Erfolgsmeldung anzeigen
-                } else {
-                    alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
-                }
+                alert(response.answer); // Erfolgsmeldung anzeigen
                 (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
                 this.displayPortfolioStock(stockSymbol); // Portfolio-Aktie anzeigen
 
@@ -215,7 +218,8 @@ export class PortfolioComponent implements OnInit {
 
                 this.displayAllDatabaseData(); // Alle Daten anzeigen
             },
-            error: (error) => {
+            (error) => {
+              console.log(error);
                 if (error.status === 400 || error.status === 401 || error.status === 500) {
                     alert("An error occurred: " + error.message); // Fehlernachricht anzeigen
                     (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
@@ -224,7 +228,7 @@ export class PortfolioComponent implements OnInit {
                     (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
                 }
             }
-        });
+        );
   }
 
   increasePortfolioStockOrder(stockAmount: number, totalPrice: number, pricePerStock: number): void {
@@ -245,10 +249,10 @@ export class PortfolioComponent implements OnInit {
 
     this.http.put<any>("https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy", orderData, { observe: 'response' })
         .subscribe({
-            next: (response) => {
+            next: (response: any) => {
                 // Überprüfen, ob die Antwort erfolgreich war
                 if (response.status === 200) {
-                    alert("Stock order successfully increased!"); // Erfolgsmeldung anzeigen
+                    alert(response.body.answer); // Erfolgsmeldung anzeigen
                 } else {
                     alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
                 }
@@ -289,16 +293,17 @@ export class PortfolioComponent implements OnInit {
 
     this.http.put<any>("https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell", orderData, { observe: 'response' })
         .subscribe({
-            next: (response) => {
+            next: (response: any) => {
                 // Überprüfen, ob die Antwort erfolgreich war
                 if (response.status === 200) {
-                    alert("Stock order successfully decreased!"); // Erfolgsmeldung anzeigen
+                    alert(response.answer); // Erfolgsmeldung anzeigen
                 } else {
                     alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
                 }
                 (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
 
                 this.getPortfolioStockData(stockSymbol, (data) => {
+                    console.log(data);
                     this.updateStockDisplay(stockSymbol, data.currentvalue, data.boughtvalue); // Aktienanzeige aktualisieren
                 });
                 this.displayAllDatabaseData(); // Alle Daten anzeigen
@@ -335,9 +340,10 @@ export class PortfolioComponent implements OnInit {
         body: orderData,
         observe: 'response'
     }).subscribe({
-        next: (response) => {
+        next: (response: any) => {
             // Überprüfen, ob die Antwort erfolgreich war
             if (response.status === 200) {
+              alert(response.body.answer);
                 (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
                 // Element mit dem Aktien-Symbol aus dem DOM entfernen
                 const stockElement = document.getElementById(stockSymbol.trim());
@@ -389,6 +395,7 @@ export class PortfolioComponent implements OnInit {
         next: (data) => {
             if (data.status === 'OK' && data.results) {
                 const name = data.results.name;
+                console.log("Company name: "+ name);
                 callback(name);
             } else {
                 callback(""); 
@@ -403,12 +410,11 @@ export class PortfolioComponent implements OnInit {
 
   addNewStockIfNotExists(stockName: string, stockPrice: number): void {
     this.checkStockInDB(stockName, (stockExists: boolean) => {
+      console.log(stockExists);
         if (!stockExists) {
-          console.log("Stock doesnt exist yet");
             this.getCompanyValueFromAPI(stockName, (companyName: string) => {
                 const email = this.authComponent.getCookie("email");
                 const token = this.authComponent.getCookie("token");
-                console.log("CompanyInfo are available");
 
                 this.apollo.mutate({
                     mutation: CREATE_STOCK,
@@ -420,15 +426,12 @@ export class PortfolioComponent implements OnInit {
                         name: companyName,
                     },
                   }).subscribe({
-                    next: (response) => {
-                        console.log("Stock inserted successfully:", response);
+                    next: (response: any) => {
+                        console.log("Stock inserted successfully:", response.data.createStock.answer);
                     },
                     error: (error) => {
-                        if (error.status === 401 || error.status === 500) {
-                            console.log(JSON.parse(error.error).answer);
-                        } else {
-                            console.log("An unexpected error occurred. Status: " + error.status);
-                        }
+                      console.error("Fehler bei der Anfrage:", error);
+                      alert("Ein Fehler ist aufgetreten: " + (error.message || "Unbekannter Fehler."));
                     },
                 });
             });
@@ -440,6 +443,7 @@ export class PortfolioComponent implements OnInit {
   
 
   getStockPriceFromAPI(stockName: string): void {
+    console.log("in getStockAPI aufruf");
     const url = `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=${APIKEY}`;
 
     this.http.get<any>(url).subscribe({
@@ -482,6 +486,7 @@ export class PortfolioComponent implements OnInit {
   }
 
   showStockPriceViaEvent(): void {
+    console.log("Start event")
     const inputField = document.getElementById('stock-name') as HTMLInputElement; // Typen festlegen
     if (inputField) {
         inputField.addEventListener('keypress', this.handleInputKeypress.bind(this)); // Sicherstellen, dass der Kontext beibehalten wird
@@ -842,7 +847,9 @@ const EDIT_CURRENT_VALUE = gql`
 
 const CREATE_STOCK = gql`
   mutation createStock($email: ID!, $token: String!, $symbol: String!, $stockPrice: Float!, $name: String!) {
-   createStock(email: $email, token: $token, symbol: $symbol, stockPrice: $stockPrice, name: $name)
+   createStock(email: $email, token: $token, symbol: $symbol, stockPrice: $stockPrice, name: $name) {
+    answer
+   }
 }
 `;
 
