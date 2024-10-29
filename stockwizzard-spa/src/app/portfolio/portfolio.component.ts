@@ -296,7 +296,7 @@ export class PortfolioComponent implements OnInit {
             next: (response: any) => {
                 // Überprüfen, ob die Antwort erfolgreich war
                 if (response.status === 200) {
-                    alert(response.answer); // Erfolgsmeldung anzeigen
+                    alert(response.body.answer); // Erfolgsmeldung anzeigen
                 } else {
                     alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
                 }
