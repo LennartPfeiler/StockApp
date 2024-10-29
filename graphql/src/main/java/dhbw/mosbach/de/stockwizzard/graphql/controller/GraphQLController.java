@@ -323,7 +323,7 @@ public class GraphQLController {
         }
 
     @MutationMapping
-        public String editCurrentValue(@Argument String token, @Argument String email, @Argument String symbol, @Argument Float newValue) {
+        public StringAnswer editCurrentValue(@Argument String token, @Argument String email, @Argument String symbol, @Argument Float newValue) {
             try {
                 EditCurrentValueRequest editCurrentValueRequest = new EditCurrentValueRequest();
                 editCurrentValueRequest.setToken(token);
@@ -335,12 +335,12 @@ public class GraphQLController {
                 if (isValid) {
                     portfolioStockService.editCurrentValue(editCurrentValueRequest.getEmail(),
                             editCurrentValueRequest.getSymbol(), editCurrentValueRequest.getNewValue());
-                    return "Current Value successfully updated";
+                    return new StringAnswer("Current Value successfully updated");
                 } else {
-                    return "Unauthorized for this transaction!";
+                    return new StringAnswer("Unauthorized for this transaction!");
                 }
             } catch (Exception e) {
-                return "An unexpected error occurred during updating current value of stock.";
+                return new StringAnswer("An unexpected error occurred during updating current value of stock.");
             }
         }
 

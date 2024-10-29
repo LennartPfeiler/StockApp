@@ -13,7 +13,7 @@ type Mutation {
     resetProfile(SessionEmail: ID!, token: String!): StringAnswer
     deleteProfile(SessionEmail: ID!, token:String!): StringAnswer
     createStock(email: ID!, token: String!, symbol: String!, stockPrice: Float!, name: String!): StringAnswer
-    editCurrentValue(token: String!, email: String!, symbol: String!, newValue: Float!): String
+    editCurrentValue(token: String!, email: String!, symbol: String!, newValue: Float!): StringAnswer
     addPortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
     createBuyOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer
     increasePortfolioStockOrder(transactionType: Int, stockAmount: Float, date: String, pricePerStock: Float, totalPrice: Float, email: String!, symbol: String, token: String!): StringAnswer

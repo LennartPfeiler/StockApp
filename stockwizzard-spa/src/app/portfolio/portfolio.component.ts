@@ -6,6 +6,8 @@ import { Apollo, QueryRef, gql } from 'apollo-angular';
 import { tap } from 'rxjs/operators';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 
+const APIKEY = 'Vf080TfqbqvnJHcpt2aP9Ec1XL21Xb0D';
+
 @Component({
   selector: 'app-portfolio',
   standalone: true,
@@ -31,6 +33,7 @@ export class PortfolioComponent implements OnInit {
     this.authComponent.disableGoBackFunction();
     this.displayAllDatabaseData();
     this.getAllPortfolioStocks();
+    this.showStockPriceViaEvent();
   }
   test(): void{
     console.log("test");
@@ -54,6 +57,440 @@ export class PortfolioComponent implements OnInit {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 }
 
+  displayStockPrice(value: string): void {
+    const priceDisplay = document.getElementById('price-display') as HTMLElement;
+    if (priceDisplay) {
+      priceDisplay.textContent = value.toString();
+    }
+  }
+
+  getOrderInformations(): { amount: number; price: number; totalPrice: number } | null {
+    let stockAmount: number;
+    const priceDisplay: string = (document.getElementById('price-display') as HTMLElement).textContent?.trim() || '';
+    const price: number = parseFloat(priceDisplay.replace('$', '').trim());
+
+    if (isNaN(price) || price <= 0) {
+      alert("Enter a valid stock price!");
+      return null;
+    }
+
+    const quantityLabel = (document.getElementById('quantity-label') as HTMLLabelElement).textContent;
+
+    if (quantityLabel === "Quantity in $:") {
+      const quantity: number = this.roundToTwoDecimalPlaces(parseFloat((document.getElementById('quantity') as HTMLInputElement).value.trim()));
+      if (isNaN(quantity) || quantity <= 0) {
+        alert("Enter a valid quantity in $!");
+        return null;
+      }
+      stockAmount = quantity / price;
+    } else {
+      const quantity: number = parseFloat((document.getElementById('quantity') as HTMLInputElement).value.trim());
+      if (isNaN(quantity) || quantity <= 0) {
+        alert("Enter a valid stock amount!");
+        return null;
+      }
+      stockAmount = quantity;
+    }
+
+    const totalPrice: number = this.roundToTwoDecimalPlaces(price * stockAmount);
+
+    return {
+      amount: stockAmount,
+      price: price,
+      totalPrice: totalPrice
+    };
+  }
+
+  checkBuyStock(): void {
+    const orderData = this.getOrderInformations(); // Assuming this method exists in the same class
+
+    if (orderData != null) {
+        const stockName = (document.getElementById('stock-name') as HTMLInputElement).value;
+
+        this.getPortfolioStockData(stockName, (data: number) => {
+            if (data === -1) {
+                this.addPortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+            } else {
+                if (data === 0) {
+                    alert("An error occurred when trying to create order. Please try later again.");
+                } else {
+                    const remainingBudget = parseFloat((document.querySelector('.remaining-budget') as HTMLElement).innerText.trim());
+
+                    if (orderData.totalPrice > remainingBudget) {
+                        alert("You don't have enough budget for this transaction!");
+                    } else {
+                        this.increasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                    }
+                }
+            }
+        });
+    }
+  }
+
+  checkSellStock(): void {
+    const orderData = this.getOrderInformations(); 
+
+    if (orderData != null) {
+        const stockName = (document.getElementById('stock-name') as HTMLInputElement).value;
+
+        this.getPortfolioStockData(stockName, (data: { currentvalue: number } | number) => {
+            if (data === -1) {
+                alert("You don't have this stock in your portfolio.");
+            } else if (data === 0) {
+                alert("An error occurred when trying to create order. Please try later again.");
+            } else {
+                // Hier sicherstellen, dass data ein Objekt ist
+                if (typeof data !== 'number' && data.currentvalue !== undefined) {
+                    if (orderData.totalPrice > data.currentvalue) {
+                        alert("Your stock position is not that high!");
+                    } else {
+                        if (orderData.totalPrice === data.currentvalue) {
+                            this.deletePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                        } else {
+                            this.decreasePortfolioStockOrder(orderData.amount, orderData.totalPrice, orderData.price);
+                        }
+                    }
+                } else {
+                    alert("Invalid data received."); // Fallback für unerwartete Daten
+                }
+            }
+        });
+    }
+  }
+
+  getPortfolioStockData(symbol: string, callback: (data: any) => void): void {
+    const email = this.authComponent.getCookie("email");
+    const token = this.authComponent.getCookie("token");
+    const url = `https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/portfolioStock?email=${email}&token=${token}&symbol=${symbol}`;
+
+    this.http.get(url, { observe: 'response' }).subscribe({
+        next: (response) => {
+            if (response.status === 200) {
+                callback(response.body); // Daten zurückgeben
+            } else {
+                callback(0); // Fehlerbehandlung, wenn der Status nicht 200 ist
+            }
+        },
+        error: (error) => {
+            if (error.status === 404) {
+                callback(-1); // Symbol nicht gefunden
+            } else {
+                console.error("Error fetching bought value:", error);
+                callback(0); // Allgemeiner Fehler
+            }
+        }
+    });
+  }
+
+  addPortfolioStockOrder(stockAmount: number, totalPrice: number, pricePerStock: number): void {
+    const stockSymbol = (document.getElementById('stock-name') as HTMLInputElement).value;
+    const orderData = {
+        token: this.authComponent.getCookie("token"),
+        transactioncontent: {
+            transactiontype: 1,
+            stockamount: stockAmount,
+            date: this.getCurrentDateTime(), // Methode, um das aktuelle Datum zu holen
+            priceperstock: pricePerStock,
+            totalprice: totalPrice,
+            email: this.authComponent.getCookie("email"),
+            symbol: stockSymbol
+        }
+    };
+
+    this.http.post<any>("https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order", orderData, { observe: 'response' })
+        .subscribe({
+            next: (response) => {
+                // Überprüfen, ob die Antwort erfolgreich war
+                if (response.status === 200) {
+                    alert("Order successfully added!"); // Erfolgsmeldung anzeigen
+                } else {
+                    alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
+                }
+                (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                this.displayPortfolioStock(stockSymbol); // Portfolio-Aktie anzeigen
+
+                this.getPortfolioStockData(stockSymbol, (data) => {
+                    this.updateStockDisplay(stockSymbol, data.currentvalue, data.boughtvalue); // Aktienanzeige aktualisieren
+                });
+
+                this.displayAllDatabaseData(); // Alle Daten anzeigen
+            },
+            error: (error) => {
+                if (error.status === 400 || error.status === 401 || error.status === 500) {
+                    alert("An error occurred: " + error.message); // Fehlernachricht anzeigen
+                    (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                } else {
+                    alert("An unexpected error occurred. Status: " + error.status); // Allgemeiner Fehler
+                    (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                }
+            }
+        });
+  }
+
+  increasePortfolioStockOrder(stockAmount: number, totalPrice: number, pricePerStock: number): void {
+    const stockSymbol = (document.getElementById('stock-name') as HTMLInputElement).value;
+
+    const orderData = {
+        token: this.authComponent.getCookie("token"),
+        transactioncontent: {
+            transactiontype: 1,
+            stockamount: stockAmount,
+            date: this.getCurrentDateTime(), // Methode, um das aktuelle Datum zu holen
+            priceperstock: pricePerStock,
+            totalprice: totalPrice,
+            email: this.authComponent.getCookie("email"),
+            symbol: stockSymbol
+        }
+    };
+
+    this.http.put<any>("https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/buy", orderData, { observe: 'response' })
+        .subscribe({
+            next: (response) => {
+                // Überprüfen, ob die Antwort erfolgreich war
+                if (response.status === 200) {
+                    alert("Stock order successfully increased!"); // Erfolgsmeldung anzeigen
+                } else {
+                    alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
+                }
+                (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+
+                this.getPortfolioStockData(stockSymbol, (data) => {
+                    this.updateStockDisplay(stockSymbol, data.currentvalue, data.boughtvalue); // Aktienanzeige aktualisieren
+                });
+                this.displayAllDatabaseData(); // Alle Daten anzeigen
+            },
+            error: (error) => {
+                if (error.status === 400 || error.status === 401 || error.status === 500) {
+                    alert("An error occurred: " + error.message); // Fehlernachricht anzeigen
+                    (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                } else {
+                    alert("An unexpected error occurred. Status: " + error.status); // Allgemeiner Fehler
+                    (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                }
+            }
+        });
+  }
+
+  decreasePortfolioStockOrder(stockAmount: number, totalPrice: number, pricePerStock: number): void {
+    const stockSymbol = (document.getElementById('stock-name') as HTMLInputElement).value;
+
+    const orderData = {
+        token: this.authComponent.getCookie("token"),
+        transactioncontent: {
+            transactiontype: 0, // 0 für Verkaufsauftrag
+            stockamount: stockAmount,
+            date: this.getCurrentDateTime(), // Methode, um das aktuelle Datum zu holen
+            priceperstock: pricePerStock,
+            totalprice: totalPrice,
+            email: this.authComponent.getCookie("email"),
+            symbol: stockSymbol
+        }
+    };
+
+    this.http.put<any>("https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order/sell", orderData, { observe: 'response' })
+        .subscribe({
+            next: (response) => {
+                // Überprüfen, ob die Antwort erfolgreich war
+                if (response.status === 200) {
+                    alert("Stock order successfully decreased!"); // Erfolgsmeldung anzeigen
+                } else {
+                    alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
+                }
+                (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+
+                this.getPortfolioStockData(stockSymbol, (data) => {
+                    this.updateStockDisplay(stockSymbol, data.currentvalue, data.boughtvalue); // Aktienanzeige aktualisieren
+                });
+                this.displayAllDatabaseData(); // Alle Daten anzeigen
+            },
+            error: (error) => {
+                if (error.status === 400 || error.status === 401 || error.status === 500) {
+                    alert("An error occurred: " + error.message); // Fehlernachricht anzeigen
+                    (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                } else {
+                    alert("An unexpected error occurred. Status: " + error.status); // Allgemeiner Fehler
+                    (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                }
+            }
+        });
+  }
+
+  deletePortfolioStockOrder(stockAmount: number, totalPrice: number, pricePerStock: number): void {
+    const stockSymbol = (document.getElementById('stock-name') as HTMLInputElement).value;
+
+    const orderData = {
+        token: this.authComponent.getCookie("token"),
+        transactioncontent: {
+            transactiontype: 0, // 0 für Verkaufsauftrag
+            stockamount: stockAmount,
+            date: this.getCurrentDateTime(), // Methode, um das aktuelle Datum zu holen
+            priceperstock: pricePerStock,
+            totalprice: totalPrice,
+            email: this.authComponent.getCookie("email"),
+            symbol: stockSymbol
+        }
+    };
+
+    this.http.request('DELETE', "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/order", {
+        body: orderData,
+        observe: 'response'
+    }).subscribe({
+        next: (response) => {
+            // Überprüfen, ob die Antwort erfolgreich war
+            if (response.status === 200) {
+                (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+                // Element mit dem Aktien-Symbol aus dem DOM entfernen
+                const stockElement = document.getElementById(stockSymbol.trim());
+                if (stockElement) {
+                    stockElement.remove();
+                }
+                this.displayAllDatabaseData(); // Alle Daten anzeigen
+            } else {
+                alert("Unexpected response from the server."); // Allgemeine Antwortnachricht
+            }
+        },
+        error: (error) => {
+            if (error.status === 400 || error.status === 401 || error.status === 500) {
+                alert("An error occurred: " + error.message); // Fehlernachricht anzeigen
+                (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+            } else {
+                alert("An unexpected error occurred. Status: " + error.status); // Allgemeiner Fehler
+                (document.getElementById('quantity') as HTMLInputElement).value = ""; // Input-Feld leeren
+            }
+        }
+    });
+  }
+
+  checkStockInDB(stockName: string, callback: (exists: boolean) => void): void {
+    const email = this.authComponent.getCookie("email");
+    const token = this.authComponent.getCookie("token");
+    const url = `https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock?email=${email}&token=${token}&symbol=${stockName}`;
+
+    this.http.get(url, { observe: 'response' }).subscribe({
+        next: (response) => {
+            if (response.status === 200) {
+                callback(true);
+            }
+        },
+        error: (error) => {
+            if (error.status === 404) {
+                callback(false);
+            } else {
+                callback(true);
+            }
+        }
+    });
+  }
+
+  getCompanyValueFromAPI(stockName: string, callback: (companyName: string) => void): void {
+    const url = `https://api.polygon.io/v3/reference/tickers/${stockName}?apiKey=${APIKEY}`;
+
+    this.http.get<any>(url).subscribe({
+        next: (data) => {
+            if (data.status === 'OK' && data.results) {
+                const name = data.results.name;
+                callback(name);
+            } else {
+                callback(""); 
+            }
+        },
+        error: (error) => {
+            console.error('Error fetching company name:', error);
+            callback(""); 
+        }
+    });
+  }
+
+  addNewStockIfNotExists(stockName: string, stockPrice: number): void {
+    this.checkStockInDB(stockName, (stockExists: boolean) => {
+        if (!stockExists) {
+            this.getCompanyValueFromAPI(stockName, (companyName: string) => {
+                const url = "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock";
+                const payload = {
+                    session: {
+                        token: this.authComponent.getCookie("token"),
+                        email: this.authComponent.getCookie("email"),
+                    },
+                    stock: {
+                        symbol: stockName,
+                        stockprice: stockPrice,
+                        name: companyName,
+                    },
+                };
+
+                this.http.post(url, payload, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                }).subscribe({
+                    next: (response) => {
+                        console.log("Stock inserted successfully:", response);
+                    },
+                    error: (error) => {
+                        if (error.status === 401 || error.status === 500) {
+                            console.log(JSON.parse(error.error).answer);
+                        } else {
+                            console.log("An unexpected error occurred. Status: " + error.status);
+                        }
+                    },
+                });
+            });
+        } else {
+            console.log("Stock already exists in the database.");
+        }
+    });
+  }
+
+  getStockPriceFromAPI(stockName: string): void {
+    const url = `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=${APIKEY}`;
+
+    this.http.get<any>(url).subscribe({
+        next: (data) => {
+            // Temporarily, as the price in the database is not retrieved and updated in the db anyway. 
+            // However, the database column exists if the call is changed to the commented-out code in the future 
+            if (data.status === 'OK' && data.results && data.results.length > 0) {
+                this.addNewStockIfNotExists(stockName, 0.0);
+                const closeValue = parseFloat(data.results[0].c);
+                const roundedCloseValue = this.roundToTwoDecimalPlaces(closeValue);
+                this.displayStockPrice(roundedCloseValue.toString());
+            } else if (!data.results) {
+                this.displayStockPrice('Stock not found or no data available.');
+            } else if (data.results.length === 0) {
+                this.displayStockPrice('No closing price data available.');
+            } else {
+                this.displayStockPrice('Unknown error retrieving data.');
+            }
+        },
+        error: (error) => {
+            if (error.status === 429) {
+                this.displayStockPrice('Too many requests. Please try again later.');
+            } else {
+                console.error('Error:', error);
+                this.displayStockPrice('Error retrieving data. Please try again later.');
+            }
+        }
+    });
+  }
+
+  getStockName(): string {
+    const stockNameLabel = document.getElementById("stock-name") as HTMLInputElement; // Typ angeben
+    return stockNameLabel ? stockNameLabel.value : ''; // Rückgabe des Wertes oder leerer String, wenn nicht gefunden
+  }
+
+  handleInputKeypress(e: KeyboardEvent): void {
+    if (e.key === 'Enter') { 
+        this.getStockPriceFromAPI(this.getStockName());
+    }
+  }
+
+  showStockPriceViaEvent(): void {
+    const inputField = document.getElementById('stock-name') as HTMLInputElement; // Typen festlegen
+    if (inputField) {
+        inputField.addEventListener('keypress', this.handleInputKeypress.bind(this)); // Sicherstellen, dass der Kontext beibehalten wird
+        inputField.addEventListener('blur', () => this.getStockPriceFromAPI(this.getStockName())); // Verwendung von 'this'
+    }
+  }
 
   toggleLabel(): void {
     const label = document.getElementById('quantity-label') as HTMLLabelElement;
@@ -405,3 +842,4 @@ const EDIT_CURRENT_VALUE = gql`
     editCurrentValue(token: $token, email: $email, symbol: $symbol, newValue: $newValue)
 }
 `;
+
