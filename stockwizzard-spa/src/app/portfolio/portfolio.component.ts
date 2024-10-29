@@ -404,26 +404,22 @@ export class PortfolioComponent implements OnInit {
   addNewStockIfNotExists(stockName: string, stockPrice: number): void {
     this.checkStockInDB(stockName, (stockExists: boolean) => {
         if (!stockExists) {
+          console.log("Stock doesnt exist yet");
             this.getCompanyValueFromAPI(stockName, (companyName: string) => {
-                const url = "https://StockWizzardBackend-grateful-platypus-pd.apps.01.cf.eu01.stackit.cloud/api/stock";
-                const payload = {
-                    session: {
-                        token: this.authComponent.getCookie("token"),
-                        email: this.authComponent.getCookie("email"),
-                    },
-                    stock: {
+                const email = this.authComponent.getCookie("email");
+                const token = this.authComponent.getCookie("token");
+                console.log("CompanyInfo are available");
+
+                this.apollo.mutate({
+                    mutation: CREATE_STOCK,
+                    variables: {
+                        email,
+                        token,
                         symbol: stockName,
-                        stockprice: stockPrice,
+                        stockPrice,
                         name: companyName,
                     },
-                };
-
-                this.http.post(url, payload, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                }).subscribe({
+                  }).subscribe({
                     next: (response) => {
                         console.log("Stock inserted successfully:", response);
                     },
@@ -441,6 +437,7 @@ export class PortfolioComponent implements OnInit {
         }
     });
   }
+  
 
   getStockPriceFromAPI(stockName: string): void {
     const url = `https://api.polygon.io/v2/aggs/ticker/${stockName}/prev?adjusted=true&apiKey=${APIKEY}`;
@@ -840,6 +837,12 @@ const GET_TOTAL_PORTFOLIO_VALUE = gql`
 const EDIT_CURRENT_VALUE = gql`
   mutation editCurrentValue($token: String!, $email: String!, $symbol: String!, $newValue: Float!) {
     editCurrentValue(token: $token, email: $email, symbol: $symbol, newValue: $newValue)
+}
+`;
+
+const CREATE_STOCK = gql`
+  mutation createStock($email: ID!, $token: String!, $symbol: String!, $stockPrice: Float!, $name: String!) {
+   createStock(email: $email, token: $token, symbol: $symbol, stockPrice: $stockPrice, name: $name)
 }
 `;
 
